@@ -38,6 +38,11 @@ class User implements UserInterface
      */
     private $password;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Localidad::class, inversedBy="users")
+     */
+    private $localidadDomicilio;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -124,5 +129,17 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getLocalidadDomicilio(): ?Localidad
+    {
+        return $this->localidadDomicilio;
+    }
+
+    public function setLocalidadDomicilio(?Localidad $localidadDomicilio): self
+    {
+        $this->localidadDomicilio = $localidadDomicilio;
+
+        return $this;
     }
 }
