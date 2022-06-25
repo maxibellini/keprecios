@@ -34,6 +34,11 @@ class Localidad
      */
     private $users;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Provincia::class, inversedBy="localidades")
+     */
+    private $provincia;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -94,6 +99,18 @@ class Localidad
                 $user->setLocalidadDomicilio(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProvincia(): ?Provincia
+    {
+        return $this->provincia;
+    }
+
+    public function setProvincia(?Provincia $provincia): self
+    {
+        $this->provincia = $provincia;
 
         return $this;
     }
