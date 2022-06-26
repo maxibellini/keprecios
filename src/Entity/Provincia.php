@@ -34,6 +34,11 @@ class Provincia
      */
     private $localidades;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Pais::class, inversedBy="provincias")
+     */
+    private $pais;
+
     public function __construct()
     {
         $this->localidades = new ArrayCollection();
@@ -94,6 +99,18 @@ class Provincia
                 $localidade->setProvincia(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPais(): ?Pais
+    {
+        return $this->pais;
+    }
+
+    public function setPais(?Pais $pais): self
+    {
+        $this->pais = $pais;
 
         return $this;
     }
