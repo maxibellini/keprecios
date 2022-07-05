@@ -114,4 +114,18 @@ class Localidad
 
         return $this;
     }
+    public function __toString()
+    {
+        if($this->getProvincia() != null){
+           if($this->getProvincia()->getPais() != null){
+               return $this->getProvincia()->getPais()->getNombre().' - '.$this->getProvincia()->getNombre().' - '.$this->nombre;
+           }else{
+                return 'S/N - '.$this->getProvincia()->getNombre().' - '.$this->nombre;
+           } 
+        }else{
+            return 'S/N - S/N - '.$this->nombre;
+        }
+       
+    }
+
 }

@@ -23,16 +23,21 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('EasyAdmin');
+            ->setFaviconPath('favicon.png')
+
+            ->setTitle('<img src="../assets/images/mini-logo.png" style="height: 2.1rem" align="left" alt="Bienvenido" />');
     }
 
     public function configureCrud(): Crud
     {
-        return Crud::new();
+        return Crud::new()
+            ->setDateTimeFormat('dd-MM-yyyy')
+            ->setDateFormat('dd-MM-yyyy')
+            ->setTimeFormat('H:mm')
+            ->setPaginatorPageSize(10);
     }
-
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToCrud('User', 'fas fa-folder-open', User::class);
+        yield MenuItem::linkToCrud('Usuarios', 'fas fa-user', User::class);
     }
 }

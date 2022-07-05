@@ -8,12 +8,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class AppController extends AbstractController
 {
     /**
-     * @Route("/", name="app_homepage")
+     * @Route("/", name="app_inicio")
      */
     public function homepage()
     {
         return $this->render('app/homepage.html.twig', [
-            'controller_name' => 'AppController',
+            'controller_name' => 'Inicio KePrecios',
         ]);
     }
+
+
 }

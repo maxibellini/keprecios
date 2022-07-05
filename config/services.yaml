@@ -6,11 +6,19 @@
 parameters:
     SUPER_USERNAME: '%env(SUPER_USERNAME)%'
     SUPER_PASSWORD: '%env(SUPER_PASSWORD)%'
+    app.path.usuarios_images: /uploads/images/usuarios
+
 services:
+
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            $rols:
+                ROLE_USER: ROLE_USER       
+                ROLE_ADMIN: ROLE_ADMIN 
+                ROLE_SUPER_ADMIN: ROLE_SUPER_ADMIN 
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

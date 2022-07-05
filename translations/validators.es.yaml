@@ -1,6 +1,6 @@
 'This value should be false.': 'Este valor debería ser falso.'
 'This value should be true.': 'Este valor debería ser verdadero.'
-'This value should be of type {{ type }}.': 'Este valor debería ser de tipo {{ type }}.'
+'This value should be of type {{ type }}.': 'Este valor debería ser del tipo {{ type }}'
 'This value should be blank.': 'Este valor debería estar vacío.'
 'The value you selected is not a valid choice.': 'El valor seleccionado no es una opción válida.'
 'You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.': 'Debe seleccionar al menos {{ limit }} opción.|Debe seleccionar al menos {{ limit }} opciones.'

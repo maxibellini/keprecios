@@ -15,6 +15,10 @@
   <title>{% block title %}KePrecios!{% endblock %}</title>
   {% block stylesheets %}
 	  <link rel="stylesheet" href="assets/web/assets/mobirise-icons2/mobirise2.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 	  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
 	  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
 	  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
@@ -31,6 +35,7 @@
 	  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Londrina+Solid:100,300,400,900&display=swap"></noscript>
 	  <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
 	  <link rel="stylesheet" href="assets/mobirise/css/styleskp.css" type="text/css">
+
   {% endblock %}
 
   
@@ -42,16 +47,49 @@
     <nav class="navbar navbar-dropdown navbar-expand-lg navbar-fixed-top " style="background: rgb(232,83,149); background: linear-gradient(180deg, rgba(232,83,149,1) 0%, rgba(229,105,161,1) 50%, rgba(232,83,149,1) 100%);-webkit-box-shadow: 0px 9px 8px -6px rgba(0,0,0,0.27); -moz-box-shadow: 0px 9px 8px -6px rgba(0,0,0,0.27); box-shadow: 0px 9px 8px -6px rgba(0,0,0,0.27);">
         <div class="container row">
             <div class="input-group mb-0 col-12" >
-                <span class="navbar-logo col-7 " style="">
+                <span class="navbar-logo col-7" style="">
                     <a class="ampliar2" href=" ">
                         <img src="assets/images/KegiladaWhite2.png" alt="Mobirise Website Builder" style="" >
                     </a>
                 </span>
-                <span class="col-4 d-flex">
-                    <a class="btn btn-warning display-4 ml-auto " style="border-radius: 4px 4px 4px 4px; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px; border: 0px solid #000000;background: rgb(255,83,35);background: rgb(255,83,35); background: linear-gradient(180deg, rgba(255,83,35,1) 0%, rgba(255,144,113,1) 50%);-webkit-text-stroke: 0.5px black;float-right" href=" ">Ingresa</a> 
+                <span class="col-4 ">
+                   {% if is_granted("ROLE_USER") %}
+                      <div class="dropdown" style="position: absolute; right: -50px;">
+                       
+                        <button class="btn btn-sm btn-warning display-4  dropdown-toggle" style="border-radius: 4px 4px 4px 4px; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px; border: 0px solid #000000;background: rgb(255,83,35);background: rgb(255,83,35); background: linear-gradient(180deg, rgba(255,83,35,1) 0%, rgba(255,144,113,1) 50%);-webkit-text-stroke: 0.5px black;float-right; white-space: nowrap; height: 2rem " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          {% if app.user.image != null %}
+                            {% set foto = 'uploads/images/usuarios/'~ app.user.image %}
+                            {% set foto2 = absolute_url(asset(foto)) %}
+                           <img src="{{foto2}}" alt="" style="height:1.7rem; border-radius: 200px 200px 200px 200px; -moz-border-radius: 200px 200px 200px 200px; -webkit-border-radius: 200px 200px 200px 200px; border: 0px solid #000000;" >
+                           {% else %} 	
+                         	  <img src="assets/images/user-empty.png" alt="" style="height:1.7rem; border-radius: 200px 200px 200px 200px; -moz-border-radius: 200px 200px 200px 200px; -webkit-border-radius: 200px 200px 200px 200px; border: 0px solid #000000;" >
+                          {% endif %}
+                          <span>&nbsp {{app.user.name}}</span>
+                        </button>
+
+
+                        <div class="dropdown-menu " style=" background-color: red" aria-labelledby="dropdownMenuButton">
+                         {% if is_granted("ROLE_ADMIN")  %}	
+                          <a class="dropdown-item text-white display-4" style=" background-color: #FF77B4" href="{{path('admin')}}">Administrar</a>
+                         {%endif%} 
+                          {% set iddato = app.user.id %}
+                          <a class="dropdown-item text-white display-4" style=" background-color: #FF77B4" href="{{path('app_user_perfil',{ 'id': app.user.id })}}">Ver perfil</a>
+                          <a class="dropdown-item text-white display-4" style=" background-color: #FF77B4" href="{{path('app_user_editar',{ 'id': app.user.id })}}">Modificar mis datos</a>
+                          <a class="dropdown-item text-white display-4" style=" background-color: #FF77B4" href="{{path('app_logout')}}">Salir</a>
+                        </div>
+                      </div>
+                    {% else %}
+                      <a class="btn btn-sm btn-warning display-4 ml-auto" href="{{path('app_login_user')}}" style="border-radius: 4px 4px 4px 4px; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px; border: 0px solid #000000;background: rgb(255,83,35);background: rgb(255,83,35); background: linear-gradient(180deg, rgba(255,83,35,1) 0%, rgba(255,144,113,1) 50%);-webkit-text-stroke: 0.5px black;position: absolute; right: -50px">
+                        Ingresar
+                      </a>
+                      <!-- Button trigger modal -->
+                   {% endif %}
+
                 </span>
                   <!--  
                   <a class="btn btn-warning display-4 d-block d-sm-none float-right col-4" style="border-radius: 4px 4px 4px 4px; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px; border: 0px solid #000000; background: rgb(255,83,35); background: linear-gradient(180deg, rgba(255,83,35,1) 0%, rgba(255,144,113,1) 50%);-webkit-text-stroke: 0.5px black;float-right" href="https://mobiri.se">Ingresar</a>    -->
+                  <!-- Modal -->
+
                                     
             </div>
              <div class="input-group mb-0 col-12" style="background: rgb(232,83,149); background: linear-gradient(180deg, rgba(232,83,149,1) 0%, rgba(229,105,161,1) 50%, rgba(232,83,149,1) 100%);-webkit-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.22); -moz-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.22); box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.22); border-radius: 4px 4px 4px 4px; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px; border: 0px solid #000000;border: 1px solid white;">
@@ -68,8 +106,8 @@
                     </div>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent" style="">
-                    <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true" style=";"><li class="nav-item dropdown open"><a class="nav-link link dropdown-toggle text-white show display-4" href="" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">Ofertas</a><div class="dropdown-menu show" aria-labelledby="dropdown-814" data-bs-popper="none"><a class="dropdown-item text-white display-4" href="">Crear oferta</a><a class="text-white show dropdown-item display-4" href="">Buscar oferta</a></div></li>
-                        <li class="nav-item dropdown"><a class="nav-link link text-white dropdown-toggle display-4" href="" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Comercios</a><div class="dropdown-menu" aria-labelledby="dropdown-304"><a class="text-white dropdown-item display-4" href="">Buscar comercio</a><a class="text-white show dropdown-item display-4" href="">Solicitar comercio</a></div></li><li class="nav-item"><a class="nav-link link text-white show display-4" href="">Lista de Compras</a></li></ul>
+                    <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true" style=";"><li class="nav-item dropdown open"><a class="nav-link link dropdown-toggle text-white show display-4" href="" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">Ofertas</a><div class="dropdown-menu show" aria-labelledby="dropdown-814" data-bs-popper="none"><a class="dropdown-item text-white display-4" style=" background-color: #FF77B4" href="">Crear oferta</a><a class="text-white show dropdown-item display-4" style=" background-color: #FF77B4" href="">Buscar oferta</a></div></li>
+                        <li class="nav-item dropdown"><a class="nav-link link text-white dropdown-toggle display-4" href="" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Comercios</a><div class="dropdown-menu" aria-labelledby="dropdown-304"><a class="text-white dropdown-item display-4" style=" background-color: #FF77B4" href="">Buscar comercio</a><a class="text-white show dropdown-item display-4" style=" background-color: #FF77B4" href="">Solicitar comercio</a></div></li><li class="nav-item"><a class="nav-link link text-white show display-4" href="">Lista de Compras</a></li></ul>
 
                 </div> 
           </div>
@@ -147,10 +185,35 @@
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
 {% endblock %}
-
+                      <!-- Modal -->
+                      <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              ...
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
   </body>
  
 
+<style>
+.modal-content {
 
- 
+  max-height: 400px;
+  overflow-y: auto;
+}
+</style>
+
 </html>

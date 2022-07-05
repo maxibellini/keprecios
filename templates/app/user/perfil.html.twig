@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+
+<div class="e">
+{% for message in app.flashes('exito') %}
+      <div class="alert alert-success">
+         {{message}}     
+      </div>    
+{% endfor %}
+
+</div>
+ <div class="row">
+    <div class="col-sm-2">
+
+    </div>    
+    <div class="col-sm-8 card tarjeta-body item-content display-7" style="background-color: white; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
+          <br>
+          <h4 class="display-5 card-header">Perfil de {{user.name}}</h4>  
+          <br>
+          <div class="row">
+            <div class="col-4">
+                {% if user.image != null %}
+                  {% set foto = 'uploads/images/usuarios/'~ user.image %}
+                  {% set foto2 = absolute_url(asset(foto)) %}
+                 <img src="{{foto2}}" alt="" style=" border-radius: 200px 200px 200px 200px; -moz-border-radius: 200px 200px 200px 200px; -webkit-border-radius: 200px 200px 200px 200px; border: 0px solid #000000;" >
+                 {% else %}   
+                  <img src="assets/images/user-empty.png" alt="" style=" border-radius: 200px 200px 200px 200px; -moz-border-radius: 200px 200px 200px 200px; -webkit-border-radius: 200px 200px 200px 200px; border: 0px solid #000000;" >
+                {% endif %}
+            </div>
+            <div class="col-8">
+                <div class=" ">Nombre: <span style="color:grey">{{user.nombrePersona}}</span> </div>
+                <div class=" ">Apellido: <span style="color:grey">{{user.apellidoPersona}}</span> </div>
+                <div class=" ">Sexo: <span style="color:grey">{{user.sexo}}</span> </div>
+                <div class=" ">Fecha de ingreso: <span style="color:grey">{% if user.fechaRegistro != null %}{{user.fechaRegistro | date("d-m-Y") }}{% endif %}</span> </div>
+                <div class=" ">Última conexión: <span style="color:grey">{% if user.ultimaConexion != null %}{{user.ultimaConexion | date("d-m-Y h:i") }}hs{% endif %}</span> </div>
+                <div class=" ">Estado: <span style="color:grey">{{user.estado}}</span> </div>
+            </div>
+          </div>
+    <br>
+<br>
+</div>
+</div>
+</div>
+        <br>
+        
+{% endblock %}
