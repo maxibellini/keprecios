@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper " style="background-color: rgb(255, 0, 0,0.0)">
+    <br>
+ <div class="row">
+    <div class="col-sm-4">
+
+    </div>  
+    <div class="col-sm-5 tarjeta-body item-content" style="background-color: white; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
+        <br>
+        <form method="post">
+
+
+            <h2 class="h3 mb-3 mbr-fonts-style font-weight-normal display-5">Iniciar sesión</h2>
+            {% if error %}
+                <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+            <label for="inputEmail">{% trans %}Nombre de Usuario{% endtrans %}</label>
+            <input type="name" value="{{ last_username }}" name="name" id="inputName" class="form-control" required autofocus>
+            <label for="inputPassword">{% trans %}Password{% endtrans %}</label>
+            <input type="password" name="password" id="inputPassword" class="form-control" required>
+
+            <input type="hidden" name="_csrf_token"
+                value="{{ csrf_token('authenticate') }}"
+            >
+
+
+            {% if app.user %}
+                <div class="mb-3">
+                    {% trans %}You are logged in as{% endtrans %} {{ app.user.name }}, <a href="{{ path('app_logout') }}">{% trans %}Logout{% endtrans %}</a>
+                </div>
+            {% endif %}
+
+           <br>
+            <button id="boton_submit"class="btn btn-sm btn-warning" style="display:none" type="submit">
+                Ingresar
+            </button>
+            <a id="link_submit" class="btn  btn-warning" align="right">Ingresar</a>
+             <hr style="border:2px;">
+            <h5 class="font-weight-normal align-center">¿Aun no tenes cuenta?</h5>
+            <h5 class="font-weight-normal align-center">¡Registrate ahora!</h5>
+            <a class="btn  btn-danger" href="{{path('app_user_registro')}}">
+                Registrarse
+            </a>
+            <br>
+        </form>
+    </div>
+</div>
+</center>
+    <br>
+    <br>
+    <!--
+    <a class="btn btn-primary" href="{{ path('admin') }}">Administrator</a>
+     -->
+</div>
+<script>
+document.getElementById("link_submit").onclick = function() {
+    document.getElementById("boton_submit").click();
+}
+</script>    
+
+{% endblock %}

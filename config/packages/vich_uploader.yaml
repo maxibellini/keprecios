@@ -1,0 +1,13 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        usuarios_images:
+            uri_prefix:         '%app.path.usuarios_images%'
+            upload_destination: '%kernel.project_dir%/public%app.path.usuarios_images%'
+            namer:
+                service: vich_uploader.namer_uniqid
+                #options: { property: 'slug'} # supposing that the object contains a "slug" attribute or a "getSlug" method
+            inject_on_load:     true
+            delete_on_update:   true
+            delete_on_remove:   true

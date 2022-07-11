@@ -1,0 +1,39 @@
+
+    {{ form_start(form) }}
+      <div class="row form-group" >
+
+        
+        <div class="col-12 " style="color:red"> {{ form_errors(form) }} </div>
+        <div class="col-6 form-group "> {{ form_row(form.name,{ 'label' : 'Nombre de Usuario', 'attr' : { 'class' : 'form-control' }}) }}  </div>
+        <div class="col-6 "> {{ form_row(form.email,{ 'label' : 'Correo electrónico', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.nombrePersona,{ 'label' : 'Nombre', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.apellidoPersona,{ 'label' : 'Apellido', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.sexo,{ 'label' : 'Sexo', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.fechaNacimiento,{ 'label' : 'Fecha de nacimiento', 'attr' : { 'class' : 'form-control ' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.domicilio,{ 'label' : 'Domicilio', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.localidadDomicilio,{ 'label' : 'Localidad', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.codigoPostal,{ 'label' : 'Código Postal', 'attr' : { 'class' : 'form-control' }}) }} </div>
+       <div class="col-6 "></div>
+        <div class="col-6 "> {{ form_row(form.telefono, { 'label' : 'Teléfono', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.telefonoAlternativo,{ 'label' : 'Teléfono alternativo', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 "> {{ form_row(form.imageFile,{ 'label' : 'Imagen de perfil', 'attr' : { 'class' : 'form-control' }}) }} </div> <div class="col-6 "></div>
+
+        <br>          
+        <div class="col-6" align="center">
+        	<br>
+        	<a class="" href="{{ path('app_inicio') }}">Cancelar</a>
+        </div>
+        <div class="col-6" align="right">
+        	<br>
+            <button class="btn btn-danger" align="right">{{ button_label|default('Save') }}</button>
+            
+           
+      </div>
+    {{ form_end(form) }}
+{#
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
+    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}
+#}

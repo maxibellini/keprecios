@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+{% for flash_message in app.session.flashbag.get('exito') %}
+    <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+{% for flash_message in app.session.flashbag.get('fracaso') %}
+    <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+
+    <center><h3 style="" >El inicio del fin</h3>
+    	<img src="assets/images/logochapa.png" style="width: 50%; height: auto" >
+
+    </center>
+
+
+    <br>
+    <!--
+    <a class="btn btn-primary" href="{{ path('admin') }}">Administrator</a>
+     -->
+</div>
+{% endblock %}

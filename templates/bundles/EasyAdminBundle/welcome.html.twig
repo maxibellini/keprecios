@@ -1,0 +1,23 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title ' ' %}
+
+{% block main %}
+    <style>
+        p { max-width: 600px; }
+    </style>
+
+    <p>
+        <strong><h3>¡Bienvenido al Panel de Administración de KePrecios.com!</h3></strong>
+    </p>
+
+
+    <pre>
+	<a  href="{{ path('app_inicio') }}" target="_blank" ><img src="assets/images/logochapa.png" style="width: 40%; height: auto" ></a>
+
+
+
+
+    </pre>
+{% endblock %}
