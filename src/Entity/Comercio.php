@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ComercioRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -106,6 +108,16 @@ class Comercio
      * @ORM\ManyToOne(targetEntity=Localidad::class, inversedBy="comercios")
      */
     private $localidad;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Oferta::class, mappedBy="comercio")
+     */
+    private $oferta;
+
+    public function __construct()
+    {
+        $this->oferta = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -324,6 +336,36 @@ class Comercio
     public function setLocalidad(?Localidad $localidad): self
     {
         $this->localidad = $localidad;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Oferta>
+     */
+    public function getOferta(): Collection
+    {
+        return $this->oferta;
+    }
+
+    public function addOfertum(Oferta $ofertum): self
+    {
+        if (!$this->oferta->contains($ofertum)) {
+            $this->oferta[] = $ofertum;
+            $ofertum->setComercio($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOfertum(Oferta $ofertum): self
+    {
+        if ($this->oferta->removeElement($ofertum)) {
+            // set the owning side to null (unless already changed)
+            if ($ofertum->getComercio() === $this) {
+                $ofertum->setComercio(null);
+            }
+        }
 
         return $this;
     }
