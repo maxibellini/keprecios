@@ -39,9 +39,15 @@ class Localidad
      */
     private $provincia;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Comercio::class, mappedBy="localidad")
+     */
+    private $comercios;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->comercios = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -126,6 +132,36 @@ class Localidad
             return 'S/N - S/N - '.$this->nombre;
         }
        
+    }
+
+    /**
+     * @return Collection<int, Comercio>
+     */
+    public function getComercios(): Collection
+    {
+        return $this->comercios;
+    }
+
+    public function addComercio(Comercio $comercio): self
+    {
+        if (!$this->comercios->contains($comercio)) {
+            $this->comercios[] = $comercio;
+            $comercio->setLocalidad($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComercio(Comercio $comercio): self
+    {
+        if ($this->comercios->removeElement($comercio)) {
+            // set the owning side to null (unless already changed)
+            if ($comercio->getLocalidad() === $this) {
+                $comercio->setLocalidad(null);
+            }
+        }
+
+        return $this;
     }
 
 }

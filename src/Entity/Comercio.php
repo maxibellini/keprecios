@@ -97,6 +97,16 @@ class Comercio
      */
     private $idUsuario;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="Comercio")
+     */
+    private $user;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Localidad::class, inversedBy="comercios")
+     */
+    private $localidad;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -290,6 +300,30 @@ class Comercio
     public function setIdUsuario(int $idUsuario): self
     {
         $this->idUsuario = $idUsuario;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getLocalidad(): ?Localidad
+    {
+        return $this->localidad;
+    }
+
+    public function setLocalidad(?Localidad $localidad): self
+    {
+        $this->localidad = $localidad;
 
         return $this;
     }
