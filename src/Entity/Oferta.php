@@ -47,6 +47,11 @@ class Oferta
      */
     private $comercio;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Producto::class, inversedBy="ofertas")
+     */
+    private $producto;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,6 +125,18 @@ class Oferta
     public function setComercio(?Comercio $comercio): self
     {
         $this->comercio = $comercio;
+
+        return $this;
+    }
+
+    public function getProducto(): ?Producto
+    {
+        return $this->producto;
+    }
+
+    public function setProducto(?Producto $producto): self
+    {
+        $this->producto = $producto;
 
         return $this;
     }

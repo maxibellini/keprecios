@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProductoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -61,6 +63,16 @@ class Producto
      * @ORM\ManyToOne(targetEntity=Pais::class, inversedBy="productos")
      */
     private $pais;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Oferta::class, mappedBy="producto")
+     */
+    private $ofertas;
+
+    public function __construct()
+    {
+        $this->ofertas = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -171,6 +183,36 @@ class Producto
     public function setPais(?Pais $pais): self
     {
         $this->pais = $pais;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Oferta>
+     */
+    public function getOfertas(): Collection
+    {
+        return $this->ofertas;
+    }
+
+    public function addOferta(Oferta $oferta): self
+    {
+        if (!$this->ofertas->contains($oferta)) {
+            $this->ofertas[] = $oferta;
+            $oferta->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOferta(Oferta $oferta): self
+    {
+        if ($this->ofertas->removeElement($oferta)) {
+            // set the owning side to null (unless already changed)
+            if ($oferta->getProducto() === $this) {
+                $oferta->setProducto(null);
+            }
+        }
 
         return $this;
     }
