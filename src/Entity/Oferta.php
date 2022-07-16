@@ -18,12 +18,7 @@ class Oferta
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $id_oferta;
-
-    /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="decimal", precision=10, scale=0)
      */
     private $monto;
 
@@ -43,26 +38,6 @@ class Oferta
     private $stock;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $id_comercio;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $id_producto;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $id_usuario_pub;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $id_usuario_modif;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $estado;
@@ -72,24 +47,12 @@ class Oferta
         return $this->id;
     }
 
-    public function getIdOferta(): ?string
-    {
-        return $this->id_oferta;
-    }
-
-    public function setIdOferta(string $id_oferta): self
-    {
-        $this->id_oferta = $id_oferta;
-
-        return $this;
-    }
-
-    public function getMonto(): ?int
+    public function getMonto(): ?string
     {
         return $this->monto;
     }
 
-    public function setMonto(int $monto): self
+    public function setMonto(string $monto): self
     {
         $this->monto = $monto;
 
@@ -128,54 +91,6 @@ class Oferta
     public function setStock(int $stock): self
     {
         $this->stock = $stock;
-
-        return $this;
-    }
-
-    public function getIdComercio(): ?int
-    {
-        return $this->id_comercio;
-    }
-
-    public function setIdComercio(int $id_comercio): self
-    {
-        $this->id_comercio = $id_comercio;
-
-        return $this;
-    }
-
-    public function getIdProducto(): ?int
-    {
-        return $this->id_producto;
-    }
-
-    public function setIdProducto(int $id_producto): self
-    {
-        $this->id_producto = $id_producto;
-
-        return $this;
-    }
-
-    public function getIdUsuarioPub(): ?int
-    {
-        return $this->id_usuario_pub;
-    }
-
-    public function setIdUsuarioPub(int $id_usuario_pub): self
-    {
-        $this->id_usuario_pub = $id_usuario_pub;
-
-        return $this;
-    }
-
-    public function getIdUsuarioModif(): ?int
-    {
-        return $this->id_usuario_modif;
-    }
-
-    public function setIdUsuarioModif(int $id_usuario_modif): self
-    {
-        $this->id_usuario_modif = $id_usuario_modif;
 
         return $this;
     }
