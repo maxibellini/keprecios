@@ -1,4 +1,7 @@
 App\Entity\User:
     constraints:
         - Callback: validate
+App\Entity\Comercio:
+    constraints:
+        - Callback: validate
 

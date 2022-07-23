@@ -11,3 +11,12 @@ vich_uploader:
             inject_on_load:     true
             delete_on_update:   true
             delete_on_remove:   true
+        comercios_images:
+            uri_prefix:         '%app.path.comercios_images%'
+            upload_destination: '%kernel.project_dir%/public%app.path.comercios_images%'
+            namer:
+                service: vich_uploader.namer_uniqid
+                #options: { property: 'slug'} # supposing that the object contains a "slug" attribute or a "getSlug" method
+            inject_on_load:     true
+            delete_on_update:   true
+            delete_on_remove:   true

@@ -1,0 +1,64 @@
+<link rel="preload" href="https://fonts.googleapis.com/css?family=Londrina+Solid:100,300,400,900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+<style>
+  #map { 
+    width: 100%;
+    height: 360px;
+   -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.47);
+   -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.47);
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.47);
+   	border: 1px solid #E85395; 
+    border-radius: 5px 5px 5px 5px; 
+    -moz-border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+ }
+</style>
+
+{% set array = [] %}
+  {% for comercio in comercios %}
+    {% set array = array | merge([{id: comercio.id, nombre: comercio.nombreComercio,latitud: comercio.latitudComercio, longitud: comercio.longitudComercio, }]) %}
+  {% endfor %}
+  <input type="hidden" id="array" value="{{ array|json_encode }}">
+  <div id="map" ></div>
+
+z
+<script>
+  var map = L.map('map').
+     setView([-27.4514,-58.9867],
+     15);
+L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+maxZoom: 18
+}).addTo(map);
+L.control.scale().addTo(map);
+
+var array = document.getElementById('array').value;
+var comercios = JSON.parse(array);
+comercios.forEach(function(comercio) {
+   
+   var lat = `${comercio.latitud}`;
+   var lon = `${comercio.longitud}`;
+   var id = `${comercio.id}`; 
+   var nombre = `${comercio.nombre}`;
+   var content = `<b style="font-family: Londrina Solid; font: 125% Londrina Solid">`+nombre+`</b><br> <a   target="_blank" class="btn btn-link" style="font-family: Londrina Solid; font: 110% Londrina Solid" href="{{path('app_comercio_perfil',{ 'id': 'iddato' })}}" > Ver más </a>`;
+   content = content.replace("iddato", id);
+L.marker([lat,lon],{draggable: false}).addTo(map)
+    .bindPopup(content)
+    .openPopup();
+
+});
+
+
+/*
+
+L.marker([-27.4551039,-58.991255],{draggable: true}).addTo(map)
+    .bindPopup('<b>Supermercado VEA</b><br> Tiene escalera mec&aacute;nica y acsensor.<br><button type="button" class="btn btn-link" data-toggle="modal" data-target="#exampleModal"> Ver ofertas </button>')
+    .openPopup();
+L.marker([-27.4522371,-58.9880646],{draggable: true}).addTo(map)
+    .bindPopup('<b>Supermax</b><br> Precios alt&iacute;simos.<br><button type="button" class="btn btn-link" data-toggle="modal" data-target="#exampleModal2"> Ver ofertas </button>')
+    .openPopup();
+    */
+ </script>
+
+        

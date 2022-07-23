@@ -149,12 +149,12 @@ class User implements UserInterface , \Serializable
     /**
      * @ORM\OneToMany(targetEntity=Comercio::class, mappedBy="user")
      */
-    private $Comercio;
+    private $comercio;
 
     public function __construct()
     {
         $this->productos = new ArrayCollection();
-        $this->Comercio = new ArrayCollection();
+        $this->comercio = new ArrayCollection();
     }
 
 
@@ -597,13 +597,13 @@ class User implements UserInterface , \Serializable
      */
     public function getComercio(): Collection
     {
-        return $this->Comercio;
+        return $this->comercio;
     }
 
     public function addComercio(Comercio $comercio): self
     {
-        if (!$this->Comercio->contains($comercio)) {
-            $this->Comercio[] = $comercio;
+        if (!$this->comercio->contains($comercio)) {
+            $this->comercio[] = $comercio;
             $comercio->setUser($this);
         }
 
@@ -612,7 +612,7 @@ class User implements UserInterface , \Serializable
 
     public function removeComercio(Comercio $comercio): self
     {
-        if ($this->Comercio->removeElement($comercio)) {
+        if ($this->comercio->removeElement($comercio)) {
             // set the owning side to null (unless already changed)
             if ($comercio->getUser() === $this) {
                 $comercio->setUser(null);

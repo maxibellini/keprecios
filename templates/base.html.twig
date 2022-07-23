@@ -35,6 +35,7 @@
 	  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Londrina+Solid:100,300,400,900&display=swap"></noscript>
 	  <link rel="preload" as="style" href="assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="assets/mobirise/css/mbr-additional.css" type="text/css">
 	  <link rel="stylesheet" href="assets/mobirise/css/styleskp.css" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
   {% endblock %}
 
@@ -48,7 +49,7 @@
         <div class="container row">
             <div class="input-group mb-0 col-12" >
                 <span class="navbar-logo col-7" style="">
-                    <a class="ampliar2" href=" ">
+                    <a class="ampliar2" href="{{path('app_inicio')}}">
                         <img src="assets/images/KegiladaWhite2.png" alt="Mobirise Website Builder" style="" >
                     </a>
                 </span>
@@ -107,7 +108,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent" style="">
                     <ul class="navbar-nav nav-dropdown" data-app-modern-menu="true" style=";"><li class="nav-item dropdown open"><a class="nav-link link dropdown-toggle text-white show display-4" href="" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="true">Ofertas</a><div class="dropdown-menu show" aria-labelledby="dropdown-814" data-bs-popper="none"><a class="dropdown-item text-white display-4" style=" background-color: #FF77B4" href="">Crear oferta</a><a class="text-white show dropdown-item display-4" style=" background-color: #FF77B4" href="">Buscar oferta</a></div></li>
-                        <li class="nav-item dropdown"><a class="nav-link link text-white dropdown-toggle display-4" href="" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Comercios</a><div class="dropdown-menu" aria-labelledby="dropdown-304"><a class="text-white dropdown-item display-4" style=" background-color: #FF77B4" href="">Buscar comercio</a><a class="text-white show dropdown-item display-4" style=" background-color: #FF77B4" href="">Solicitar comercio</a></div></li><li class="nav-item"><a class="nav-link link text-white show display-4" href="">Lista de Compras</a></li></ul>
+                        <li class="nav-item dropdown"><a class="nav-link link text-white dropdown-toggle display-4" href="" data-toggle="dropdown-submenu" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">Comercios</a><div class="dropdown-menu" aria-labelledby="dropdown-304"><a class="text-white dropdown-item display-4" style=" background-color: #FF77B4" href="">Buscar comercio</a><a class="text-white show dropdown-item display-4" style=" background-color: #FF77B4" href="{{path('app_comercio_registro')}}">Solicitar comercio</a></div></li><li class="nav-item"><a class="nav-link link text-white show display-4" href="">Lista de Compras</a></li></ul>
 
                 </div> 
           </div>
@@ -215,5 +216,7 @@
   overflow-y: auto;
 }
 </style>
+<script>
 
+ </script>
 </html>

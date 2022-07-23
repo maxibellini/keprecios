@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modificar solicitud{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+
+{% for message in app.flashes('exito') %}
+      <div class="alert alert-success">
+         {{message}}     
+      </div>    
+{% endfor %}
+
+
+ <div class="row">
+    <div class="col-sm-2">
+
+    </div>    
+    <div class="col-sm-8 tarjeta-body item-content " style="background-color: white; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
+          <br>
+          <h4 class="display-5">Modificar datos del Comercio</h4>  
+
+		
+          <br>
+            {{ include('app/comercio/_form.html.twig', {'button_label': 'Guardar cambios'}) }}
+           <div class="col-12" align="center">
+                <br>
+           </div>
+          <hr style="border:2px;">
+          <div class="col-12" align="center">
+              <br>
+			  {{ include('app/comercio/_delete_form.html.twig') }}
+			</div>
+ 
+    <br>
+</div>
+</div>
+</div>
+</div>
+<br>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.js"></script>
+    <script>
+        $(document).ready(function() {
+            // you may need to change this code if you are not using Bootstrap Datepicker
+            $('.js-datepicker').datepicker({
+                format: 'yyyy-mm-dd'
+            });
+        });
+    </script>
+{% endblock %}

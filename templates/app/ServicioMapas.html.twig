@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta http-equiv="content-type" content="text/html; utf-8">
+<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+  #map { 
+    width: 95%;
+    height: 420px;
+    box-shadow: 5px 5px 5px #FF9071;
+	border-radius: 5px 5px 5px 5px;
+	-moz-border-radius: 5px 5px 5px 5px;
+	-webkit-border-radius: 5px 5px 5px 5px;
+	border: 0px solid #000000; 
+ }
+</style>
+<div class="row">
+<body style="background-color:#E85395">
+<div class="col-sm-12" >
+
+<center>
+<br>
+<b style="color: white" >TEST SERVICIO DE MAPAS KEPRECIOS</b>
+<br><br>
+<div id="map" ></div>
+</center>
+<script>
+  var map = L.map('map').
+     setView([-27.4514,-58.9867],
+     15);
+</script>
+<script>
+L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+maxZoom: 18
+}).addTo(map);
+L.control.scale().addTo(map);
+L.marker([-27.4551039,-58.991255],{draggable: true}).addTo(map)
+    .bindPopup('<b>Supermercado VEA</b><br> Tiene escalera mec&aacute;nica y acsensor.<br><button type="button" class="btn btn-link" data-toggle="modal" data-target="#exampleModal"> Ver ofertas </button>')
+    .openPopup();
+L.marker([-27.4522371,-58.9880646],{draggable: true}).addTo(map)
+    .bindPopup('<b>Supermax</b><br> Precios alt&iacute;simos.<br><button type="button" class="btn btn-link" data-toggle="modal" data-target="#exampleModal2"> Ver ofertas </button>')
+    .openPopup();
+ </script>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+  <div class="modal-dialog" role="document" >
+    <div class="modal-content" style="background-color: #FFF3EF">
+      <div class="modal-header">
+      	<center>
+        <h5 class="modal-title" id="exampleModalLabel" style="color: #E85395"> Supermercado VEA</h5>
+        </center>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="color:#7A2C4F">
+        Aca ir&iacute;a todo el choclo de info y ofertas
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" >
+    <div class="modal-content" style="background-color: #FFF3EF">
+      <div class="modal-header">
+      	<center>
+        <h5 class="modal-title" id="exampleModalLabel" style="color: #E85395">Supermax</h5>
+        </center>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="color:#7A2C4F">
+        Aca ir&iacute;a todo el choclo de info y ofertas
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</body> 
+
+<div class="col-sm-12">
+
+<footer>
+            <div>
+            	<br>
+            	<center>
+                <p style="color: white;">&#169; Keprecios.com - Todos los derechos reservados</p>
+                </center>
+            </div>
+</footer>
+</div>
+</div>
+</html>
+

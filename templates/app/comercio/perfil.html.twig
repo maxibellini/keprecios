@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+
+<div class="e">
+{% for message in app.flashes('exito') %}
+      <div class="alert alert-success">
+         {{message}}     
+      </div>    
+{% endfor %}
+
+</div>
+ <div class="row">
+ 
+    <div class="col-sm-12 card tarjeta-body item-content display-7" style="background-color: white; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
+          <br>
+          <h4 class="display-5 card-header" align="center">{{comercio.nombreComercio}}</h4>  
+          <br>
+          <div class="row">
+            <div class="col-4">
+                {% if comercio.image != null %}
+                  {% set foto = 'uploads/images/comercios/'~ comercio.image %}
+                  {% set foto2 = absolute_url(asset(foto)) %}
+                 <img src="{{foto2}}" alt="" style=" border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                 {% else %}   
+                  <img src="assets/images/comercio-empty.png" alt="" style="border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                {% endif %}
+            </div>
+            <div class="col-8">
+                <div class=" ">Nombre: <span style="color:grey">{{comercio.nombreComercio}}</span> </div>
+                <div class=" ">Descripción: <span style="color:grey">{{comercio.descripcionComercio}}</span> </div>
+                <div class=" ">CUIT: <span style="color:grey">{{comercio.cuitComercio}}</span> </div>
+                {% if comercio.sucursal == 1 %}
+                <div class=" ">Es una sucursal: <span style="color:grey">Si</span></div>
+                {% endif %}
+
+                {% if comercio.url != null %}
+                <div class=" ">Sitio web: <a href="{{comercio.url}}" target="_blank" style="color:grey">{{comercio.url}}</a> </div>
+                {% endif %}
+                {% if comercio.horaAperturaComercio != null %}
+                <div class=" ">Hora de apertura: <span style="color:grey">{{comercio.horaAperturaComercio| date("h:i")}}hs</span></div>
+                {% endif %}
+                {% if comercio.horaCierreComercio != null %}
+                <div class=" ">Hora de cierre: <span style="color:grey">{{comercio.horaCierreComercio| date("h:i")}}hs</span></div>
+                {% endif %}
+                <div class=" ">Teléfono: <span style="color:grey">{{comercio.telefonoComercio}}</span> </div>
+                <div class=" ">Fecha de registro: <span style="color:grey">{% if comercio.fechaRegistroComercio != null %}{{comercio.fechaRegistroComercio | date("d-m-Y") }}{% endif %}</span> </div>
+                <div class=" ">Estado: <span style="color:grey">{{comercio.estadoComercio}}</span> </div>
+                <div class=" " style="color:grey"><i class="ri-map-pin-line" style="color:black"></i> {{comercio.direccionComercio}} {% if comercio.localidad != null %}- {{comercio.localidad.nombre }}{% endif %}</div>
+                {% if comercio.latitudComercio != null and comercio.longitudComercio != null %}
+                  {% set lat = comercio.latitudComercio %}
+                  {% set long = comercio.longitudComercio %}
+                      <div style="width: 100%; -webkit-box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.35); -moz-box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.35); box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.35);" ><iframe width="100%" height="250" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?width=100%25&amp;height=250&amp;hl=es&amp;q={{lat}},{{long}}+(Keprecios)&amp;t=&amp;z=17&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"><a href="https://www.gps.ie/car-satnav-gps/">GPS devices</a></iframe></div>
+                {% endif %}
+            </div>
+          </div>
+    <br>
+<br>
+</div>
+</div>
+</div>
+        <br>
+        
+{% endblock %}

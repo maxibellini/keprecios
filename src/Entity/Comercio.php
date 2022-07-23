@@ -6,9 +6,16 @@ use App\Repository\ComercioRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @ORM\Entity(repositoryClass=ComercioRepository::class)
+ * @Vich\Uploadable
  */
 class Comercio
 {
@@ -20,7 +27,7 @@ class Comercio
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="bigint")
      */
     private $cuitComercio;
 
@@ -45,32 +52,32 @@ class Comercio
     private $fechaRegistroComercio;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $horaAperturaComercio;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="float", nullable=true)
      */
     private $latitudComercio;
 
     /**
-     * @ORM\Column(type="float")
+     * @ORM\Column(type="float", nullable=true)
      */
     private $longitudComercio;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $horaCierreComercio;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $url;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $estadoComercio;
 
@@ -85,19 +92,9 @@ class Comercio
     private $telefonoComercio;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $sucursal;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $idLocalidad;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $idUsuario;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="Comercio")
@@ -113,6 +110,31 @@ class Comercio
      * @ORM\OneToMany(targetEntity=Oferta::class, mappedBy="comercio")
      */
     private $oferta;
+
+   /**
+     * @ORM\Column(type="string", length=255, nullable =true)
+     * @var string
+     */
+    private $image;
+
+    /**
+     * @Vich\UploadableField(mapping="comercios_images", fileNameProperty="image")
+     * @Ignore()
+     */
+    private $imageFile ;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @var \DateTime
+     */
+    private $updatedAt;
+    private $em;
+    private $comercios;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $motivoRechazo;
 
     public function __construct()
     {
@@ -189,7 +211,7 @@ class Comercio
         return $this->horaAperturaComercio;
     }
 
-    public function setHoraAperturaComercio(\DateTimeInterface $horaAperturaComercio): self
+    public function setHoraAperturaComercio(?\DateTimeInterface $horaAperturaComercio): self
     {
         $this->horaAperturaComercio = $horaAperturaComercio;
 
@@ -225,7 +247,7 @@ class Comercio
         return $this->horaCierreComercio;
     }
 
-    public function setHoraCierreComercio(\DateTimeInterface $horaCierreComercio): self
+    public function setHoraCierreComercio(?\DateTimeInterface $horaCierreComercio): self
     {
         $this->horaCierreComercio = $horaCierreComercio;
 
@@ -292,30 +314,6 @@ class Comercio
         return $this;
     }
 
-    public function getIdLocalidad(): ?int
-    {
-        return $this->idLocalidad;
-    }
-
-    public function setIdLocalidad(int $idLocalidad): self
-    {
-        $this->idLocalidad = $idLocalidad;
-
-        return $this;
-    }
-
-    public function getIdUsuario(): ?int
-    {
-        return $this->idUsuario;
-    }
-
-    public function setIdUsuario(int $idUsuario): self
-    {
-        $this->idUsuario = $idUsuario;
-
-        return $this;
-    }
-
     public function getUser(): ?User
     {
         return $this->user;
@@ -366,6 +364,188 @@ class Comercio
                 $ofertum->setComercio(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getEm(): ?EntityManagerInterface
+    {
+        return $this->em;
+    }
+
+    public function setEm(?EntityManagerInterface $em): self
+    {
+        $this->em = $em;
+
+        return $this;
+    }
+    public function getComercios(): ?Array
+    {
+        return $this->comercios;
+    }
+
+    public function setComercios(?Array $comercios): self
+    {
+        $this->comercios = $comercios;
+
+        return $this;
+    }
+    public function setImageFile( $image = null)
+    {
+        $this->imageFile = $image;
+
+        // VERY IMPORTANT:
+        // It is required that at least one field changes if you are using Doctrine,
+        // otherwise the event listeners won't be called and the file is lost
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
+
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    public function setImage(?string $image): void
+    {
+        $this->image = $image;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+    /**
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context, $payload)
+    {
+        $contNames=0; $contEmails=0; $contCuits=0; $contLtLn=0;
+        //setea nombre
+        $this->setNombreComercio( ucwords(strtolower($this->getNombreComercio())));
+        if($this->getCuitComercio()!= NULL){
+            if ( $this->getCuitComercio() < 0 or $this->getCuitComercio() > 99999999999 ){
+                $context->buildViolation('Error: El CUIT ingresado esta fuera de rango.')
+                    ->atPath('')
+                    ->addViolation();   
+            } 
+        }
+        if($this->getLatitudComercio() != null) {
+            if ($this->getLatitudComercio() > 90 or  $this->getLatitudComercio() < -90 ){
+                $context->buildViolation('Error: La latitud esta fuera de rango, debería estar entre -90 y 90.')
+                     ->atPath('')
+                     ->addViolation();
+            }
+        }
+        if($this->getLongitudComercio() != null) {
+            if ($this->getLongitudComercio() > 90 or  $this->getLongitudComercio() < -90 ){
+                $context->buildViolation('Error: La longitud esta fuera de rango, debería estar entre -90 y 90.')
+                     ->atPath('')
+                     ->addViolation();
+            }
+        }
+        if ($this->em != null){
+            $namecomercio= $this->getNombreComercio();
+            $emailcomercio= $this->getEmailComercio();
+            $cuitcomercio= $this->getCuitComercio();
+            $latcomercio= $this->getLatitudComercio();
+            $longcomercio= $this->getLongitudComercio();
+            $comercion= $this->em->getRepository("App:Comercio")->findOneBy(array('nombreComercio'=>$namecomercio));
+            $comercioe= $this->em->getRepository("App:Comercio")->findOneBy(array('emailComercio'=>$emailcomercio));
+            $comercioc= $this->em->getRepository("App:Comercio")->findOneBy(array('cuitComercio'=>$cuitcomercio));
+            $comercioltln= $this->em->getRepository("App:Comercio")->findOneBy(array('latitudComercio'=>$latcomercio, 'longitudComercio'=>$longcomercio));
+    
+            if($comercion){
+              if($comercion->getId() != $this->getId()) {
+                $context->buildViolation('Error: El nombre de comercio ya está en uso')
+                    ->atPath('')
+                    ->addViolation();
+              }
+            }
+            if($comercioe){
+              if($comercioe->getId() != $this->getId()) {
+                $context->buildViolation('Error: El correo electrónico ya está en uso')
+                    ->atPath('')
+                    ->addViolation();
+              }
+            }
+            if($comercioc and $this->getSucursal() == 0 ){
+              if($comercioc->getId() != $this->getId()) {
+                $context->buildViolation('Error: El cuit del comercio ya está en uso')
+                    ->atPath('')
+                    ->addViolation();
+              }
+            }
+            if($comercioltln ){
+              if($comercioc->getId() != $this->getId()) {
+                $context->buildViolation('Error: Esa ubicación ya está en uso')
+                    ->atPath('')
+                    ->addViolation();
+              }
+            }
+        } 
+
+        $comercios=$this->comercios; 
+        if (is_array($comercios)){
+            foreach ($comercios as $comercio) {
+               if($comercio->getNombreComercio() == $this->getNombreComercio() ){
+                  $contNames++;
+               }
+               if($comercio->getEmailComercio() == $this->getEmailComercio() ){
+                  $contEmails++;
+               }
+               if($comercio->getCuitComercio() == $this->getCuitComercio() and $this->getSucursal() == 0 ){
+                  $contCuits++;
+               }
+               if($comercio->getLatitudComercio() == $this->getLatitudComercio() and $comercio->getLongitudComercio() == $this->getLongitudComercio()  ){
+                  $contLtLn++;
+               }
+            }
+        }
+        if( $contNames > 1 ){
+            $context->buildViolation('Error: El nombre de comercio ya está en uso')
+                ->atPath('')
+                ->addViolation();
+        }
+        if( $contEmails > 1 ){
+            $context->buildViolation('Error: El correo electrónico ya está en uso')
+                ->atPath('')
+                ->addViolation();
+        }
+        if( $contCuits > 1 ){
+            $context->buildViolation('Error: El cuit del comercio ya está en uso')
+                ->atPath('')
+                ->addViolation();
+        }
+        if( $contLtLn > 1 ){
+            $context->buildViolation('Error: Esa ubicación ya está en uso')
+                ->atPath('')
+                ->addViolation();
+        }
+    }
+
+    public function getMotivoRechazo(): ?string
+    {
+        return $this->motivoRechazo;
+    }
+
+    public function setMotivoRechazo(?string $motivoRechazo): self
+    {
+        $this->motivoRechazo = $motivoRechazo;
 
         return $this;
     }

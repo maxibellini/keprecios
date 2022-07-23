@@ -52,6 +52,51 @@
           </div>
     <br>
 <br>
+          {% if app.user.name == user.name %}
+          <h5>Mis Solicitudes</h5>
+          {% set solicitudes = user.comercio %}
+              <table class="table">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Comercio</th>
+                    <th scope="col">Dirección</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Solicitud</th>
+                    <th scope="col">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                 {% for solicitud in solicitudes %}
+                  <tr>
+                    <th scope="row">{{solicitud.nombreComercio}}</th>
+                    <td>{{solicitud.direccionComercio}} - {{solicitud.localidad.nombre}}</td>
+                    <td>{% if solicitud.estadoComercio == 'ACTIVO' %}<span style="color: green">{% elseif solicitud.estadoComercio == 'PENDIENTE' %}<span style="color: grey">{% elseif solicitud.estadoComercio == 'BAJA' %}<span style="color: red">{% else %}<span style="color: grey">{% endif %}{{solicitud.estadoComercio}}</span></td>
+                    <td>{% if solicitud.estadoComercio == 'ACTIVO' %}
+                          <span style="color: green">APROBADA</span>
+                          {% elseif solicitud.estadoComercio == 'PENDIENTE' %}
+                             {% if solicitud.motivoRechazo != NULL %}
+                               <span style="color: red">RECHAZADA </span><br> {{solicitud.motivoRechazo}}
+                               {% else %}
+                                  <span style="color: grey">PENDIENTE</span>
+                             {% endif %}
+                            {% elseif solicitud.estadoComercio == 'BAJA' %}
+                                <span style="color: red">BAJA </span>
+                        {%endif%}
+                    </td>
+                    <td>{% if solicitud.estadoComercio == 'ACTIVO' %}
+                          
+                          {% elseif solicitud.estadoComercio == 'PENDIENTE' %}
+                               <a style="" href="{{path('app_comercio_editar',{ 'id': solicitud.id })}}" > Editar</a>
+                             
+                            {% elseif solicitud.estadoComercio == 'BAJA' %}
+                               
+                        {%endif%}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+          {% endif %}
 </div>
 </div>
 </div>

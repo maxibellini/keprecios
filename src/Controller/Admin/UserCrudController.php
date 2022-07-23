@@ -58,7 +58,7 @@ class UserCrudController extends AbstractCrudController
         $latitud = NumberField::new('latitud');
         $longitud = NumberField::new('longitud');
         $sexo = ChoiceField::new('sexo')
-              ->setChoices(['Maculino' => 'Maculino', 'Femenino' => 'Femenino', 'No binario' => 'No binario']);
+              ->setChoices(['Masculino' => 'Masculino', 'Femenino' => 'Femenino', 'No binario' => 'No binario']);
         $estado = ChoiceField::new('estado')
               ->setChoices(['ACTIVO' => 'ACTIVO', 'SUSPENDIDO' => 'SUSPENDIDO', 'BANEADO' => 'BANEADO', '' => '']);
         $image = TextAreaField::new('imageFile')

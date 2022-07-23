@@ -1,0 +1,85 @@
+
+    {{ form_start(form) }}
+      <div class="row form-group" >
+
+        
+        <div class="col-12 " style="color:red"> {{ form_errors(form) }} </div>
+        <div class="col-sm-6 form-group "> {{ form_row(form.nombreComercio,{ 'label' : 'Nombre del Comercio', 'attr' : { 'class' : 'form-control' }}) }}  </div>
+        <div class="col-sm-6 "> {{ form_row(form.cuitComercio,{ 'label' : 'CUIT del Comercio', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-6 "> {{ form_row(form.descripcionComercio,{ 'label' : 'Descripción del Comercio', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-6 "> {{ form_row(form.sucursal,{ 'label' : '¿Es sucursal?', 'attr' : { 'class' : '' }}) }} </div>
+        <div class="col-sm-12 "> </div><br>
+        <div class="col-sm-6 "> {{ form_row(form.emailComercio,{ 'label' : 'Email del Comercio', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-6 "> {{ form_row(form.url,{ 'label' : 'URL o sitio web', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-12 "> </div><br>
+        <div class="col-sm-6 "> {{ form_row(form.horaAperturaComercio,{ 'label' : 'Hora de apertura', 'attr' : { 'class' : 'form-control ' }}) }} </div>
+        <div class="col-sm-6 "> {{ form_row(form.horaCierreComercio,{ 'label' : 'Hora de cierre', 'attr' : { 'class' : 'form-control ' }}) }} </div>
+        <div class="col-sm-12 "> </div><br>
+        <div class="col-sm-6 "> {{ form_row(form.direccionComercio,{ 'label' : 'Dirección del Comercio', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-12 "> </div><br>
+        <div class="col-sm-6 "> {{ form_row(form.localidad,{ 'label' : 'Localidad', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-12 "> </div><br>
+        <div>
+                  <!-- Button trigger modal -->
+        <a class="btn btn-link" data-toggle="modal" data-target="#exampleModal" style="color:grey; border: 1px solid grey">
+          Cargar posición desde mapa
+        </a>
+        </div>  
+        <div class="col-sm-6 "> {{ form_row(form.latitudComercio,{ 'label' : 'Ubicación (latitud)', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-6 "> {{ form_row(form.longitudComercio,{ 'label' : 'Ubicación (longitud)', 'attr' : { 'class' : 'form-control' }}) }} </div> 
+        <div class="col-sm-12 "> </div><br>
+        <div class="col-sm-6 "> {{ form_row(form.telefonoComercio, { 'label' : 'Teléfono', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-6 "> {{ form_row(form.imageFile,{ 'label' : 'Imagen del comercio', 'attr' : { 'class' : 'form-control' }}) }} </div> 
+
+        <br>         
+        <div class="col-sm-6" align="center">
+          <br>
+          <a class="" href="{{ path('app_inicio') }}">Cancelar</a>
+        </div>
+        <div class="col-6" align="right">
+        	<br>
+            <button class="btn btn-danger" align="right">{{ button_label|default('Save') }}</button>
+            
+           
+      </div>
+    {{ form_end(form) }}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="font-family: Arial, sans-serif; font-size: smaller; ">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div style="background-color: #E85395; color: white; text-align: center;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        Seleccione la posición en el mapa y luego presione
+         el botón <b>"Cargar posición"</b> para asignar la latitud y longitud.</div>
+                <iframe id="inlineFrameExample"
+                    title="Inline Frame Example"
+                    width="100%"
+                    height="230"
+                    src="{{path('app_map_ubicacion')}}">
+                </iframe>
+      </div>
+      <div class="modal-footer mbr-fonts-style" >
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal">Cancelar</button>
+        <button type="button" align="right" class="btn btn-warning btn-sm" onclick="setUbicacion()">Cargar posición</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+  function setUbicacion() {
+    var iframes = document.querySelector("iframe"); //te da los Iframes de la pagina
+    var iframeDocument = iframes.contentWindow.document;
+    eltolat = iframeDocument.getElementById('inputLat').value;
+    eltolong = iframeDocument.getElementById('inputLong').value; 
+    document.getElementById('comercio_latitudComercio').value = eltolat;
+    document.getElementById('comercio_longitudComercio').value = eltolong;
+    document.getElementById("cerrarModal").click();
+  }
+</script>
+{#
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_errors(form) }}
+    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}
+#}

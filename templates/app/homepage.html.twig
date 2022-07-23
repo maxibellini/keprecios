@@ -2,10 +2,7 @@
 
 {% block title %}KePrecios{% endblock %}
 
-{% block head %}
-    {{ parent() }}
 
-{% endblock %}
 
 {% block body %}
 <style>
@@ -25,15 +22,82 @@
     </div>
 {% endfor %}
 
-    <center><h3 style="" >El inicio del fin</h3>
-    	<img src="assets/images/logochapa.png" style="width: 50%; height: auto" >
+<section data-bs-version="5.1" class="map1 cid-t98qMskqpA" id="map1-o">
+    
+    
+    
+   
+        <div class="mbr-section-head mb-4">
+            <h3 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
+                <strong>Comercios</strong></h3>
+            
+        </div>
+  
+            <a class="btn btn-warning btn-sm" href="{{path('app_comercio_registro')}}"></i>¡Solicitá tu comercio ahora!</i></a>
+     
+        <div class="row">
+            <div class="col-sm-7">
+                
+                <iframe id="inlineFrameExample"
+                    title="Inline Frame Example"
+                    width="100%"
+                    height="420"
+                    src="{{path('app_map')}}">
+                </iframe>
 
-    </center>
+            </div>
+            <div class="col-sm-5 mbr-fonts-style">
+                <div class="accordion" id="accordionExample">
+                {% set i = 0 %}
+                {% for comercio in comercios %}
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-4" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo{{i}}" aria-expanded="false" aria-controls="collapseTwo" style="border: 2px solid #E85395; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                        {{ comercio.nombreComercio}}
+                      </button>
+                    </h2>
+                    <div id="collapseTwo{{i}}" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                      <div class="row accordion-body">
+
+                         <div class="col-sm-4">
+                            {% if comercio.image != null %}
+                              {% set foto = 'uploads/images/comercios/'~ comercio.image %}
+                              {% set foto2 = absolute_url(asset(foto)) %}
+                             <img src="{{foto2}}" alt="" style=" border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                             {% else %}   
+                              <img src="assets/images/comercio-empty.png" alt="" style=" border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                            {% endif %}
+                         </div>
+                         <div class="col-sm-8" style="font: 70% sans-serif ;">
+                             {{comercio.descripcionComercio}}<br>
+                             <i class="ri-map-pin-line"></i> {{comercio.direccionComercio}} {% if comercio.localidad != null %}- {{comercio.localidad.nombre }}{% endif %}<br><br>
+                             <a class="" href="{{path('app_comercio_perfil',{ 'id': comercio.id })}}" > Ver más</a>
+
+                             <!--
+                             <b>Hora apertura:</b> {% if comercio.horaAperturaComercio != null %}{{comercio.horaAperturaComercio | date("h:i") }}hs{% endif %}<br>
+                             <b>Hora cierre:</b> {% if comercio.horaCierreComercio != null %}{{comercio.horaCierreComercio | date("h:i") }}hs{% endif %}<br>
+                             -->
+
+                         </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  {% set i = i + 1 %}
+                {% endfor %}
+
+                </div>
+            </div>
+        </div>      
+ 
+</section>
 
 
     <br>
     <!--
     <a class="btn btn-primary" href="{{ path('admin') }}">Administrator</a>
      -->
+   
 </div>
+
 {% endblock %}

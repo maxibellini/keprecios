@@ -1,0 +1,52 @@
+<link rel="preload" href="https://fonts.googleapis.com/css?family=Londrina+Solid:100,300,400,900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+
+<style>
+  #map2 { 
+    width: 100%;
+    height: 210px;
+   -webkit-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.47);
+   -moz-box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.47);
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.47);
+   	border: 1px solid #E85395; 
+    border-radius: 5px 5px 5px 5px; 
+    -moz-border-radius: 5px 5px 5px 5px;
+    -webkit-border-radius: 5px 5px 5px 5px;
+ }
+</style>
+
+  <div id="map2" ></div>
+<input type="hidden" id="inputLat" value="">
+<input type="hidden" id="inputLong" value="">
+
+<script>
+  var map = L.map('map2').
+     setView([-27.4514,-58.9867],
+     15);
+L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+maxZoom: 18
+}).addTo(map);
+L.control.scale().addTo(map);
+function onMapClick(e) {
+    var lat = '';
+    var long = '';   
+    var latlong = e.latlng.toString(); 
+    latlong = latlong.replace('LatLng', '');
+    alert("La posición elegida es: " + latlong);
+    latlong = latlong.replace('(', '');
+    latlong = latlong.replace(')', '');
+    let arrltln = latlong.split(',');
+    lat = arrltln[0];
+    long = arrltln[1]
+    L.marker([lat,long],{draggable: false}).addTo(map);
+    eltolatitud = document.getElementById('inputLat'); eltolatitud.value=lat; 
+    eltolongitud = document.getElementById('inputLong'); eltolongitud.value=long; 
+
+}
+
+map.on('click', onMapClick);
+ </script>
+
+        
