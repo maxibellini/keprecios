@@ -51,7 +51,7 @@
             </div>
           </div>
     <br>
-<br>
+<br>   {% if app.user != null %}
           {% if app.user.name == user.name %}
           <h5>Mis Solicitudes</h5>
           {% set solicitudes = user.comercio %}
@@ -96,7 +96,38 @@
                   {% endfor %}
                 </tbody>
               </table>
+          <br>    
+          <h5>Mis Productos cargados</h5>
+          {% set productos = user.productos %}
+              <table class="table">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Código</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Marca</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                 {% for producto in productos %}
+                  <tr>
+                    <th scope="row">{{producto.gtin}}</th>
+                    <td>{{producto.descripcionProducto}}</td>
+                    <td>{{producto.marcaProducto}}</td>
+                    <td>{% if producto.estadoProducto == 1 %}<span style="color: green">ACTIVO{% else%}<span style="color: red"> BAJA{% endif %}</span>
+                    </td>
+                    <td> 
+                      {% if producto.estadoProducto == 1 %}
+                      <a style="" href="{{path('app_producto_perfil',{ 'id': producto.id })}}" > Ver</a>&nbsp
+                      <a style="" href="{{path('app_producto_editar',{ 'id': producto.id })}}" > Editar</a></td>
+                      {% endif %}
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>       
           {% endif %}
+        {% endif %}
 </div>
 </div>
 </div>

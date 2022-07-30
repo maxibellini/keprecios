@@ -1,0 +1,271 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registro de Producto{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+<!-- Incluir la versión reducida de quagga de un archivo local -->
+<script src="quagga.min.js"></script>
+
+<!-- O usa un CDN -->
+<script src="https://cdn.rawgit.com/serratus/quaggaJS/0420d5e0/dist/quagga.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+<div class="e">
+{% for message in app.flashes('exito') %}
+      <div class="alert alert-success">
+         {{message}}     
+      </div>    
+{% endfor %}
+
+</div>
+
+ <div class="row">
+    <div class="col-sm-2">
+
+    </div>    
+    <div class="col-sm-8 tarjeta-body item-content " style="background-color: #FCFCFC; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
+          <br>
+          <h4 class="display-5">Registrar Producto</h4>  
+          <br>
+
+
+    {{ form_start(formulario) }}
+      <div class="row form-group" >        
+        <div class="col-12 " style="color:red"> {{ form_errors(formulario) }} </div>
+        <div class="col-sm-6 form-group "> <a  id="btn" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal"  style="  ">|||| Leer código de barras </a> </div>
+        <div class="col-sm-6  "> <a id="botonapi" class="btn " data-toggle="modal" data-target="#exampleModalapi"  style="color: #252E7C; background-color: #FFF159;background-image: url(assets/images/btnML.png);">&nbsp &nbsp &nbsp &nbsp Buscar en API de ML</a> </div>
+        <div class="col-sm-6 form-group "> {{ form_row(formulario.gtin,{ 'label' : 'Código de producto *', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-sm-6 "> </div>
+        <div class="col-sm-6 form-group "> {{ form_row(formulario.marcaProducto,{ 'label' : 'Marca *', 'attr' : { 'class' : 'form-control' }}) }}  </div>
+        <div class="col-sm-6  "> {{ form_row(formulario.descripcionProducto,{  'label' : 'Descripción *', 'attr' : { 'class' : 'form-control ' }}) }}  </div>   
+        <div class="col-sm-6 form-group "> {{ form_row(formulario.categoriaProducto,{ 'label' : 'Categoría *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
+        <div class="col-sm-6 "> {{ form_row(formulario.companiaProducto,{ 'label' : 'Compañía', 'attr' : { 'class' : 'form-control' }}) }}  </div>     
+        <div class="col-sm-6 form-group "> {{ form_row(formulario.netContent,{ 'label' : 'Contenido neto *', 'attr' : { 'class' : 'form-control' }}) }} </div> 
+        <div class="col-sm-6 "> {{ form_row(formulario.pais,{ 'label' : 'Pais', 'attr' : { 'class' : 'form-control' }}) }} </div> 
+        <div class="col-sm-6 " style="">{{ form_row(formulario.imgUrl,{ 'label' : 'Url de imagen', 'attr' : { 'class' : 'form-control' }}) }}   </div>  
+
+        <div class="col-sm-6 form-group "> 
+        {{ form_row(formulario.imageFile,{ 'label' : 'Cargar imagen manualmente', 'attr' : { 'class' : 'form-control' }}) }} </div> 
+
+        <br>         
+        <div class="col-sm-6" align="center">
+          <br>
+          <a class="" href="{{ path('app_inicio') }}">Cancelar</a>
+        </div>
+        <div class="col-sm-6" align="right">
+          <br>
+       
+          <button type="submit" class="btn btn-danger">Guardar</button>
+      </div>
+    {{ form_end(formulario) }}
+    <br>
+    </div>
+</div>
+</div>
+</div>
+<br>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="font-family: Arial, sans-serif; font-size: smaller; ">
+    <div class="modal-content">
+      <div class="modal-footer mbr-fonts-style" >
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal">Cancelar</button>
+        <button type="button" align="right" class="btn btn-warning btn-sm" onclick="setGtin()">Cargar código</button>
+      </div>
+      <div class="modal-body">
+          <div id="scanner-container"></div>
+          <input type="hidden" id="inputgtin" value="">
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- Incluir la biblioteca image-diff -->
+    <script src="quagga.min.js"></script>
+<!-- Modal -->
+<div class="modal fade" id="exampleModalapi" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document" style="font-family: Arial, sans-serif;  ">
+    <div class="modal-content" style="max-height: 180px; max-width: auto%;">
+      <div class="modal-footer mbr-fonts-style" >
+                <p><strong>¿Esta seguro que quiere buscar los datos para ese código de producto?</strong> <br>
+                    Al presionar "Buscar producto" el sistema se conectará con la API de Mercadolibre para obtener los  datos asociados al código de producto ingresado.
+                </p>
+        <button type="button" id="cerrarModalapi" align="left" class="btn btn-link btn-sm" data-dismiss="modal">Cancelar</button>
+        <button type="button" align="right" class="btn btn-warning btn-sm" onclick="buscarApi()">Buscar producto</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <script>
+        var _scannerIsRunning = false;
+
+        function startScanner() {
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('#scanner-container'),
+                    constraints: {
+                        width: 360,
+                        height: 240,
+                        facingMode: "environment"
+                    },
+                },
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                        "code_39_vin_reader",
+                        "codabar_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "i2of5_reader"
+                    ],
+                    debug: {
+                        showCanvas: true,
+                        showPatches: true,
+                        showFoundPatches: true,
+                        showSkeleton: true,
+                        showLabels: true,
+                        showPatchLabels: true,
+                        showRemainingPatchLabels: true,
+                        boxFromPatches: {
+                            showTransformed: true,
+                            showTransformedBox: true,
+                            showBB: true
+                        }
+                    }
+                },
+
+            }, function (err) {
+                if (err) {
+                    console.log(err);
+                    return
+                }
+
+                console.log("Initialization finished. Ready to start");
+                Quagga.start();
+
+                // Establecer bandera en se está ejecutando
+                _scannerIsRunning = true;
+            });
+
+            Quagga.onProcessed(function (result) {
+                var drawingCtx = Quagga.canvas.ctx.overlay,
+                drawingCanvas = Quagga.canvas.dom.overlay;
+
+                if (result) {
+                    if (result.boxes) {
+                        drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                        result.boxes.filter(function (box) {
+                            return box !== result.box;
+                        }).forEach(function (box) {
+                            Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, { color: "green", lineWidth: 2 });
+                        });
+                    }
+
+                    if (result.box) {
+                        Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: "#00F", lineWidth: 2 });
+                    }
+
+                    if (result.codeResult && result.codeResult.code) {
+                        Quagga.ImageDebug.drawPath(result.line, { x: 'x', y: 'y' }, drawingCtx, { color: 'red', lineWidth: 3 });
+                    }
+                }
+            });
+
+
+            Quagga.onDetected(function (result) {
+              document.getElementById('inputgtin').value = result.codeResult.code;
+              alert('El código ingresado es: '+result.codeResult.code );               
+              console.log("Barcode detected and processed : [" + result.codeResult.code + "]", result);
+            });
+        }
+
+
+        // Iniciar / detener el escáner
+        document.getElementById("btn").addEventListener("click", function () {
+            if (_scannerIsRunning) {
+                
+            } else {
+                startScanner();
+            }
+        }, false);
+
+        function setGtin() {
+            document.getElementById('producto_gtin').value = document.getElementById('inputgtin').value;
+            document.getElementById("cerrarModal").click();
+        }
+        //tratar api ml
+        function buscarApi() {
+            var gtinfield = document.getElementById("producto_gtin").value;
+            if (gtinfield == '' ){ alert('Error: debe cargar el código del producto') }else{
+                 var url = '{{ path("apiml_test", {'codigo': 'codigodato'}) }}';
+                 url = url.replace("codigodato", gtinfield);
+                 $.getJSON(url , function(data) {
+                  if(`${data.status}`!= 'undefined'){
+                    alert('Error: no se  pudo conectar con la API'); 
+                  }else{
+                  var totalresults = `${data.paging.total}`;
+                  if ( totalresults == 0 ){
+                    alert('Error: no se encontró ningún producto con ese código.');
+                  }else{
+                     var marca ='';
+                     var descripcion ='';
+                     var compania = '';
+                     var netcontent = '';
+                     var imgurl = '';
+                     if(`${data.results[0].name}`!= 'undefined'){ descripcion =`${data.results[0].name}`; }
+                     if(`${data.results[0].attributes}`!= 'undefined'){ 
+                        var atts = `${data.results[0].attributes}`;
+                        $.each(data.results[0].attributes, function(i, item) {
+                          
+                          if (item.id != 'undefined'){
+                              if (item.id == 'BRAND'){
+                                 marca = item.value_name;
+                              }
+                              if (item.id == 'NET_WEIGHT'){
+                                 netcontent = item.value_name;
+                              }
+                              if (item.id == 'MANUFACTURER'){
+                                 compania = item.value_name;
+                              }
+                              
+                          }
+
+                        });
+                     }
+                     if(`${data.results[0].pictures}`!= 'undefined'){ 
+                       if(`${data.results[0].pictures[0].url}`!= 'undefined'){
+                        imgurl =`${data.results[0].pictures[0].url}`;
+                       }
+                     };
+                     document.getElementById("producto_marcaProducto").value = marca;
+                     document.getElementById("producto_descripcionProducto").value = descripcion;
+                     document.getElementById("producto_netContent").value = netcontent;
+                     document.getElementById("producto_companiaProducto").value = compania;
+                     document.getElementById("producto_imgUrl").value = imgurl;
+
+                     alert('Se han cargado los datos de: '+gtinfield+' - '+marca+' '+descripcion);
+
+                  } }
+               });
+            }
+            document.getElementById("cerrarModalapi").click();
+        };
+
+
+    </script>
+{% endblock %}

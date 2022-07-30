@@ -5,6 +5,8 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Comercio;
+use App\Service\ApiMLService;
+use Symfony\Component\HttpFoundation\Request;
 
 class AppController extends AbstractController
 {
@@ -43,6 +45,17 @@ class AppController extends AbstractController
             'controller_name' => 'Mapa ubicación KePrecios',
 
         ]);
+    }
+
+    /**
+     * @param int    $codigo
+     * @Route("/apiml/{codigo}", name="apiml_test")
+     */
+    public function testApiML($codigo, Request $request, ApiMLService $renaper)
+    {
+        $ret = $renaper->fetchByCodigo($codigo, $request);
+
+        return $this->json($ret);
     }
 
 }

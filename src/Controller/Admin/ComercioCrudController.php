@@ -43,7 +43,7 @@ class ComercioCrudController extends AbstractCrudController
         $nombre = TextField::new('nombreComercio')->setLabel('Nombre');
         $cuit = IntegerField::new('cuitComercio')->setLabel('CUIT');
         $email = TextField::new('emailComercio')->setLabel('Correo electrónico');
-        $descripcion = TextField::new('descripcionComercio')->setLabel('Descripsión');
+        $descripcion = TextField::new('descripcionComercio')->setLabel('Descripción');
         $hsap = TimeField::new('horaAperturaComercio')->setLabel('Hora apertura');
         $hscrr =TimeField::new('horaCierreComercio')->setLabel('Hora cierre');
         $fechaRegistro =TimeField::new('fechaRegistroComercio')->setLabel('Fecha de registro');

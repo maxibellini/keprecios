@@ -6,9 +6,16 @@ use App\Repository\ProductoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @ORM\Entity(repositoryClass=ProductoRepository::class)
+ * @Vich\Uploadable
  */
 class Producto
 {
@@ -27,32 +34,32 @@ class Producto
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $marca_producto;
+    private $marcaProducto;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $descripcion_producto;
+    private $descripcionProducto;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $categoria_producto;
+    private $categoriaProducto;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $net_content;
+    private $netContent;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $compania_producto;
+    private $companiaProducto;
 
     /**
      * @ORM\Column(type="boolean")
      */
-    private $estado_producto;
+    private $estadoProducto;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="productos")
@@ -68,6 +75,31 @@ class Producto
      * @ORM\OneToMany(targetEntity=Oferta::class, mappedBy="producto")
      */
     private $ofertas;
+
+   /**
+     * @ORM\Column(type="string", length=255, nullable =true)
+     * @var string
+     */
+    private $image;
+
+    /**
+     * @Vich\UploadableField(mapping="productos_images", fileNameProperty="image")
+     * @Ignore()
+     */
+    private $imageFile ;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @var \DateTime
+     */
+    private $updatedAt;
+    private $em;
+    private $productos;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $imgUrl;
 
     public function __construct()
     {
@@ -93,72 +125,72 @@ class Producto
 
     public function getMarcaProducto(): ?string
     {
-        return $this->marca_producto;
+        return $this->marcaProducto;
     }
 
-    public function setMarcaProducto(string $marca_producto): self
+    public function setMarcaProducto(string $marcaProducto): self
     {
-        $this->marca_producto = $marca_producto;
+        $this->marcaProducto = $marcaProducto;
 
         return $this;
     }
 
     public function getDescripcionProducto(): ?string
     {
-        return $this->descripcion_producto;
+        return $this->descripcionProducto;
     }
 
-    public function setDescripcionProducto(string $descripcion_producto): self
+    public function setDescripcionProducto(string $descripcionProducto): self
     {
-        $this->descripcion_producto = $descripcion_producto;
+        $this->descripcionProducto = $descripcionProducto;
 
         return $this;
     }
 
     public function getCategoriaProducto(): ?string
     {
-        return $this->categoria_producto;
+        return $this->categoriaProducto;
     }
 
-    public function setCategoriaProducto(string $categoria_producto): self
+    public function setCategoriaProducto(string $categoriaProducto): self
     {
-        $this->categoria_producto = $categoria_producto;
+        $this->categoriaProducto = $categoriaProducto;
 
         return $this;
     }
 
     public function getNetContent(): ?string
     {
-        return $this->net_content;
+        return $this->netContent;
     }
 
-    public function setNetContent(string $net_content): self
+    public function setNetContent(string $netContent): self
     {
-        $this->net_content = $net_content;
+        $this->netContent = $netContent;
 
         return $this;
     }
 
     public function getCompaniaProducto(): ?string
     {
-        return $this->compania_producto;
+        return $this->companiaProducto;
     }
 
-    public function setCompaniaProducto(string $compania_producto): self
+    public function setCompaniaProducto(string $companiaProducto): self
     {
-        $this->compania_producto = $compania_producto;
+        $this->companiaProducto = $companiaProducto;
 
         return $this;
     }
 
     public function getEstadoProducto(): ?bool
     {
-        return $this->estado_producto;
+        return $this->estadoProducto;
     }
 
-    public function setEstadoProducto(bool $estado_producto): self
+    public function setEstadoProducto(bool $estadoProducto): self
     {
-        $this->estado_producto = $estado_producto;
+        $this->estadoProducto = $estadoProducto;
 
         return $this;
     }
@@ -216,4 +248,118 @@ class Producto
 
         return $this;
     }
+
+    public function setImageFile( $image = null)
+    {
+        $this->imageFile = $image;
+
+        // VERY IMPORTANT:
+        // It is required that at least one field changes if you are using Doctrine,
+        // otherwise the event listeners won't be called and the file is lost
+        if ($image) {
+            // if 'updatedAt' is not defined in your entity, use another property
+            $this->updatedAt = new \DateTime('now');
+        }
+    }
+
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    public function setImage(?string $image): void
+    {
+        $this->image = $image;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+    public function getEm(): ?EntityManagerInterface
+    {
+        return $this->em;
+    }
+
+    public function setEm(?EntityManagerInterface $em): self
+    {
+        $this->em = $em;
+
+        return $this;
+    }
+    public function getProductos(): ?Array
+    {
+        return $this->productos;
+    }
+
+    public function setProductos(?Array $productos): self
+    {
+        $this->productos = $productos;
+
+        return $this;
+    }
+
+    public function getImgUrl(): ?string
+    {
+        return $this->imgUrl;
+    }
+
+    public function setImgUrl(?string $imgUrl): self
+    {
+        $this->imgUrl = $imgUrl;
+
+        return $this;
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context, $payload)
+    {
+        $contcodigos=0;
+        if ($this->em != null){
+            $gtin= $this->getGtin();
+            $productogt= $this->em->getRepository("App:Producto")->findOneBy(array('gtin'=>$gtin));  
+            if($productogt){
+              if($productogt->getId() != $this->getId()) {
+                $context->buildViolation('Error: El código de producto ya está en uso')
+                    ->atPath('')
+                    ->addViolation();
+              }
+            }
+
+        } 
+        $productos=$this->productos; 
+        if (is_array($productos)){
+            foreach ($productos as $producto) {
+               if($producto->getGtin() == $this->getGtin() ){
+                  $contcodigos++;
+               }
+            }
+        }
+        if( $contcodigos > 1 ){
+            $context->buildViolation('Error: El código de producto ya está en uso')
+                ->atPath('')
+                ->addViolation();
+        }
+        if( $this->getCategoriaProducto() == '' ){
+            $context->buildViolation('Error: Debe ingresar una categoría')
+                ->atPath('')
+                ->addViolation();
+        }
+
+    }
+
 }

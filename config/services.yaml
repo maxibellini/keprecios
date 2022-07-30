@@ -8,6 +8,7 @@ parameters:
     SUPER_PASSWORD: '%env(SUPER_PASSWORD)%'
     app.path.usuarios_images: /uploads/images/usuarios
     app.path.comercios_images: /uploads/images/comercios
+    app.path.productos_images: /uploads/images/productos
 
 services:
 
