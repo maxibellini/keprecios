@@ -43,6 +43,7 @@
                 <div class="swiper-slide container">
                  <div class="row">
                   {% set lenghtl = ofertas | length %}
+      {% if ofertas != null %}            
                   {% for i in range(low=0, high= lenghtl - 1 , step=1) %}
                     <div class="col-lg-4 mt-3 ">
                             <div class="item-wrapper tarjeta ampliar3">
@@ -86,7 +87,7 @@
 
         {%endfor%}
  
-
+{% endif %}
                     
                     </div>
                 </div>
