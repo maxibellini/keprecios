@@ -51,7 +51,7 @@
                                 <div class="item-img tarjeta-head" style="height:  11.0rem; vertical-align: middle;">
                                     <center>
                                         {% if ofertas[i].producto.image != null %}
-                                          {% set foto = 'uploads/images/productos/'~ oferta.producto.image %}
+                                          {% set foto = 'uploads/images/productos/'~ oferta[i].producto.image %}
                                           {% set foto2 = absolute_url(asset(foto)) %}
                                          <img src="{{foto2}}" alt="" style=" border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;width:  11.0rem; vertical-align: middle;" >
                                          {% else %}  
