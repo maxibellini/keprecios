@@ -17,9 +17,11 @@ class AppController extends AbstractController
     {
     	$em = $this->getDoctrine()->getManager();
         $comercios = $em->getRepository("App:Comercio")->findBy(array('estadoComercio'=> 'ACTIVO'));
+        $ofertas = $em->getRepository("App:Oferta")->findBy(array('estado'=> 1));
         return $this->render('app/homepage.html.twig', [
             'controller_name' => 'Inicio KePrecios',
-            'comercios' => $comercios
+            'comercios' => $comercios,
+            'ofertas' => $ofertas
         ]);
     }
 

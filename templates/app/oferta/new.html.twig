@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Registro de Producto{% endblock %}
+{% block title %}Registro de Oferta{% endblock %}
 
 {% block head %}
     {{ parent() }}
@@ -11,6 +11,9 @@
 <style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code {  padding: 2px 6px; }
+    .ocultar {
+      display: none ;
+    }
 </style>
 <!-- Incluir la versión reducida de quagga de un archivo local -->
 <script src="quagga.min.js"></script>
@@ -34,39 +37,65 @@
     </div>    
     <div class="col-sm-8 tarjeta-body item-content " style="background-color: #FCFCFC; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
           <br>
-          <h4 class="display-5">Registrar Producto</h4>  
+          <h4 class="display-5">Registrar Oferta</h4>  
           <br>
 
 
     {{ form_start(formulario) }}
-      <div class="row form-group" >        
+    <div class="row form-group" > 
         <div class="col-12 " style="color:red"> {{ form_errors(formulario) }} </div>
-        <div class="col-sm-6 form-group "> <a  id="btn" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal"  style="  ">|||| Leer código de barras </a> </div>
-        <div class="col-sm-6  ">  </div>
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.gtin,{ 'label' : 'Código de producto *', 'attr' : { 'class' : 'form-control' }}) }} </div>
-        <div class="col-sm-6 "><label style="color: white">-</label><a id="botonapi" class="btn " data-toggle="modal" data-target="#exampleModalapi"  style="color: #252E7C; background-color: #FFF159;background-image: url(assets/images/btnML.png);">&nbsp &nbsp &nbsp &nbsp Buscar en API de ML</a> </div>
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.marcaProducto,{ 'label' : 'Marca *', 'attr' : { 'class' : 'form-control' }}) }}  </div>
-        <div class="col-sm-6  "> {{ form_row(formulario.descripcionProducto,{  'label' : 'Descripción *', 'attr' : { 'class' : 'form-control ' }}) }}  </div>   
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.categoriaProducto,{ 'label' : 'Categoría *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
-        <div class="col-sm-6 "> {{ form_row(formulario.companiaProducto,{ 'label' : 'Compañía', 'attr' : { 'class' : 'form-control' }}) }}  </div>     
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.netContent,{ 'label' : 'Contenido neto *', 'attr' : { 'class' : 'form-control' }}) }} </div> 
-        <div class="col-sm-6 "> {{ form_row(formulario.pais,{ 'label' : 'Pais', 'attr' : { 'class' : 'form-control' }}) }} </div> 
-        <div class="col-sm-6 " style="">{{ form_row(formulario.imgUrl,{ 'label' : 'Url de imagen', 'attr' : { 'class' : 'form-control' }}) }}   </div>  
+        <div class="col-sm-6  ">  
+          <label for="exampleInputEmail1">Código del producto</label>  
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" id="codigoProducto" placeholder="" aria-label="" aria-describedby="basic-addon1">
+            <div class="input-group-prepend">
+              <button class="btn btn-outline-secondary" type="button" onclick="buscarProduct()">🔎</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 form-group " > <label style="color:white" for="exampleInputEmail1">-</label>
+          <a  id="btn" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal"  style="  ">|||| Leer código</a> </div>
+        <div class="col-sm-12 form-group"> {{ form_row(formulario.producto,{ 'label' : 'Producto', 'attr' : { 'class' : 'form-control' }}) }}  </div>  
+        <p style="">
 
-        <div class="col-sm-6 form-group "> 
-        {{ form_row(formulario.imageFile,{ 'label' : 'Cargar imagen manualmente', 'attr' : { 'class' : 'form-control' }}) }} </div> 
-
+          <button class="btn btn-warning ocultar" id="botonNuevo" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" style="display: none">
+            Crear nuevo producto
+          </button>
+        </p>
+        <div class="collapse" id="collapseExample" style=" border:  solid #FF4C1A 1px; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+         
+                <iframe id="inlineFrameExample"
+                    title="Inline Frame Example"
+                    width="100%"
+                    height="650"
+                    src="{{path('app_producto_registro_new')}}" >
+                </iframe>
+         
+        </div>
+        <div class="col-sm-12 form-group" style="">
+          <br>
+          {{ form_row(formulario.comercio,{ 'label' : 'Comercio *', 'attr' : { 'class' : 'form-control' }}) }}
+        </div>  
+        <div class="col-sm-6 form-group "> {{ form_row(formulario.monto,{ 'label' : 'Monto *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
+        <div class="col-sm-6 "> {{ form_row(formulario.stock,{ 'label' : 'Stock *', 'attr' : { 'class' : 'form-control' }}) }}  </div>  
+        <div class="col-sm-6 form-group "> {{ form_row(formulario.descripcionOferta,{ 'label' : 'Descripción *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
+        <div class="col-sm-6 "> {{ form_row(formulario.tipoDescuento,{ 'label' : 'Tipo de descuento *', 'attr' : { 'class' : 'form-control' }}) }}  </div>
+        <div class="col-sm-12 form-group" style="display: none">
+          {{ form_row(formulario.motivoBaja,{ 'label' : 'Motivo de baja', 'attr' : { 'class' : 'form-control' }}) }}
+        </div>  
         <br>         
         <div class="col-sm-6" align="center">
           <br>
-          <a class="" href="{{ path('app_inicio') }}">Cancelar</a>
+        
         </div>
         <div class="col-sm-6" align="right">
           <br>
-       
-          <button type="submit" class="btn btn-danger">Guardar</button>
+        <button type="submit" class="btn btn-danger">Guardar</button>
+         
       </div>
+    </div>
     {{ form_end(formulario) }}
+
     <br>
     </div>
 </div>
@@ -106,6 +135,7 @@
     </div>
   </div>
 </div>
+
     <script>
         var _scannerIsRunning = false;
 
@@ -205,67 +235,40 @@
         }, false);
 
         function setGtin() {
-            document.getElementById('producto_gtin').value = document.getElementById('inputgtin').value;
+            document.getElementById('codigoProducto').value = document.getElementById('inputgtin').value;
             document.getElementById("cerrarModal").click();
         }
-        //tratar api ml
-        function buscarApi() {
-            var gtinfield = document.getElementById("producto_gtin").value;
-            if (gtinfield == '' ){ alert('Error: debe cargar el código del producto') }else{
-                 var url = '{{ path("apiml_test", {'codigo': 'codigodato'}) }}';
-                 url = url.replace("codigodato", gtinfield);
+
+        function buscarProduct() {
+            var gtinfield = document.getElementById("codigoProducto").value;
+            var selectProducto = document.getElementById("oferta_producto");
+            if (gtinfield == '' ){ alert('Error: no ingresó ningún código del producto') }else{
+                 var url = '{{ path("producto_json", {'gtin': 'gtindato'}) }}';
+                 url = url.replace("gtindato", gtinfield);
                  $.getJSON(url , function(data) {
-                  if(`${data.status}`!= 'undefined'){
-                    alert('Error: no se  pudo conectar con la API'); 
-                  }else{
-                  var totalresults = `${data.paging.total}`;
-                  if ( totalresults == 0 ){
-                    alert('Error: no se encontró ningún producto con ese código.');
-                  }else{
-                     var marca ='';
-                     var descripcion ='';
-                     var compania = '';
-                     var netcontent = '';
-                     var imgurl = '';
-                     if(`${data.results[0].name}`!= 'undefined'){ descripcion =`${data.results[0].name}`; }
-                     if(`${data.results[0].attributes}`!= 'undefined'){ 
-                        var atts = `${data.results[0].attributes}`;
-                        $.each(data.results[0].attributes, function(i, item) {
-                          
-                          if (item.id != 'undefined'){
-                              if (item.id == 'BRAND'){
-                                 marca = item.value_name;
-                              }
-                              if (item.id == 'NET_WEIGHT'){
-                                 netcontent = item.value_name;
-                              }
-                              if (item.id == 'MANUFACTURER'){
-                                 compania = item.value_name;
-                              }
-                              
-                          }
+                      if (`${data}` == ''){
+                        alert('Error: no se encontró ningún producto con ese código. Podrá añadirlo apretando el botón "Crear nuevo producto".')
+                            var iframes = document.querySelector("iframe"); //te da los Iframes de la pagina
+                            var iframeDocument = iframes.contentWindow.document;
+                            codigo = document.getElementById('codigoProducto').value;
+                            iframeDocument.getElementById('producto_gtin').value = codigo;
+                            iframeDocument.getElementById('inputgtinx').value=codigo;
+                            document.getElementById('botonNuevo').style.display = "inline";
+                      }else{
+                        var valueselect = '' ;
+                        var optiontext = '';
+                         for(var i=0;i<selectProducto.options.length;i++){ 
+                             optiontext = selectProducto.options[i].text;
+                             if ( optiontext.includes(gtinfield)){
+                               valueselect = selectProducto.options[i].value;
+                             }
+                          }   
+                          selectProducto.value= valueselect;
+                      };
 
-                        });
-                     }
-                     if(`${data.results[0].pictures}`!= 'undefined'){ 
-                       if(`${data.results[0].pictures[0].url}`!= 'undefined'){
-                        imgurl =`${data.results[0].pictures[0].url}`;
-                       }
-                     };
-                     document.getElementById("producto_marcaProducto").value = marca;
-                     document.getElementById("producto_descripcionProducto").value = descripcion;
-                     document.getElementById("producto_netContent").value = netcontent;
-                     document.getElementById("producto_companiaProducto").value = compania;
-                     document.getElementById("producto_imgUrl").value = imgurl;
-
-                     alert('Se han cargado los datos de: '+gtinfield+' - '+marca+' '+descripcion);
-
-                  } }
-               });
+                 })
             }
-            document.getElementById("cerrarModalapi").click();
-        };
-
+        }
 
     </script>
 {% endblock %}

@@ -52,7 +52,7 @@ class Producto
     private $netContent;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $companiaProducto;
 
@@ -359,7 +359,11 @@ class Producto
                 ->atPath('')
                 ->addViolation();
         }
+        //dd($context);
 
     }
-
+    public function __toString()
+    {
+        return $this->gtin.' - '.$this->descripcionProducto.' - '.$this->marcaProducto.' - '.$this->netContent;
+    }
 }

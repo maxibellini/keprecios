@@ -4,6 +4,9 @@ namespace App\Entity;
 
 use App\Repository\OfertaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @ORM\Entity(repositoryClass=OfertaRepository::class)
@@ -25,15 +28,15 @@ class Oferta
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $descripcion_oferta;
+    private $descripcionOferta;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $tipo_descuento;
+    private $tipoDescuento;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     private $stock;
 
@@ -48,9 +51,32 @@ class Oferta
     private $comercio;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Producto::class, inversedBy="ofertas")
+     * @ORM\ManyToOne(targetEntity=Producto::class, inversedBy="ofertas",cascade={"persist"})
      */
     private $producto;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $motivoBaja;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="ofertas")
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $fechaCarga;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $fechaUpdate;
+
+    private $em;
+    private $ofertas;
 
     public function getId(): ?int
     {
@@ -71,34 +97,34 @@ class Oferta
 
     public function getDescripcionOferta(): ?string
     {
-        return $this->descripcion_oferta;
+        return $this->descripcionOferta;
     }
 
-    public function setDescripcionOferta(string $descripcion_oferta): self
+    public function setDescripcionOferta(string $descripcionOferta): self
     {
-        $this->descripcion_oferta = $descripcion_oferta;
+        $this->descripcionOferta = $descripcionOferta;
 
         return $this;
     }
 
     public function getTipoDescuento(): ?string
     {
-        return $this->tipo_descuento;
+        return $this->tipoDescuento;
     }
 
-    public function setTipoDescuento(string $tipo_descuento): self
+    public function setTipoDescuento(string $tipoDescuento): self
     {
-        $this->tipo_descuento = $tipo_descuento;
+        $this->tipoDescuento = $tipoDescuento;
 
         return $this;
     }
 
-    public function getStock(): ?int
+    public function getStock(): ?string
     {
         return $this->stock;
     }
 
-    public function setStock(int $stock): self
+    public function setStock(string $stock): self
     {
         $this->stock = $stock;
 
@@ -139,5 +165,130 @@ class Oferta
         $this->producto = $producto;
 
         return $this;
+    }
+
+    public function getMotivoBaja(): ?string
+    {
+        return $this->motivoBaja;
+    }
+
+    public function setMotivoBaja(?string $motivoBaja): self
+    {
+        $this->motivoBaja = $motivoBaja;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getFechaCarga(): ?\DateTimeInterface
+    {
+        return $this->fechaCarga;
+    }
+
+    public function setFechaCarga(?\DateTimeInterface $fechaCarga): self
+    {
+        $this->fechaCarga = $fechaCarga;
+
+        return $this;
+    }
+
+    public function getFechaUpdate(): ?\DateTimeInterface
+    {
+        return $this->fechaUpdate;
+    }
+
+    public function setFechaUpdate(?\DateTimeInterface $fechaUpdate): self
+    {
+        $this->fechaUpdate = $fechaUpdate;
+
+        return $this;
+    }
+    public function getEm(): ?EntityManagerInterface
+    {
+        return $this->em;
+    }
+
+    public function setEm(?EntityManagerInterface $em): self
+    {
+        $this->em = $em;
+
+        return $this;
+    }
+    public function getOfertas(): ?Array
+    {
+        return $this->ofertas;
+    }
+
+    public function setOfertas(?Array $ofertas): self
+    {
+        $this->ofertas = $ofertas;
+
+        return $this;
+    }
+
+    /**
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context, $payload)
+    {
+        
+        if($this->getProducto() == null){
+                $context->buildViolation('Error: Debe ingresar un producto')
+                    ->atPath('')
+                    ->addViolation();
+        }
+        if($this->getComercio() == null){
+                $context->buildViolation('Error: Debe ingresar el comercio')
+                    ->atPath('')
+                    ->addViolation();
+        }
+        $contofertas=0;
+        if ($this->em != null){
+            $prod= $this->getProducto();
+            $comerc= $this->getComercio();
+            $ofertaprod= $this->em->getRepository("App:Oferta")->findOneBy(array('producto'=>$prod,
+                                                                                 'comercio' => $comerc,
+                                                                                 'estado' => 1)); 
+
+            if($ofertaprod){
+                $context->buildViolation('Error: Ya existe una oferta activa de este producto en este comercio.')
+                    ->atPath('')
+                    ->addViolation();
+            }
+
+        } 
+        $ofertas=$this->ofertas; 
+        if (is_array($ofertas)){
+            foreach ($ofertas as $oferta) {
+               if($oferta->getProducto() == $this->getProducto() and $oferta->getComercio() == $this->getComercio() and $oferta->getEstado() == 1 ){
+                  $contofertas++;
+               }
+            }
+        }
+        if( $contofertas > 1 ){
+            $context->buildViolation('Error: Ya existe una oferta activa de este producto en este comercio.')
+                ->atPath('')
+                ->addViolation();
+        }
+        if($this->getStock() == 'Sin stock'){
+            $this->setEstado(0);
+        }
+        //dd($context);
+    }
+
+    public function __toString()
+    {
+        return $this->monto.' - '.$this->descripcionOferta;
     }
 }

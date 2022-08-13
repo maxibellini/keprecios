@@ -1,0 +1,66 @@
+{% extends 'base-empty.html.twig' %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+<!-- Incluir la versión reducida de quagga de un archivo local -->
+<script src="quagga.min.js"></script>
+
+<!-- O usa un CDN -->
+<script src="https://cdn.rawgit.com/serratus/quaggaJS/0420d5e0/dist/quagga.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+<div class="e">
+{% for message in app.flashes('exito') %}
+      <div class="alert alert-success">
+         {{message}}     
+      </div>    
+{% endfor %}
+
+</div>
+<br>
+<center>
+<button class="btn btn-outline-secondary" type="button" onclick="setProduct()">Click aquí para añadir el producto a la oferta</button></center>
+<input type="hidden" id="inputgtinp" value="{{producto.gtin}}">
+  
+<script type="text/javascript">
+   function setProduct() {
+      var gtincampo = document.getElementById("inputgtinp").value;
+      var ofertaProducto = window.parent.document.getElementById("oferta_producto");
+      var botonNuevo = window.parent.document.getElementById("botonNuevo");
+      var url = '{{ path("producto_json", {'gtin': 'gtindato'}) }}';
+           url = url.replace("gtindato", gtincampo);
+           $.getJSON(url , function(data) {
+                if (`${data}` == ''){
+                  alert('Error: no se encontró ningún producto con ese código.')
+                  
+                }else{
+                  
+                  var idproduct = `${data[0].id}`;
+                  var descripcionproduct = `${data[0].descripcionProducto}`;
+                  var marcaproduct = `${data[0].marcaProducto}`;
+                  var netcontentproduct = `${data[0].netContent}`;
+                  var opcontent=idproduct+' - '+descripcionproduct+' - '+marcaproduct+' - '+netcontentproduct;
+                  var option = new Option(opcontent,idproduct);
+                  ofertaProducto.appendChild(option);
+                  alert('Se ha añadido el producto a esta oferta');
+                  var valueselect = '' ;
+                  var optiontext = '';
+                   for(var i=0;i<ofertaProducto.options.length;i++){ 
+                        optiontext = ofertaProducto.options[i].text;
+                        if ( optiontext.includes(opcontent)){
+                          valueselect = ofertaProducto.options[i].value;
+                       }
+                    }   
+                   ofertaProducto.value= valueselect;
+                   botonNuevo.click();
+                   botonNuevo.style.display = "none";
+                }
+           })
+         }
+
+</script>
+
+{% endblock %}

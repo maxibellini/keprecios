@@ -1,0 +1,48 @@
+
+    {{ form_start(form) }}
+    <div class="row form-group" >
+        <div class="col-12 " style="color:red"> {{ form_errors(form) }} </div>
+        <div class="col-sm-12 form-group" style="display:none">
+          {{ form_row(form.comercio,{ 'label' : 'Comercio', 'attr' : { 'class' : 'form-control' }}) }}
+        </div> 
+        <div class="col-sm-12 form-group" style="display:none">
+          {{ form_row(form.producto,{ 'label' : 'Producto', 'attr' : { 'class' : 'form-control' }}) }}
+        </div>  
+        <div class="col-sm-12 form-group" style="">
+          <label for="">Comercio</label>
+          <input type="text" id="inputcom" class="form-control"  value="" disabled="true">
+        </div> 
+        <div class="col-sm-12 form-group" style="">
+          <label for="">Producto</label>
+          <input type="text" id="inputprod" class="form-control"  value="" disabled="true">
+        </div> 
+        <div class="col-sm-6 form-group "> {{ form_row(form.monto,{ 'label' : 'Monto *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
+        <div class="col-sm-6 "> {{ form_row(form.stock,{ 'label' : 'Stock *', 'attr' : { 'class' : 'form-control' }}) }}  </div>  
+        <div class="col-sm-6 form-group "> {{ form_row(form.descripcionOferta,{ 'label' : 'Descripción *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
+        <div class="col-sm-6 "> {{ form_row(form.tipoDescuento,{ 'label' : 'Tipo de descuento *', 'attr' : { 'class' : 'form-control' }}) }}  </div>
+        <div class="col-sm-12 form-group" style="display: none">
+          {{ form_row(form.motivoBaja,{ 'label' : 'Motivo de baja', 'attr' : { 'class' : 'form-control' }}) }}
+        </div>  
+        <br>  
+        <div class="col-sm-6" align="center">
+          <br>
+          <a class="" href="{{ path('app_inicio') }}">Cancelar</a>
+        </div>
+        <div class="col-6" align="right">
+        	<br>
+            <button class="btn btn-danger" align="right">{{ button_label|default('Save') }}</button>
+          
+           
+      </div>
+    {{ form_end(form) }}
+
+
+    <script>
+     var comercio = document.getElementById('oferta_comercio');
+     var textcom = comercio.options[comercio.selectedIndex].text;
+     var producto = document.getElementById('oferta_producto');
+     var textprod = producto.options[producto.selectedIndex].text;
+     document.getElementById('inputcom').value=textcom;
+     document.getElementById('inputprod').value=textprod;
+
+    </script>

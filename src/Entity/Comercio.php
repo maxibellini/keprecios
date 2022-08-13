@@ -549,4 +549,13 @@ class Comercio
 
         return $this;
     }
+    public function __toString()
+    {
+        if ($this->localidad != null){
+         return $this->cuitComercio.' - '.$this->nombreComercio.' - '.$this->direccionComercio.' - '.$this->localidad->getNombre();
+        }else{
+            return $this->cuitComercio.' - '.$this->nombreComercio.' - '.$this->direccionComercio;
+        }
+       
+    }
 }

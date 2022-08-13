@@ -96,7 +96,40 @@
                   {% endfor %}
                 </tbody>
               </table>
-          <br>    
+          <br>
+          <h5>Mis Ofertas cargadas</h5>
+          {% set ofertas = user.ofertas %}
+              <table class="table">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Oferta</th>
+                    <th scope="col">Fecha carga</th>
+                    <th scope="col">Fecha update</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                 {% for oferta in ofertas %}
+                  <tr>
+                    <th scope="row">{{oferta.__toString}}</th>
+                    <td>{% if oferta.fechaCarga != null %}{{oferta.fechaCarga|date('Y-m-d')}}{% endif %} </td>
+                    <td>{% if oferta.fechaUpdate != null %}{{oferta.fechaUpdate|date('Y-m-d')}}{% endif %} </td>
+                    <td>{% if oferta.estado == '1' %}
+                          <span style="color: green">ACTIVA</span>
+                               {% else %}
+                                  <span style="color: red">INACTIVA</span>
+                        {% endif %}
+ 
+                    </td>
+                    <td>
+                      <a style="" href="{{path('app_oferta_editar',{ 'id': oferta.id })}}" > Editar</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+          <br>        
           <h5>Mis Productos cargados</h5>
           {% set productos = user.productos %}
               <table class="table">

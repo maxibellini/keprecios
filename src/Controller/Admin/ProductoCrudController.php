@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DatetimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -61,14 +62,15 @@ class ProductoCrudController extends AbstractCrudController
               ->setLabel('Imagen')           
               ->setFormTypeOption('allow_delete',true);
         $imgurl = TextField::new('imgUrl')->setLabel('Url de imagen');
+        $estado = BooleanField::new('estadoProducto', 'Estado');
 
 
         if (Crud::PAGE_INDEX === $pageName) {
-            return [$gtin, $descripcion, $marca, $netcontent, $compania, $categoria];
+            return [$gtin, $descripcion, $marca, $netcontent, $compania, $categoria,$estado];
         } elseif (Crud::PAGE_DETAIL === $pageName) {
-            return [$id, $gtin, $descripcion, $marca, $netcontent, $compania, $categoria, $pais, $image, $imgurl  ];
+            return [$id, $gtin, $descripcion, $marca, $netcontent, $compania, $categoria, $pais,$estado, $image, $imgurl  ];
         } elseif (Crud::PAGE_EDIT === $pageName) {
-            return [$id, $gtin, $descripcion, $marca, $netcontent, $compania, $categoria, $pais, $image, $imgurl   ];
+            return [$id, $gtin, $descripcion, $marca, $netcontent, $compania, $categoria, $pais, $estado, $image, $imgurl   ];
         }
     }
     public function configureActions(Actions $actions): Actions

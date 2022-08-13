@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+
+<div class="e">
+{% for message in app.flashes('exito') %}
+      <div class="alert alert-success">
+         {{message}}     
+      </div>    
+{% endfor %}
+
+</div>
+ <div class="row">
+ 
+    <div class="col-sm-12 card tarjeta-body item-content display-7" style="background-color: white; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
+          <br>
+          <h4 class="display-5 card-header" align="center">{{oferta.producto.descripcionProducto}}</h4>  
+          <br>
+          <div class="row">
+            <div class="col-4">
+                {% if oferta.producto.image != null %}
+                  {% set foto = 'uploads/images/productos/'~ oferta.producto.image %}
+                  {% set foto2 = absolute_url(asset(foto)) %}
+                 <img src="{{foto2}}" alt="" style=" border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                 {% else %}  
+                    {% if oferta.producto.imgUrl != null %} 
+                       <img src="{{oferta.producto.imgUrl}}" alt="" style="border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                       {% else %}
+                          <img src="assets/images/producto-empty.png" alt="" style="border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="col-4">
+                <div class=" ">Monto: <span style="color:grey;">${{oferta.monto}}</span> </div>
+                <div class=" ">Descripción: <span style="color:grey">{{oferta.descripcionOferta}}</span> </div>
+                <div class=" ">Tipo de descuento: <span style="color:grey">{{oferta.tipoDescuento}}</span> </div>
+                <div class=" ">Stock: <span style="color:grey">{{oferta.stock}}</span> </div>
+                <div class=" ">Fecha creación: <span style="color:grey">{% if oferta.fechaCarga != null %}{{oferta.fechaCarga|date('Y-m-d')}}{% endif %} </span> </div>
+                <div class=" ">Fecha actualización: <span style="color:grey">{% if oferta.fechaUpdate != null %}{{oferta.fechaUpdate|date('Y-m-d')}}{% endif %} </span> </div>
+                <div class=" ">Comercio: <span style="color:grey"><a href="{{path('app_comercio_perfil',{ 'id': oferta.comercio.id })}}">{% if oferta.comercio != null %}{{oferta.comercio.nombreComercio}}{% endif %}</a></span> </div>
+                <div class=" ">Usuario: <span style="color:grey"><a href="{{path('app_user_perfil',{ 'id': oferta.user.id })}}">{% if oferta.user != null %}{{oferta.user.name}}{% endif %}</a></span> </div>
+               <div class=" ">Estado: {% if oferta.estado == '1' %}
+                      <span style="color: green">ACTIVA</span>
+                           {% else %}
+                              <span style="color: red">INACTIVA</span>
+                    {% endif %}
+                </div>
+
+            </div>
+            <div class="col-4">
+                <div class=" ">Producto: <span style="color:grey">{{oferta.producto.descripcionProducto}}</span> </div>
+                <div class=" ">Código: <span style="color:grey">{{oferta.producto.gtin}}</span> </div>
+                <div class=" ">Contenido neto: <span style="color:grey">{{oferta.producto.netContent}}</span> </div>
+                <div class=" ">Marca: <span style="color:grey">{{oferta.producto.marcaProducto}}</span> </div>
+                <div class=" ">Fabricante: <span style="color:grey">{{oferta.producto.companiaProducto}}</span> </div>
+                <div class=" ">Categoría: <span style="color:grey">{{oferta.producto.categoriaProducto}}</span> </div>
+                {% if oferta.producto.pais != null %}
+                   <div class=" ">País: <span style="color:grey">{{oferta.producto.pais.nombre}}</span> </div>
+                {% endif %}
+                <div class=" ">Estado: <span style="color:grey">{% if oferta.producto.estadoProducto == 1 %}ACTIVO{%else%}BAJA{% endif %}</span> </div>
+
+            </div>
+          </div>
+    <br>
+<br>
+</div>
+</div>
+</div>
+        <br>
+        
+{% endblock %}

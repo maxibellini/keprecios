@@ -1,16 +1,9 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Registro de Producto{% endblock %}
-
-{% block head %}
-    {{ parent() }}
-
-{% endblock %}
+{% extends 'base-empty.html.twig' %}
 
 {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code {  padding: 2px 6px; }
+    .example-wrapper { width: 100%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  }
 </style>
 <!-- Incluir la versión reducida de quagga de un archivo local -->
 <script src="quagga.min.js"></script>
@@ -27,52 +20,38 @@
 {% endfor %}
 
 </div>
-
- <div class="row">
-    <div class="col-sm-2">
-
-    </div>    
-    <div class="col-sm-8 tarjeta-body item-content " style="background-color: #FCFCFC; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
-          <br>
-          <h4 class="display-5">Registrar Producto</h4>  
-          <br>
-
-
     {{ form_start(formulario) }}
-      <div class="row form-group" >        
-        <div class="col-12 " style="color:red"> {{ form_errors(formulario) }} </div>
-        <div class="col-sm-6 form-group "> <a  id="btn" class="btn btn-outline-secondary" data-toggle="modal" data-target="#exampleModal"  style="  ">|||| Leer código de barras </a> </div>
-        <div class="col-sm-6  ">  </div>
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.gtin,{ 'label' : 'Código de producto *', 'attr' : { 'class' : 'form-control' }}) }} </div>
-        <div class="col-sm-6 "><label style="color: white">-</label><a id="botonapi" class="btn " data-toggle="modal" data-target="#exampleModalapi"  style="color: #252E7C; background-color: #FFF159;background-image: url(assets/images/btnML.png);">&nbsp &nbsp &nbsp &nbsp Buscar en API de ML</a> </div>
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.marcaProducto,{ 'label' : 'Marca *', 'attr' : { 'class' : 'form-control' }}) }}  </div>
-        <div class="col-sm-6  "> {{ form_row(formulario.descripcionProducto,{  'label' : 'Descripción *', 'attr' : { 'class' : 'form-control ' }}) }}  </div>   
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.categoriaProducto,{ 'label' : 'Categoría *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
-        <div class="col-sm-6 "> {{ form_row(formulario.companiaProducto,{ 'label' : 'Compañía', 'attr' : { 'class' : 'form-control' }}) }}  </div>     
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.netContent,{ 'label' : 'Contenido neto *', 'attr' : { 'class' : 'form-control' }}) }} </div> 
-        <div class="col-sm-6 "> {{ form_row(formulario.pais,{ 'label' : 'Pais', 'attr' : { 'class' : 'form-control' }}) }} </div> 
-        <div class="col-sm-6 " style="">{{ form_row(formulario.imgUrl,{ 'label' : 'Url de imagen', 'attr' : { 'class' : 'form-control' }}) }}   </div>  
+      <div class="row form-group" >   
 
-        <div class="col-sm-6 form-group "> 
-        {{ form_row(formulario.imageFile,{ 'label' : 'Cargar imagen manualmente', 'attr' : { 'class' : 'form-control' }}) }} </div> 
+        <div class="col-12 " style="color:red"> {{ form_errors(formulario) }} </div>
+        <div class="col-6 form-group " style="display: none"> {{ form_row(formulario.gtin,{ 'label' : 'Código de producto *', 'attr' : { 'class' : 'form-control' }}) }} </div>
+        <div class="col-6 form-group "><label for="">Código de producto</label>
+          <input type="text" id="inputgtinx" class="form-control"  value="" disabled="true"> </div>
+        <div class="col-6 "><label style="color: white">-</label><a id="botonapi" class="btn " data-toggle="modal" data-target="#exampleModalapi"  style="color: #252E7C; background-color: #FFF159;background-image: url(assets/images/btnML.png);">&nbsp &nbsp &nbsp &nbsp Buscar en API</a> </div>
+        <div class="col-6 form-group "> {{ form_row(formulario.marcaProducto,{ 'label' : 'Marca *', 'attr' : { 'class' : 'form-control' }}) }}  </div>
+        <div class="col-6  "> {{ form_row(formulario.descripcionProducto,{  'label' : 'Descripción *', 'attr' : { 'class' : 'form-control ' }}) }}  </div>   
+        <div class="col-6 form-group "> {{ form_row(formulario.categoriaProducto,{ 'label' : 'Categoría *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
+        <div class="col-6 "> {{ form_row(formulario.companiaProducto,{ 'label' : 'Compañía', 'attr' : { 'class' : 'form-control' }}) }}  </div>     
+        <div class="col-6 form-group "> {{ form_row(formulario.netContent,{ 'label' : 'Contenido neto *', 'attr' : { 'class' : 'form-control' }}) }} </div> 
+        <div class="col-6 "> {{ form_row(formulario.pais,{ 'label' : 'Pais', 'attr' : { 'class' : 'form-control' }}) }} </div> 
+        <div class="col-6 " style="">{{ form_row(formulario.imgUrl,{ 'label' : 'Url de imagen', 'attr' : { 'class' : 'form-control' }}) }}   </div>  
+
+        <div class="col-6 form-group "> 
+        {{ form_row(formulario.imageFile,{ 'label' : 'Cargar manualmente', 'attr' : { 'class' : 'form-control' }}) }} </div> 
 
         <br>         
-        <div class="col-sm-6" align="center">
-          <br>
-          <a class="" href="{{ path('app_inicio') }}">Cancelar</a>
+        <div class="col-12" align="right">
+     
+       <br>
+          <button type="submit" class="btn btn-danger">Guardar nuevo producto</button>
         </div>
-        <div class="col-sm-6" align="right">
-          <br>
-       
-          <button type="submit" class="btn btn-danger">Guardar</button>
-      </div>
     {{ form_end(formulario) }}
-    <br>
+    
     </div>
+
 </div>
-</div>
-</div>
-<br>
+
+
 
 
 <!-- Modal -->
@@ -220,7 +199,7 @@
                   }else{
                   var totalresults = `${data.paging.total}`;
                   if ( totalresults == 0 ){
-                    alert('Error: no se encontró ningún producto con ese código.');
+                    alert('Error: no se encontró ningún producto con ese código en la API. Deberá ingresar manualmente los datos');
                   }else{
                      var marca ='';
                      var descripcion ='';
@@ -265,6 +244,7 @@
             }
             document.getElementById("cerrarModalapi").click();
         };
+
 
 
     </script>

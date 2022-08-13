@@ -7,4 +7,8 @@ App\Entity\Comercio:
 App\Entity\Producto:
     constraints:
         - Callback: validate
+App\Entity\Oferta:
+    constraints:
+        - Callback: validate
+
 
