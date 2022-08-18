@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Entity\Comercio;
 use App\Entity\Producto;
+use App\Entity\Oferta;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -43,5 +44,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Usuarios', 'fas fa-user', User::class);
         yield MenuItem::linkToCrud('Comercios', 'fas fa-building', Comercio::class);
         yield MenuItem::linkToCrud('Productos', 'fas fa-shopping-cart', Producto::class);
+        yield MenuItem::linkToCrud('Ofertas', 'fas fa-dollar-sign', Oferta::class);
     }
 }

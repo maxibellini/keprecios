@@ -96,7 +96,7 @@ class OfertaController extends AbstractController
         $em->remove($oferta); 
         $flush=$em->flush();
         if ($flush == null) {
-            $this->addFlash('exito','El oferta fue dado eliminada correctamente');
+            $this->addFlash('exito','La oferta fue eliminada correctamente');
              return $this->redirectToRoute('app_inicio');    
         } else {
             $this->addFlash('fracaso','Error, no se pudo eliminar oferta');

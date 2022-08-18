@@ -137,6 +137,7 @@
 </div>
 
     <script>
+        document.querySelector('#oferta_stock option[value="Sin stock"]').remove();
         var _scannerIsRunning = false;
 
         function startScanner() {
@@ -269,6 +270,7 @@
                  })
             }
         }
+
 
     </script>
 {% endblock %}

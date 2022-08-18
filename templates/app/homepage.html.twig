@@ -47,7 +47,7 @@
                   {% for i in range(low=0, high= lenghtl - 1 , step=1) %}
                     <div class="col-lg-4 mt-3 ">
                             <div class="item-wrapper tarjeta ampliar3">
-                                <a href="guia.html">
+                                <a href="{{path('app_oferta_perfil',{ 'id': ofertas[i].id })}}">
                                 <div class="item-img tarjeta-head" style="height:  11.0rem; vertical-align: middle;">
                                     <center>
                                         {% if ofertas[i].producto.image != null %}
