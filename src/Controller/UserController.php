@@ -31,7 +31,7 @@ class UserController extends AbstractController
     		$user->setPassword($passwordEncoder = $encoder->encodePassword($user, $form['password']->getData()));
     		$em->persist($user);
     		$em->flush();
-    		$this->addFlash('exito','¡Se ha registrado de manera correcta, ya puedes ingresar con tu nombre de  usuario y contraseña!');
+    		$this->addFlash('exito','¡Se ha registrado de manera correcta, ya puedes ingresar con tu nombre de usuario y contraseña!');
     		return $this->redirectToRoute('app_inicio');
     	}
         return $this->render('app/user/registro.html.twig', [

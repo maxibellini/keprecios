@@ -94,10 +94,11 @@
                                     
             </div>
              <div class="input-group mb-0 col-12" style="background: rgb(232,83,149); background: linear-gradient(180deg, rgba(232,83,149,1) 0%, rgba(229,105,161,1) 50%, rgba(232,83,149,1) 100%);-webkit-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.22); -moz-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.22); box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.22); border-radius: 4px 4px 4px 4px; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px; border: 0px solid #000000;border: 1px solid white;">
-               
-
-                        <input type="text" class="form-control " placeholder="Busca lo que necesites" aria-label="" aria-describedby="" style=";"><span class="ampliar"><a class="btn display-4" href=" " style="color:white"> 🔎Buscar  </a></span>
-
+                        <input id="buscador" type="text" class="form-control " placeholder="Busca lo que necesites" aria-label="" aria-describedby="" style=";" ><span class="ampliar"><a id="botonBuscar" class="btn display-4" style="color:white" > 🔎Buscar  </a></span>          
+                        <form method="POST" action="{{path('app_buscar')}}" style="display: none">
+                         <input id="buscadorx" type="text" class="form-control " name="_buscador" aria-label="" aria-describedby="" style="">
+                         <button id="actionBuscar" type="submit"></button>
+                       </form>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbarSupportedContent" data-bs-target="#navbarSupportedContent" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation" style="color:white;">
                     <div class="hamburger">
                         <span></span>
@@ -235,6 +236,16 @@
 }
 </style>
 <script>
+var inputBuscar = document.getElementById("buscador");
+var botonBuscar = document.getElementById("botonBuscar");
+var inputAction = document.getElementById("buscadorx");
+var actionBuscar = document.getElementById("actionBuscar");
+botonBuscar.addEventListener("click",function() {
+         inputAction.value = inputBuscar.value;
+         actionBuscar.click();
+});
+
+    //document.getElementById("botonBuscar").submit();
 
  </script>
 </html>
