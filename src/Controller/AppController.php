@@ -41,6 +41,7 @@ class AppController extends AbstractController
           ->innerJoin('o.producto', 'p')
           ->andWhere("p.categoriaProducto like :texto or p.descripcionProducto like :texto or p.marcaProducto like :texto")
           ->setParameter('texto','%'.$texto.'%')
+          ->orderBy('o.fechaCarga', 'DESC')
           ->getQuery()
           ->getResult();
         $ofpaginado = $paginator->paginate(
@@ -50,7 +51,8 @@ class AppController extends AbstractController
             $request->query->getInt('page', 1),
             // Items per page
             6  );
-       // dd($ofpaginado);
+       
+        //dd($ofpaginado);
         return $this->render('app/buscar.html.twig', [
             'controller_name' => 'Buscar KePrecios',
             'comercios' => $comercios,
