@@ -89,8 +89,15 @@ class UserController extends AbstractController
      */
     public function editarUser(Request $request, $id)
     {
+
         $em = $this->getDoctrine()->getManager(); 
         $user =$em->getRepository("App:User")->findOneBy(array('id'=>$id));
+        if($user){
+          if($user != $this->getUser()){
+            $this->addFlash('fracaso','Error, el usuario no corresponde al usuario logueado');
+            return $this->redirectToRoute('app_inicio');
+          }            
+        }
         $users= $em->getRepository("App:User")->findAll();
         $nameusuario= $user->getName();
         $emailusuario= $user->getEmail();

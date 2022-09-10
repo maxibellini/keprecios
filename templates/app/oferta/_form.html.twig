@@ -16,7 +16,7 @@
           <label for="">Producto</label>
           <input type="text" id="inputprod" class="form-control"  value="" disabled="true">
         </div> 
-        <div class="col-sm-6 form-group "> {{ form_row(form.monto,{ 'label' : 'Monto *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
+        <div class="col-sm-6 form-group "> {{ form_row(form.monto,{ 'label' : 'Monto *', 'attr' : { 'class' : 'form-control','step' : '0.01' }}) }}  </div> 
         <div class="col-sm-6 "> {{ form_row(form.stock,{ 'label' : 'Stock *', 'attr' : { 'class' : 'form-control' }}) }}  </div>  
         <div class="col-sm-6 form-group "> {{ form_row(form.descripcionOferta,{ 'label' : 'Descripción *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
         <div class="col-sm-6 "> {{ form_row(form.tipoDescuento,{ 'label' : 'Tipo de descuento *', 'attr' : { 'class' : 'form-control' }}) }}  </div>

@@ -76,7 +76,7 @@
           <br>
           {{ form_row(formulario.comercio,{ 'label' : 'Comercio *', 'attr' : { 'class' : 'form-control' }}) }}
         </div>  
-        <div class="col-sm-6 form-group "> {{ form_row(formulario.monto,{ 'label' : 'Monto *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
+        <div class="col-sm-6 form-group "> {{ form_row(formulario.monto,{ 'label' : 'Monto *', 'attr' : { 'class' : 'form-control','step' : '0.01' }}) }}  </div> 
         <div class="col-sm-6 "> {{ form_row(formulario.stock,{ 'label' : 'Stock *', 'attr' : { 'class' : 'form-control' }}) }}  </div>  
         <div class="col-sm-6 form-group "> {{ form_row(formulario.descripcionOferta,{ 'label' : 'Descripción *', 'attr' : { 'class' : 'form-control' }}) }}  </div> 
         <div class="col-sm-6 "> {{ form_row(formulario.tipoDescuento,{ 'label' : 'Tipo de descuento *', 'attr' : { 'class' : 'form-control' }}) }}  </div>
