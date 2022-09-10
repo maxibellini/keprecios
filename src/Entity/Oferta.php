@@ -66,7 +66,7 @@ class Oferta
     private $user;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="date", nullable=true)
      */
     private $fechaCarga;
 
@@ -191,12 +191,12 @@ class Oferta
         return $this;
     }
 
-    public function getFechaCarga(): ?\DateTimeInterface
+    public function getFechaCarga(): ?\DateInterface
     {
         return $this->fechaCarga;
     }
 
-    public function setFechaCarga(?\DateTimeInterface $fechaCarga): self
+    public function setFechaCarga(?\DateInterface $fechaCarga): self
     {
         $this->fechaCarga = $fechaCarga;
 

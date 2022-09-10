@@ -85,7 +85,6 @@ class AppController extends AbstractController
           ->setParameter('fini',$fini)
           ->andWhere("o.fechaCarga <= :ffin")
           ->setParameter('ffin',$ffin)
-          ->orderBy('o.fechaCarga', 'DESC')
           ->andWhere("p.gtin like :gtin")
           ->setParameter('gtin','%'.$gtin.'%')
           ->andWhere("p.companiaProducto like :compania")
@@ -94,6 +93,8 @@ class AppController extends AbstractController
           ->setParameter('marca','%'.$marca.'%')
           ->andWhere("o.tipoDescuento like :descuento")
           ->setParameter('descuento','%'.$descuento.'%')
+          ->orderBy('o.fechaCarga', 'DESC')
+          ->addOrderBy('o.monto', 'ASC')
           ->getQuery()
           ->getResult();
         $ofpaginado = $paginator->paginate(
