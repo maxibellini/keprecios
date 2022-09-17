@@ -191,12 +191,12 @@ class Oferta
         return $this;
     }
 
-    public function getFechaCarga(): ?\DateInterface
+    public function getFechaCarga(): ?\DateTimeInterface
     {
         return $this->fechaCarga;
     }
 
-    public function setFechaCarga(?\DateInterface $fechaCarga): self
+    public function setFechaCarga(?\DateTimeInterface $fechaCarga): self
     {
         $this->fechaCarga = $fechaCarga;
 
