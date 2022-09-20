@@ -162,6 +162,17 @@ class AppController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/lector", name="app_lector")
+     */
+    public function lector()
+    {
+      $em = $this->getDoctrine()->getManager();
+        
+        return $this->render('app/lector.html.twig', [
+            'controller_name' => 'Lector KePrecios'
+        ]);
+    }
 
     /**
      * @param int    $codigo

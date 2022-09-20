@@ -86,7 +86,7 @@
                         {%endif%}
                     </td>
                     <td>
-                      <a style="" href="{{path('app_comercio_perfil',{ 'id': solicitud.id })}}" > Ver</a>
+                      <a style="color: grey" href="{{path('app_comercio_perfil',{ 'id': solicitud.id })}}" > Ver</a>
                       {% if solicitud.estadoComercio == 'ACTIVO' %}
                           
                           {% elseif solicitud.estadoComercio == 'PENDIENTE' %}
@@ -127,7 +127,7 @@
  
                     </td>
                     <td>
-                      <a style="" href="{{path('app_oferta_perfil',{ 'id': oferta.id })}}" > Ver</a>
+                      <a style="color: grey" href="{{path('app_oferta_perfil',{ 'id': oferta.id })}}" > Ver</a>
                       <a style="" href="{{path('app_oferta_editar',{ 'id': oferta.id })}}" > Editar</a>
                     </td>
                   </tr>
@@ -157,7 +157,7 @@
                     </td>
                     <td> 
                       {% if producto.estadoProducto == 1 %}
-                      <a style="" href="{{path('app_producto_perfil',{ 'id': producto.id })}}" > Ver</a>&nbsp
+                      <a style="color: grey" href="{{path('app_producto_perfil',{ 'id': producto.id })}}" > Ver</a>&nbsp
                       <a style="" href="{{path('app_producto_editar',{ 'id': producto.id })}}" > Editar</a></td>
                       {% endif %}
                   </tr>

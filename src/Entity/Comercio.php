@@ -112,7 +112,7 @@ class Comercio
     private $oferta;
 
    /**
-     * @ORM\Column(type="string", length=255, nullable =true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @var string
      */
     private $image;
