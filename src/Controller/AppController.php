@@ -24,6 +24,7 @@ class AppController extends AbstractController
              ->innerJoin('o.comercio', 'c')
              ->andWhere("c.estadoComercio like :estado")
              ->setParameter('estado','ACTIVO')
+             ->orderBy('o.fechaCarga', 'DESC')
              ->getQuery()
              ->getResult();
         return $this->render('app/homepage.html.twig', [
