@@ -1,0 +1,15 @@
+  <a class="btn btn-link btn-sm" data-toggle="collapse" href="#collapseExample2" role="button" aria-expanded="false" aria-controls="collapseExample2">
+    Quiero eliminar esta lista de compras
+  </a>
+
+<div class="collapse" id="collapseExample2">
+  <div class="card card-body">
+<form method="post" action="{{ path('app_lista_borrar', {'id': lista.id}) }}" onsubmit="return confirm('¿Esta seguro de que quiere eliminar esta lista de compra?');">
+    <input type="hidden" name="_method" value="DELETE">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ lista.id) }}">
+    <button class="btn btn-sm" style="background-color: red; color:white">🗑️ Eliminar lista de compra</button>
+</form>
+
+
+  </div>
+</div>

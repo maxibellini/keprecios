@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lista de Compra{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+    .ocultar {
+      display: none ;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+<div class="e">
+{% for message in app.flashes('exito') %}
+      <div class="alert alert-success">
+         {{message}}     
+      </div>    
+{% endfor %}
+
+</div>
+
+ <div class="row">
+    <div class="col-sm-2">
+
+    </div>    
+    <div class="col-sm-8 tarjeta-body item-content " style="background-color: #FCFCFC; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
+          <br>
+          <h4 class="display-5">Mi Lista de Compra</h4>  
+
+
+
+    {{ form_start(formulario) }}
+    <div class="row form-group" > 
+        <div class="col-12 " style="color:red"> {{ form_errors(formulario) }} </div>
+        <div class="col-sm-6 form-group" style="">
+          <br>
+          {{ form_row(formulario.nombre,{ 'label' : 'Nombre *', 'attr' : { 'class' : 'form-control' }}) }}
+        </div>  
+        <br>        
+        <div class="col-sm-6" align="center">
+          
+        
+        </div>
+        <div class="col-sm-6  form-group" align="center">
+          <br>
+         <a href="javascript:history.back()" style="align-content: left"> Cancelar</a>
+        </div>
+        <div class="col-sm-6" align="right">
+          <br>
+        <button type="submit" class="btn btn-danger">Guardar</button>
+         
+      </div>
+    </div>
+    {{ form_end(formulario) }}
+
+
+    </div>
+</div>
+</div>
+</div>
+<br>
+
+
+
+{% endblock %}

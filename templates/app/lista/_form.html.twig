@@ -1,0 +1,26 @@
+
+    {{ form_start(form) }}
+    <div class="row form-group" >
+        <div class="col-12 " style="color:red"> {{ form_errors(form) }} </div>
+        <div class="col-sm-6 form-group" style="">
+          {{ form_row(form.nombre,{ 'label' : 'Nombre', 'attr' : { 'class' : 'form-control' }}) }}
+        </div>  
+        <br>  
+        <div class="col-sm-6" align="center"></div>
+        <div class="col-sm-6" align="center">
+          <br>
+          <a class="" href="{{ path('app_inicio') }}">Cancelar</a>
+        </div>
+        <div class="col-6" align="right">
+        	<br>
+            <button class="btn btn-danger" align="right">{{ button_label|default('Save') }}</button>
+          
+           
+      </div>
+    {{ form_end(form) }}
+
+
+    <script>
+
+
+    </script>

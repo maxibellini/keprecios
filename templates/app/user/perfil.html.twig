@@ -55,120 +55,214 @@
     <br>
 <br>   {% if app.user != null %}
           {% if app.user.name == user.name %}
-          <h5>Mis Solicitudes</h5>
-          {% set solicitudes = user.comercio %}
-              <table class="table">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Comercio</th>
-                    <th scope="col">Dirección</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Solicitud</th>
-                    <th scope="col">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                 {% for solicitud in solicitudes %}
-                  <tr>
-                    <th scope="row">{{solicitud.nombreComercio}}</th>
-                    <td>{{solicitud.direccionComercio}} - {{solicitud.localidad.nombre}}</td>
-                    <td>{% if solicitud.estadoComercio == 'ACTIVO' %}<span style="color: green">{% elseif solicitud.estadoComercio == 'PENDIENTE' %}<span style="color: grey">{% elseif solicitud.estadoComercio == 'BAJA' %}<span style="color: red">{% else %}<span style="color: grey">{% endif %}{{solicitud.estadoComercio}}</span></td>
-                    <td>{% if solicitud.estadoComercio == 'ACTIVO' %}
-                          <span style="color: green">APROBADA</span>
-                          {% elseif solicitud.estadoComercio == 'PENDIENTE' %}
-                             {% if solicitud.motivoRechazo != NULL %}
-                               <span style="color: red">RECHAZADA </span><br> {{solicitud.motivoRechazo}}
-                               {% else %}
-                                  <span style="color: grey">PENDIENTE</span>
-                             {% endif %}
-                            {% elseif solicitud.estadoComercio == 'BAJA' %}
-                                <span style="color: red">BAJA </span>
-                        {%endif%}
-                    </td>
-                    <td>
-                      <a style="color: grey" href="{{path('app_comercio_perfil',{ 'id': solicitud.id })}}" > Ver</a>
-                      {% if solicitud.estadoComercio == 'ACTIVO' %}
-                          
-                          {% elseif solicitud.estadoComercio == 'PENDIENTE' %}
-                               <a style="" href="{{path('app_comercio_editar',{ 'id': solicitud.id })}}" > Editar</a>
-                             
-                            {% elseif solicitud.estadoComercio == 'BAJA' %}
-                               
-                        {%endif%}
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-          <br>
-          <h5>Mis Ofertas cargadas</h5>
-          {% set ofertas = user.ofertas %}
-              <table class="table">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Oferta</th>
-                    <th scope="col">Fecha carga</th>
-                    <th scope="col">Fecha update</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                 {% for oferta in ofertas %}
-                  <tr>
-                    <th scope="row">{{oferta.__toString}}</th>
-                    <td>{% if oferta.fechaCarga != null %}{{oferta.fechaCarga|date('Y-m-d')}}{% endif %} </td>
-                    <td>{% if oferta.fechaUpdate != null %}{{oferta.fechaUpdate|date('Y-m-d')}}{% endif %} </td>
-                    <td>{% if oferta.estado == '1' %}
-                          <span style="color: green">ACTIVA</span>
-                               {% else %}
-                                  <span style="color: red">INACTIVA</span>
-                        {% endif %}
- 
-                    </td>
-                    <td>
-                      <a style="color: grey" href="{{path('app_oferta_perfil',{ 'id': oferta.id })}}" > Ver</a>
-                      <a style="" href="{{path('app_oferta_editar',{ 'id': oferta.id })}}" > Editar</a>
-                    </td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-          <br>        
-          <h5>Mis Productos cargados</h5>
-          {% set productos = user.productos %}
-              <table class="table">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">Código</th>
-                    <th scope="col">Producto</th>
-                    <th scope="col">Marca</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                 {% for producto in productos %}
-                  <tr>
-                    <th scope="row">{{producto.gtin}}</th>
-                    <td>{{producto.descripcionProducto}}</td>
-                    <td>{{producto.marcaProducto}}</td>
-                    <td>{% if producto.estadoProducto == 1 %}<span style="color: green">ACTIVO{% else%}<span style="color: red"> BAJA{% endif %}</span>
-                    </td>
-                    <td> 
-                      {% if producto.estadoProducto == 1 %}
-                      <a style="color: grey" href="{{path('app_producto_perfil',{ 'id': producto.id })}}" > Ver</a>&nbsp
-                      <a style="" href="{{path('app_producto_editar',{ 'id': producto.id })}}" > Editar</a></td>
-                      {% endif %}
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>       
+           <div class="col-sm-12 mbr-fonts-style">
+           {% set listas = user.listaCompras %}
+           {% if listas != '' %}
+                <div class="accordion" id="accordionExample0">
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-5" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo0" aria-expanded="false" aria-controls="collapseTwo" style="border: 1px solid #E85395; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                       Mis Listas de Compra
+                      </button>
+                    </h2>
+                    <div id="collapseTwo0" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample0">
+                      <div class="row accordion-body">
+                         <table class="table">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Fecha Creación</th>
+                                <th scope="col">Acciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                             {% for lista in listas %}
+                              <tr>
+                                <th scope="row">{{lista.nombre}}</th>
+                                <td>{% if lista.fechaCreacion != null %}{{lista.fechaCreacion|date('Y-m-d')}}{% endif %}</td>
+                                <td>
+                                  <a style="color: grey" href="{{path('app_lista_perfil',{ 'id': lista.id })}}" > Ver</a>
+                                  &nbsp;
+                                  <a style="" href="{{path('app_lista_editar',{ 'id': lista.id })}}" > Editar</a>
+
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                      <br>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+           {% endif %}
+           {% set solicitudes = user.comercio %}
+           {% if solicitudes != '' %}
+                <div class="accordion" id="accordionExample">
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-5" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo1" aria-expanded="false" aria-controls="collapseTwo" style="border: 1px solid #E85395; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                       Mis solicitudes de comercios
+                      </button>
+                    </h2>
+                    <div id="collapseTwo1" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                      <div class="row accordion-body">
+                         <table class="table">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">Comercio</th>
+                                <th scope="col">Dirección</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Solicitud</th>
+                                <th scope="col">Acciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                             {% for solicitud in solicitudes %}
+                              <tr>
+                                <th scope="row">{{solicitud.nombreComercio}}</th>
+                                <td>{{solicitud.direccionComercio}} - {{solicitud.localidad.nombre}}</td>
+                                <td>{% if solicitud.estadoComercio == 'ACTIVO' %}<span style="color: green">{% elseif solicitud.estadoComercio == 'PENDIENTE' %}<span style="color: grey">{% elseif solicitud.estadoComercio == 'BAJA' %}<span style="color: red">{% else %}<span style="color: grey">{% endif %}{{solicitud.estadoComercio}}</span></td>
+                                <td>{% if solicitud.estadoComercio == 'ACTIVO' %}
+                                      <span style="color: green">APROBADA</span>
+                                      {% elseif solicitud.estadoComercio == 'PENDIENTE' %}
+                                         {% if solicitud.motivoRechazo != NULL %}
+                                           <span style="color: red">RECHAZADA </span><br> {{solicitud.motivoRechazo}}
+                                           {% else %}
+                                              <span style="color: grey">PENDIENTE</span>
+                                         {% endif %}
+                                        {% elseif solicitud.estadoComercio == 'BAJA' %}
+                                            <span style="color: red">BAJA </span>
+                                    {%endif%}
+                                </td>
+                                <td>
+                                  <a style="color: grey" href="{{path('app_comercio_perfil',{ 'id': solicitud.id })}}" > Ver</a>
+                                  {% if solicitud.estadoComercio == 'ACTIVO' %}
+                                      
+                                      {% elseif solicitud.estadoComercio == 'PENDIENTE' %}
+                                           <a style="" href="{{path('app_comercio_editar',{ 'id': solicitud.id })}}" > Editar</a>
+                                         
+                                        {% elseif solicitud.estadoComercio == 'BAJA' %}
+                                           
+                                    {%endif%}
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                      <br>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+                {% set ofertas = user.ofertas %}
+                {% if ofertas != '' %}
+                <div class="accordion" id="accordionExample2">
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-4" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo2" aria-expanded="false" aria-controls="collapseTwo" style="border: 1px solid #E85395; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                       Mis ofertas cargadas
+                      </button>
+                    </h2>
+                    <div id="collapseTwo2" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample2">
+                      <div class="row accordion-body">
+                          <table class="table">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">Oferta</th>
+                                <th scope="col">Fecha carga</th>
+                                <th scope="col">Fecha update</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                             {% for oferta in ofertas %}
+                              <tr>
+                                <th scope="row">{{oferta.__toString}}</th>
+                                <td>{% if oferta.fechaCarga != null %}{{oferta.fechaCarga|date('Y-m-d')}}{% endif %} </td>
+                                <td>{% if oferta.fechaUpdate != null %}{{oferta.fechaUpdate|date('Y-m-d')}}{% endif %} </td>
+                                <td>{% if oferta.estado == '1' %}
+                                      <span style="color: green">ACTIVA</span>
+                                           {% else %}
+                                              <span style="color: red">INACTIVA</span>
+                                    {% endif %}
+             
+                                </td>
+                                <td>
+                                  <a style="color: grey" href="{{path('app_oferta_perfil',{ 'id': oferta.id })}}" > Ver</a>
+                                  <a style="" href="{{path('app_oferta_editar',{ 'id': oferta.id })}}" > Editar</a>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                      <br>  
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+                {% set productos = user.productos %}
+                {% if productos != '' %}
+                <div class="accordion" id="accordionExample3">
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-4" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo3" aria-expanded="false" aria-controls="collapseTwo" style="border: 1px solid #E85395; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                       Mis productos cargados
+                      </button>
+                    </h2>
+                    <div id="collapseTwo3" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample3">
+                      <div class="row accordion-body">
+                        <table class="table">
+                          <thead class="thead-light">
+                            <tr>
+                              <th scope="col">Código</th>
+                              <th scope="col">Producto</th>
+                              <th scope="col">Marca</th>
+                              <th scope="col">Estado</th>
+                              <th scope="col">Acciones</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                           {% for producto in productos %}
+                            <tr>
+                              <th scope="row">{{producto.gtin}}</th>
+                              <td>{{producto.descripcionProducto}}</td>
+                              <td>{{producto.marcaProducto}}</td>
+                              <td>{% if producto.estadoProducto == 1 %}<span style="color: green">ACTIVO{% else%}<span style="color: red"> BAJA{% endif %}</span>
+                              </td>
+                              <td> 
+                                {% if producto.estadoProducto == 1 %}
+                                <a style="color: grey" href="{{path('app_producto_perfil',{ 'id': producto.id })}}" > Ver</a>&nbsp
+                                <a style="" href="{{path('app_producto_editar',{ 'id': producto.id })}}" > Editar</a></td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>   
+                        <br>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+            </div>
+          
+    <br> 
           {% endif %}
         {% endif %}
+</div> 
+</div> 
 </div>
-</div>
-</div>
-        <br>
+        
         
 {% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+    @font-face {
+       font-family: lapiz;
+       src: url('assets/web/DK Crayon Crumble.ttf');
+    }
+
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+
+<div class="e">
+{% for message in app.flashes('exito') %}
+      <div class="alert alert-success">
+         {{message}}     
+      </div>    
+{% endfor %}
+
+</div>
+  <a href="javascript:history.back()" style="float: right"> Volver Atrás</a>
+      <br>
+ <div class="row">
+    <div class="col-sm-3"> </div>
+    <div class="col-sm-6 card tarjeta-body item-content display-7" style="background-image: url('/assets/images/fondo-papel.png'); background-repeat:repeat; background-position:center;-webkit--webkit-box-shadow: 10px 10px 4px -3px rgba(0,0,0,0.42);
+-moz-box-shadow: 10px 10px 4px -3px rgba(0,0,0,0.42);
+box-shadow: 10px 10px 4px -3px rgba(0,0,0,0.42);border: 0.5px solid #EAEAEA; ;font-family: lapiz; color: rgba(0,0,0,0.6)">
+          <br>
+          <h4 class=" " align="center" style=" font-size: 200%"><b>{{lista.nombre | upper}}</b></h4>  
+          <div class="row">
+            <div class="col-12" style="font-family: lapiz; color:rgba(0,0,0,0.7); font-size: 150%">
+                <div class=" ">Fecha de creación: <span >{% if lista.fechaCreacion != null %}{{lista.fechaCreacion|date('Y-m-d')}}{% endif %} </span> </div>
+
+            </div>
+            <br> <br><br> <br><br> <br><br> <br><br>
+          </div>
+      <br>
+      <br>
+    </div>
+    <div class="col-sm-3"> </div>
+</div>
+</div>
+        <br>
+        
+{% endblock %}
