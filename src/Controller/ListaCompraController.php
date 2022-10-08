@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 class ListaCompraController extends AbstractController
 {
@@ -25,10 +27,33 @@ class ListaCompraController extends AbstractController
             return $this->redirectToRoute('app_inicio');  
         }
     	$lista = new ListaCompra();
+        if ($this->getUser()){
+            $lista->setUser($this->getUser());
+        }else{
+            $this->addFlash('fracaso','Error no tiene la sesión iniciada.');
+            return $this->redirectToRoute('app_inicio');
+        }
         $em = $this->getDoctrine()->getManager();
     	$form = $this->createForm(ListaCompraType::class , $lista);
         $form-> handleRequest($request);
     	if($form->isSubmitted() && $form->isValid() ){
+            if ($form->getClickedButton() && 'savefind' === $form->getClickedButton()->getName()) {
+                $em = $this->getDoctrine()->getManager();
+                if ($this->getUser()){
+                    $lista->setUser($this->getUser());
+                }else{
+                    $this->addFlash('fracaso','Error no tiene la sesión iniciada.');
+                    return $this->redirectToRoute('app_inicio');
+                }
+                $hoy= new \DateTime();
+                $lista->setFechaCreacion($hoy);
+                $em->persist($lista);
+                $em->flush();
+
+                //$this->addFlash('exito','¡Tu Lista fue guardada exitosamente!');
+                
+                return $this->redirectToRoute('app_lista_buscar', array('id' => $lista->getId()));
+            }
     		$em = $this->getDoctrine()->getManager();
             if ($this->getUser()){
                 $lista->setUser($this->getUser());
@@ -119,6 +144,13 @@ class ListaCompraController extends AbstractController
         $form->handleRequest($request);       
       // dd($form);
         if ($form->isSubmitted() && $form->isValid()) {
+
+            if ($form->getClickedButton() && 'savefind' === $form->getClickedButton()->getName()) {
+                $this->getDoctrine()->getManager()->flush();
+                //$this->addFlash('exito','¡Los cambios se han guardado correctamente!');
+
+                return $this->redirectToRoute('app_lista_buscar', array('id' => $id));
+            }
             $this->getDoctrine()->getManager()->flush();
             $this->addFlash('exito','¡Los cambios se han guardado correctamente!');
             return $this->redirectToRoute('app_inicio');
@@ -129,5 +161,44 @@ class ListaCompraController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
+    /**
+     * @Route("/buscarlista-{id}", name="app_lista_buscar")
+     */
+    public function buscarListaCompra( $id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $lista = $em->getRepository("App:ListaCompra")->findOneBy(array('id'=>$id));
+        if (!$lista){
+            $this->addFlash('fracaso','Error, no se encontró la lista de compra solicitada');
+            return $this->redirectToRoute('app_inicio');    
+        }        
+        $lineas = $lista->getLineasProductos();
+        $productos = new ArrayCollection();
+        foreach ($lineas as $linea) {
+           $productos[] = $linea->getProducto();
+        }
+        $comerces = $em->getRepository("App:Comercio")->findAll();
+        $comercios = $em->getRepository("App:ListaCompra")->createQueryBuilder('lc')
+          ->select('c.id','c.nombreComercio','sum(o.monto*lp.cantidad) as montoTotal')
+          ->innerJoin('lc.lineasProductos', 'lp')
+          ->innerJoin('lp.producto', 'p')
+          ->innerJoin('p.ofertas', 'o')
+          ->innerJoin('o.comercio', 'c')
+          ->setParameter('productos',$productos)
+          ->andWhere("o.producto in (:productos)")
+          ->setParameter('lista',$lista->getId())
+          ->andWhere("lc.id = :lista")
+          ->andWhere("o.estado = 1")
+          ->groupBy('c.nombreComercio')
+          ->setParameter('cantp',count($lineas)-1)
+          ->having('COUNT(c.nombreComercio)>:cantp')
+          ->orderBy('montoTotal')
+          ->getQuery()
+          ->getResult();
+        return $this->render('app/buscar_lista.html.twig', [
+            'lista' => $lista,
+            'comercios' => $comercios, 
+            'comerces' => $comerces
+        ]);
+    }
 }

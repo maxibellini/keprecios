@@ -45,19 +45,45 @@
           {{ form_row(formulario.nombre,{ 'label' : 'Nombre *', 'attr' : { 'class' : 'form-control' }}) }}
         </div>  
         <br>        
-        <div class="col-sm-6" align="center">
-          
-        
+        <div class="col-sm-12 row js-linea-producto-wrapper " align="center" data-prototype="
+                 <div class='js-linea-producto-item row form-group' style='border: 0.5px solid #E5E5E5; background-color: #F9F9F9; border-radius: 6px 6px 6px 6px; -moz-border-radius: 6px 6px 6px 6px; -webkit-border-radius: 6px 6px 6px 6px; '>
+                   <div class='col-sm-8'>{{ form_row(formulario.lineasProductos.vars.prototype.producto,{ 'label' : 'Producto', 'attr' : { 'class' : 'form-control' }})|e('html_attr') }}<br></div>
+                   <div class='col-sm-3'>{{ form_row(formulario.lineasProductos.vars.prototype.cantidad,{ 'label' : 'Cantidad', 'attr' : { 'class' : 'form-control' }})|e('html_attr') }}<br></div>
+                   <div class='col-sm-1' >
+                    <a href='#' class='js-remove-linea pull-right' style='border: 0px solid #E00000; border-radius: 6px 6px 6px 6px; -moz-border-radius: 6px 6px 6px 6px; -webkit-border-radius: 6px 6px 6px 6px; color:white; background-color: #E00000 '>
+                      <span class='fa fa-close' >&nbsp;x&nbsp;</span>
+                    </a><br>
+                   </div>
+                 </div>"
+         data-index="{{ formulario.lineasProductos|length }}" style="left: 15px;">
+              {% for linea in formulario.lineasProductos %}
+                 <div class='js-linea-producto-item row form-group' style='border: 0.5px solid #E5E5E5; background-color: #F9F9F9; border-radius: 6px 6px 6px 6px; -moz-border-radius: 6px 6px 6px 6px; -webkit-border-radius: 6px 6px 6px 6px; '>
+                   <div class='col-sm-8'>{{ form_row(linea.producto,{ 'label' : 'Producto', 'attr' : { 'class' : 'form-control' }}) }}<br></div>
+                   <div class='col-sm-3'>{{ form_row(linea.cantidad,{ 'label' : 'Cantidad', 'attr' : { 'class' : 'form-control' }}) }}<br></div>
+                   <div class='col-sm-1' >
+                    <a href='#' class='js-remove-linea pull-right' style='border: 0px solid #E00000; border-radius: 6px 6px 6px 6px; -moz-border-radius: 6px 6px 6px 6px; -webkit-border-radius: 6px 6px 6px 6px; color:white; background-color: #E00000 '>
+                      <span class='fa fa-close' >&nbsp;x&nbsp;</span>
+                    </a><br>
+                   </div>
+                 </div>
+              {% endfor %}
+              <a href="#" class="btn btn-sm btn-warning js-linea-producto-add">
+                  <span class="fa fa-plus-circle"></span>
+                  Agregar un producto
+              </a>
         </div>
-        <div class="col-sm-6  form-group" align="center">
+        <div class="col-sm-3" align="center">
           <br>
-         <a href="javascript:history.back()" style="align-content: left"> Cancelar</a>
+          <a href="javascript:history.back()" style="align-content: left"> Cancelar</a>
         </div>
-        <div class="col-sm-6" align="right">
+        <div class="col-4" align="center">
           <br>
-        <button type="submit" class="btn btn-danger">Guardar</button>
-         
-      </div>
+            {{ form_row(formulario.save,{ 'label' : 'Sólo Guardar', 'attr' : { 'class' : 'form-control btn btn-outline-secondary' }}) }}
+        </div>        
+        <div class="col-5" align="right">
+          <br>
+            {{ form_row(formulario.savefind,{ 'label' : 'Guardar y Buscar', 'attr' : { 'class' : 'form-control btn btn-danger' }}) }}
+        </div>
     </div>
     {{ form_end(formulario) }}
 
@@ -67,7 +93,31 @@
 </div>
 </div>
 <br>
-
+<script>
+          jQuery(document).ready(function() {
+            var $wrapper = $('.js-linea-producto-wrapper');
+            $wrapper.on('click', '.js-remove-linea', function(e) {
+                e.preventDefault();
+                $(this).closest('.js-linea-producto-item')
+                    .fadeOut()
+                    .remove();
+            });
+            $wrapper.on('click', '.js-linea-producto-add', function(e) {
+                e.preventDefault();
+                // Get the data-prototype explained earlier
+                var prototype = $wrapper.data('prototype');
+                // get the new index
+                var index = $wrapper.data('index');
+                // Replace '__name__' in the prototype's HTML to
+                // instead be a number based on how many items we have
+                var newForm = prototype.replace(/__name__/g, index);
+                // increase the index with one for the next item
+                $wrapper.data('index', index + 1);
+                // Display the form in the page before the "new" link
+                $(this).before(newForm);
+            });
+        });
+</script>
 
 
 {% endblock %}

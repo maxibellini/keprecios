@@ -39,10 +39,24 @@ box-shadow: 10px 10px 4px -3px rgba(0,0,0,0.42);border: 0.5px solid #EAEAEA; ;fo
           <h4 class=" " align="center" style=" font-size: 200%"><b>{{lista.nombre | upper}}</b></h4>  
           <div class="row">
             <div class="col-12" style="font-family: lapiz; color:rgba(0,0,0,0.7); font-size: 150%">
-                <div class=" ">Fecha de creación: <span >{% if lista.fechaCreacion != null %}{{lista.fechaCreacion|date('Y-m-d')}}{% endif %} </span> </div>
-
+                <div class=" ">Fecha: <span >{% if lista.fechaCreacion != null %}{{lista.fechaCreacion|date('Y-m-d')}}{% endif %} </span> </div>
+                <br>
+                {% set lineasp = lista.lineasProductos  %}
+                {% if lineasp != null %}
+                  <table>
+                  <tbody>
+                    {% for lineap in lineasp %}
+                      <tr>
+                        <td>{{lineap.producto.descripcionProducto}}</td>
+                        <td>------------x{{lineap.cantidad}}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                  </table>
+                {% endif %}
+                <br>
             </div>
-            <br> <br><br> <br><br> <br><br> <br><br>
+            
           </div>
       <br>
       <br>

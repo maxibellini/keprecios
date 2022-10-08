@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+    .colorboton {
+      background-color: white; color: #FF9071;  
+       border: 1px solid #FF9071;
+    }
+    .colorboton:hover , .colorboton:focus, .colorboton:active , coloboton.active {
+
+    background-color: #FF9071;
+        border: 1px solid #FF9071;
+     
+    color: white;
+
+    }
+    @font-face {
+       font-family: lapiz;
+       src: url('assets/web/DK Crayon Crumble.ttf');
+    }
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+{% for flash_message in app.session.flashbag.get('exito') %}
+    <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+{% for flash_message in app.session.flashbag.get('fracaso') %}
+    <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+ <a href="javascript:history.back()" style="float: right"> Volver Atrás</a>
+ <br>
+
+       
+         <div class="row" style="font-family: Londrina Solid; " >    
+                 <!-- Button trigger modal -->
+              <a class="btn btn-link" data-toggle="modal" data-target="#exampleModal" style="color:grey; border: 1px solid grey">
+                Ver Lista de Compra
+              </a>
+              <!-- Modal -->
+              <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document" style="font-family: Arial, sans-serif; font-size: smaller; ">
+                  <div class="modal-content">
+                    <div class="modal-body row">
+                       <div class="col-sm-2"> </div>
+                        <div class="col-sm-8 card tarjeta-body item-content display-7" style="background-image: url('/assets/images/fondo-papel.png'); background-repeat:repeat; background-position:center;-webkit--webkit-box-shadow: 10px 10px 4px -3px rgba(0,0,0,0.42); -moz-box-shadow: 10px 10px 4px -3px rgba(0,0,0,0.42); box-shadow: 10px 10px 4px -3px rgba(0,0,0,0.42);border: 0.5px solid #EAEAEA ;font-family: lapiz; color: rgba(0,0,0,0.6)">
+                              <br>
+                              <h4 class=" " align="center" style=" font-size: 200%"><b>{{lista.nombre | upper}}</b></h4>  
+                              <div class="row">
+                                <div class="col-12" style="font-family: lapiz; color:rgba(0,0,0,0.7); font-size: 150%">
+                                    <div class=" ">Fecha de creación: <span >{% if lista.fechaCreacion != null %}{{lista.fechaCreacion|date('Y-m-d')}}{% endif %} </span> </div>
+                                    <br>
+                                    {% set lineasp = lista.lineasProductos  %}
+                                    {% if lineasp != null %}
+                                      <table>
+                                      <tbody>
+                                        {% for lineap in lineasp %}
+                                          <tr>
+                                            <td>{{lineap.producto.descripcionProducto}}</td>
+                                            <td>----x{{lineap.cantidad}}</td>
+                                          </tr>
+                                        {% endfor %}
+                                      </tbody>
+                                      </table>
+                                    {% endif %}
+                                    <br>
+                                </div>
+                                
+                              </div>
+                          <br>
+                          <br>
+                        </div>
+                        <div class="col-sm-2"> </div>
+                    </div>
+                    <div class="modal-footer mbr-fonts-style" >
+                      <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal">Cancelar</button>
+                      <a type="button" align="right" class="btn btn-warning btn-sm" href="{{path('app_lista_editar',{ 'id': lista.id })}}">Editar lista</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          {% if comercios != null %}
+ 
+
+            <div class="col-sm-12">           
+            Resultados encontrados: </div>
+            <br><br><!-- {{dump(comercios,lista)}} -->
+            {% set lineasp = lista.lineasProductos %}
+            {% for comercio in comercios %} 
+              <div class="col-sm-6 ampliar4 " style="background-color: white; border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; -webkit-box-shadow: 0px 0px 13px -1px rgba(0,0,0,0.42); -moz-box-shadow: 0px 0px 13px -1px rgba(0,0,0,0.42); box-shadow: 0px 0px 13px -1px rgba(0,0,0,0.42); ">
+                {% for comerce in comerces %} 
+                  {% if comerce.id == comercio.id %}
+                    {% set ofertasc = comerce.oferta %}
+                      <center style=" font-size: 200%;"><a href="{{path('app_comercio_perfil',{ 'id': comerce.id })}}" style="color: #E6639E; -webkit-text-stroke: 0.5px black;"> {{comercio.nombreComercio}}</a></center>
+
+
+                      <table class="table">
+                      <tbody>
+                              <tr style="background-color: #FF683E; color:white;">
+                                <td>Producto</td>
+                                <td>Cant.</td>
+                                <td>Monto</td>
+                              </tr>
+                        {% for lineap in lineasp %}
+                          {% for oferta in ofertasc %}
+                            {% if lineap.producto == oferta.producto %}
+                              <tr style="color:grey">
+                                <td><a href="{{path('app_oferta_perfil',{ 'id': oferta.id })}}">{{oferta.producto.descripcionProducto}}</a></td>
+                                <td>x{{lineap.cantidad}}</td>
+                                <td>${{oferta.monto*lineap.cantidad}}</td>
+                              </tr>
+                            {% endif %}
+                          {% endfor %}
+                        {% endfor %}
+                             <td>Total</td>
+                                <td></td>
+                                <td><b style="font-size: 130%;-webkit-text-stroke: 1px #824434;color: #FFCFC1">${{comercio.montoTotal}}</b></td>
+                             </tr>
+                      </tbody>
+                      </table>
+
+
+
+                      
+                  {% endif %}
+                {% endfor %}
+              </div>  
+            {% endfor %}
+           {% else %}
+              <div class="alert alert-warning" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+                  No se han encontrado resultados que contemplen todos los productos de la Lista.</a>
+              </div>
+           
+           {% endif %}
+         </div>
+            
+            
+            
+            
+            
+ </div> 
+
+
+    <br>
+
+{% endblock %}

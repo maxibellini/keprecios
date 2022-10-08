@@ -10,5 +10,8 @@ App\Entity\Producto:
 App\Entity\Oferta:
     constraints:
         - Callback: validate
+App\Entity\ListaCompra:
+    constraints:
+        - Callback: validate
 
 

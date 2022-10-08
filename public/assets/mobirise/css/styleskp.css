@@ -44,6 +44,20 @@ overflow:hidden;
 -o-transform:scale(1.05);
 transform:scale(1.05);
 }
+.ampliar4 {
+-webkit-transform:scale(0.95);
+-webkit-transition:all .10s ease; /* Safari y Chrome */
+-moz-transition:all .10s ease; /* Firefox */
+-o-transition:all .10s ease; /* IE 9 */
+-ms-transition:all .10s ease; /* Opera */
+}
+.ampliar4:hover  {
+-webkit-transform:scale(1.00);
+-moz-transform:scale(1.00);
+-ms-transform:scale(1.00);
+-o-transform:scale(1.00);
+transform:scale(1.00);
+}
 .achicar {
 -webkit-transition:all .10s ease; /* Safari y Chrome */
 -moz-transition:all .10s ease; /* Firefox */
