@@ -195,9 +195,28 @@ class ListaCompraController extends AbstractController
           ->orderBy('montoTotal')
           ->getQuery()
           ->getResult();
+        $comerciosp = $em->getRepository("App:ListaCompra")->createQueryBuilder('lc')
+          ->select('c.id','c.nombreComercio','sum(o.monto*lp.cantidad) as montoTotal','count(lp.producto) as cantProd')
+          ->innerJoin('lc.lineasProductos', 'lp')
+          ->innerJoin('lp.producto', 'p')
+          ->innerJoin('p.ofertas', 'o')
+          ->innerJoin('o.comercio', 'c')
+          ->setParameter('productos',$productos)
+          ->andWhere("o.producto in (:productos)")
+          ->setParameter('lista',$lista->getId())
+          ->andWhere("lc.id = :lista")
+          ->andWhere("o.estado = 1")
+          ->groupBy('c.nombreComercio')
+          ->setParameter('cantp',count($lineas))
+          ->having('COUNT(c.nombreComercio)<:cantp')
+          ->addOrderBy('cantProd', 'DESC')
+          ->addOrderBy('montoTotal', 'ASC')
+          ->getQuery()
+          ->getResult();
         return $this->render('app/buscar_lista.html.twig', [
             'lista' => $lista,
             'comercios' => $comercios, 
+            'comerciosp' => $comerciosp, 
             'comerces' => $comerces
         ]);
     }

@@ -14,6 +14,13 @@
     .ocultar {
       display: none ;
     }
+      .select2-container--bootstrap {
+        width: 0px;
+        }
+      .select2-dropdown--below {
+        max-height: 200px;
+        overflow: scroll;
+      }
 </style>
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -34,7 +41,8 @@
     <div class="col-sm-8 tarjeta-body item-content " style="background-color: #FCFCFC; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
           <br>
           <h4 class="display-5">Mi Lista de Compra</h4>  
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2-rc.1/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.2-rc.1/js/select2.min.js"></script>
 
 
     {{ form_start(formulario) }}
@@ -94,6 +102,10 @@
 </div>
 <br>
 <script>
+          $('select').select2(); 
+        $('select').select2({
+            theme: "bootstrap form-control",
+        })
           jQuery(document).ready(function() {
             var $wrapper = $('.js-linea-producto-wrapper');
             $wrapper.on('click', '.js-remove-linea', function(e) {
@@ -115,6 +127,10 @@
                 $wrapper.data('index', index + 1);
                 // Display the form in the page before the "new" link
                 $(this).before(newForm);
+                        $('select').select2(); 
+        $('select').select2({
+            theme: "bootstrap form-control",
+        })
             });
         });
 </script>

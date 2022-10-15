@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudAutocompleteType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ORM\EntityRepository;
@@ -34,6 +35,9 @@ class LineaProductoType extends AbstractType
             ->add('producto' , EntityType::class, [
                 // looks for choices from this entity
                 'class' => Producto::class,
+                'attr' => [
+                    'class' => 'select2'
+                ]
             ] )
             ->add('cantidad' , IntegerType::class, [
                 'required' => true,
