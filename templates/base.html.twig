@@ -137,6 +137,15 @@
 
 </section>
 
+{% if is_granted("ROLE_USER") %}
+  <input id="usu_id" name="usu_id" value="{{app.user.id}}" type="hidden">
+  <input id="usu_latitud" name="usu_latitud" value="{{app.user.latitud}}" type="hidden">
+  <input id="usu_longitud" name="usu_longitud" value="{{app.user.longitud}}" type="hidden">
+  {% else %}
+    <input id="usu_id" name="usu_id" value="x" type="hidden">
+    <input id="usu_latitud" name="usu_latitud" value="x" type="hidden">
+    <input id="usu_longitud" name="usu_longitud" value="x" type="hidden">
+{% endif %}
 {% block body %}
 
 {% endblock %}
@@ -250,5 +259,47 @@ function buscar() {
 }
     //document.getElementById("botonBuscar").submit();
 
+
+const funcionInit = () => {
+  var usuid = document.getElementById('usu_id');
+  var usuLat = document.getElementById('usu_latitud');
+  var usuLong = document.getElementById('usu_longitud');
+  var xdlat = usuLat.value;
+  var xdlong = usuLong.value;
+  if (usuid.value != 'x'){
+          if (!"geolocation" in navigator) {
+            return alert("Tu navegador no soporta el acceso a la ubicación. Intenta con otro");
+          }
+
+          const onUbicacionConcedida = ubicacion => {
+            //alert("Ubicación: "+ubicacion.coords.latitude+' '+ubicacion.coords.longitude);
+            usuLat.value=ubicacion.coords.latitude;
+            usuLong.value=ubicacion.coords.longitude;
+            var urlpos = "{{ path('set_posicion', {'id': 'iddato','latitud': 'latituddato','longitud': 'longituddato'}) }}"; 
+            urlpos = urlpos.replace("iddato", usuid.value); 
+            urlpos = urlpos.replace("latituddato", usuLat.value); 
+            urlpos = urlpos.replace("longituddato", usuLong.value); 
+            $.getJSON(urlpos , function(data3) {
+             
+            });
+            if( xdlat == '' && xdlong == '' ){
+              location.reload();
+            }
+          }
+          
+          const onErrorDeUbicacion = err => {
+            alert("Error: "+err);
+          }
+
+          const opcionesDeSolicitud = {
+            enableHighAccuracy: true, // Alta precisión
+            maximumAge: 0, // No queremos caché
+            timeout: 5000 // Esperar solo 5 segundos
+          };
+          // Solicitar
+          navigator.geolocation.getCurrentPosition(onUbicacionConcedida, onErrorDeUbicacion, opcionesDeSolicitud);
+  }
+};
+document.addEventListener("DOMContentLoaded", funcionInit);
  </script>
 </html>

@@ -12,7 +12,7 @@
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code {  padding: 2px 6px; }
 </style>
-
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
 
 <div class="e">
@@ -61,6 +61,16 @@
                 <div class=" ">Teléfono: <span style="color:grey">{{comercio.telefonoComercio}}</span> </div>
                 <div class=" ">Fecha de registro: <span style="color:grey">{% if comercio.fechaRegistroComercio != null %}{{comercio.fechaRegistroComercio | date("d-m-Y") }}{% endif %}</span> </div>
                 <div class=" ">Estado: <span style="color:grey">{{comercio.estadoComercio}}</span> </div>
+                {% if is_granted("ROLE_USER") %}
+                  {% if (app.user.latitud != '') and (app.user.longitud != '') and (comercio.latitudComercio != '') and (comercio.longitudComercio != '') %}
+                    <input id="usu_lati" name="usu_lati" value="{{app.user.latitud}}" type="hidden">
+                    <input id="usu_longi" name="usu_longi" value="{{app.user.longitud}}" type="hidden">
+                    <input id="com_lati" name="com_lati" value="{{comercio.latitudComercio}}" type="hidden">
+                    <input id="com_longi" name="com_longi" value="{{comercio.longitudComercio}}" type="hidden">
+                        <div class=" ">Distancia a mi posición: <span style="color:grey">         <input id="inputdist" type="text" style="display: none">
+                      <span id="mensaje"> </span></span> </div>
+                  {% endif %}
+                {% endif %}
                 <div class=" " style="color:grey"><i class="ri-map-pin-line" style="color:black"></i> {{comercio.direccionComercio}} {% if comercio.localidad != null %}- {{comercio.localidad.nombre }}{% endif %}</div>
                 {% if comercio.latitudComercio != null and comercio.longitudComercio != null %}
                   {% set lat = comercio.latitudComercio %}
@@ -75,5 +85,27 @@
 </div>
 </div>
         <br>
-        
+<script type="text/javascript">
+  var usuLati= document.getElementById('usu_lati');
+  var usuLongi= document.getElementById('usu_longi');
+  var comLati= document.getElementById('com_lati');
+  var comLongi= document.getElementById('com_longi');
+  var mensaje=document.getElementById('mensaje');
+
+  if(usuLati != null && usuLongi != null && comLati != null && comLongi != null ){
+    var urldist = "{{ path('get_distance', {'latitudeFrom': 'ultdato','longitudeFrom': 'ulgdato','latitudeTo': 'cltdato','longitudeTo': 'clgdato'}) }}"; 
+
+    urldist = urldist.replace("ultdato", usuLati.value); 
+    urldist = urldist.replace("ulgdato", usuLongi.value); 
+    urldist = urldist.replace("cltdato", comLati.value); 
+    urldist = urldist.replace("clgdato", comLongi.value);
+
+    $.getJSON(urldist , function(data) {      
+       mensaje.textContent= data;
+    })
+
+    
+  }
+
+</script>        
 {% endblock %}

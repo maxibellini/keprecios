@@ -73,7 +73,7 @@
                                         {% for lineap in lineasp %}
                                           <tr>
                                             <td>{{lineap.producto.descripcionProducto}}</td>
-                                            <td>----x{{lineap.cantidad}}</td>
+                                            <td> &nbsp;x{{lineap.cantidad}}&nbsp; </td>
                                           </tr>
                                         {% endfor %}
                                       </tbody>
@@ -152,7 +152,7 @@
             <div class="col-sm-12 btn-link" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" style="color:grey">           
             Ver resultados con algunos productos de la lista </div>
 
-            <div class="collapse row" id="collapseExample">
+            <div class="collapse" id="collapseExample">
               <br>
               {% set lineasp = lista.lineasProductos %}
               {% for comerciop in comerciosp %} 

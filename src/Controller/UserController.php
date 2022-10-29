@@ -120,5 +120,25 @@ class UserController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/set-posicion-{id}_{latitud}_{longitud}", name="set_posicion")
+     */
+    public function setPosicion($id,$latitud,$longitud)
+    {
+        
+        $em = $this->getDoctrine()->getManager(); 
+        $user =$em->getRepository("App:User")->findOneBy(array('id'=>$id));
+        if($user){
+          if($user != $this->getUser()){
+            $this->addFlash('fracaso','Error, el usuario no corresponde al usuario logueado');
+            return $this->redirectToRoute('app_inicio');
+          }            
+        }
+        $user->setLatitud($latitud);
+        $user->setLongitud($longitud);
+        $em->flush();
+        $res= json_encode($user,true);
+        return new Response($res);
+    }
 
 }

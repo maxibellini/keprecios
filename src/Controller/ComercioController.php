@@ -138,6 +138,28 @@ class ComercioController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
+    /**
+     * @Route("/distance*{latitudeFrom}*{longitudeFrom}*{latitudeTo}*{longitudeTo}", name="get_distance")
+     */
+    function getDistance($latitudeFrom,$longitudeFrom,$latitudeTo,$longitudeTo){ 
+        //Get latitude and longitude from geo data
+        $unit='K';
+        //Calculate distance from latitude and longitude
+        $theta = $longitudeFrom - $longitudeTo;
+        $dist = sin(deg2rad($latitudeFrom)) * sin(deg2rad($latitudeTo)) +  cos(deg2rad($latitudeFrom)) * cos(deg2rad($latitudeTo)) * cos(deg2rad($theta));
+        $dist = acos($dist);
+        $dist = rad2deg($dist);
+        $miles = $dist * 60 * 1.1515;
+        $unit = strtoupper($unit);
+        if ($unit == "K") {
+            $res= round($miles * 1.609344, 2).' km';
+        } else if ($unit == "N") {
+            $res= round($miles * 0.8684, 2).' nm';
+        } else {
+             $res=round($miles,2).' mi';
+        }
+        $resx= json_encode($res,true);
+        return new Response($resx);
+    }
 
 }
