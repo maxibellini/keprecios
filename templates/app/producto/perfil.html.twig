@@ -16,10 +16,15 @@
 <div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
 
 <div class="e">
-{% for message in app.flashes('exito') %}
-      <div class="alert alert-success">
-         {{message}}     
-      </div>    
+{% for flash_message in app.session.flashbag.get('exito') %}
+    <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+        {{ flash_message|raw }}
+    </div>
+{% endfor %}
+{% for flash_message in app.session.flashbag.get('fracaso') %}
+    <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        {{ flash_message|raw }}
+    </div>
 {% endfor %}
 
 </div>
@@ -56,11 +61,85 @@
                    <div class=" ">País: <span style="color:grey">{{producto.pais.nombre}}</span> </div>
                 {% endif %}
                 <div class=" ">Estado: <span style="color:grey">{% if producto.estadoProducto == 1 %}ACTIVO{%else%}BAJA{% endif %}</span> </div>
-
+                    <br>
+                    <div class="bordebl" >
+                        <div class="titbordebl" style="width: 250px;" >¿Este producto no debería figurar? </div>
+                        <div class="row">
+                            <div class="col-7 ">
+                                <table style="margin-top: 5px; margin-bottom: 10px; margin-left: 10px;">
+                                    <tbody>
+                                        <tr>
+                                            <td><div class="number" align="right">{{votosfin}}</div></td>
+                                            <td>Votos registrados para informar la baja del producto <span style="color: gray">({{5-votosfin}} restantes)</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>    
+                            </div>
+                            <div class="col-5">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="color: #EE1B24">¿Solicitar baja del producto?</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <center >
+                                                {% if app.user %}
+                                                    <div id="modal-fn" class="btn btn-secondary" style="background-image: url('/assets/images/colaboracion/yes.png'); margin-top: -1px; width: 75px; height: 1.4rem; " data-toggle="modal" data-target="#myModalFn" style="display:block;"></div>
+                                                {% else %}
+                                                    <div id="modal-fn" class="btn btn-secondary" style="background-image: url('/assets/images/colaboracion/yes.png'); margin-top: -1px; width: 75px; height: 1.4rem; " data-toggle="modal" data-target="#myModalLog" style="display:block;"></div>
+                                                {% endif %}
+                                                </center>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>    
+                        </div>
+                    </div>
             </div>
+
           </div>
     <br>
 <br>
+{%  if app.user != null %}
+  {% set idUsu = app.user.id%}
+{%else%}
+  {% set idUsu = 'null'%}
+{%endif%}
+<div class="modal fade" id="myModalFn">
+  <div class="modal-dialog">
+    <div class="modal-content">    
+      <div class="modal-header">
+        <button type="button" class="ml-auto" data-dismiss="modal" style="color: white; background-color: #EE1B24; border-radius: 255px; text-align:right" >&nbsp;X&nbsp;</button>
+      </div>
+      <div class="modal-body" style="vertical-align: middle; font-size: 150%;">
+        <p>¿Esta seguro de que desea informar la baja del producto?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal" style="font-size: 130%;">Cancelar</button>
+        <a href="{{ path('app_fin_producto', {'idproducto': producto.id, 'idusuario': idUsu}) }}" class="btn btn-secondary btn-sm" style="font-size: 130%;">Confirmar</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="myModalLog">
+  <div class="modal-dialog">
+    <div class="modal-content">    
+      <div class="modal-header">
+        <button type="button" class="ml-auto" data-dismiss="modal" style="color: white; background-color: #EE1B24; border-radius: 255px; text-align:right" >&nbsp;X&nbsp;</button>
+      </div>
+      <div class="modal-body" style="vertical-align: middle; font-size: 150%;">
+        <p>Debes iniciar sesión para poder votar.<br>
+        ¡Ingresá ahora y ganá puntos por colaborar con KePrecios!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal" style="font-size: 130%;">Cancelar</button>
+       <a href="{{path('app_login_user')}}" class="btn btn-secondary btn-sm" style="font-size: 130%;">Ingresar</a>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 </div>
 </div>

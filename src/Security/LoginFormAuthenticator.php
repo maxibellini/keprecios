@@ -71,9 +71,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
             // fail authentication with a custom error
             throw new CustomUserMessageAuthenticationException('Username could not be found.');
         }
-        $ya= new \DateTime() ;
-        $user->setUltimaConexion($ya);
-        $this->entityManager->flush();
+        
         return $user;
     }
 
@@ -95,7 +93,30 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);
         }
+        $user = $token->getUser();
 
+        $ultimaConexion = $user->getUltimaConexion(); 
+        $ultimaConexion->modify('+1 hour');
+        $colaboraciones = $user->getColaboracions();
+
+        $colaboracionesDespuésDeConexion = 0;
+        foreach ($colaboraciones as $colaboracion) {
+            $fechaColaboracion = $colaboracion->getFecha();
+
+            if ($fechaColaboracion > $ultimaConexion) {
+                $colaboracionesDespuésDeConexion++;
+            }
+        }
+        // Verifica si hay colaboraciones después de la última conexión
+        if ($colaboracionesDespuésDeConexion > 0) {
+            // Agrega un mensaje flash informando la cantidad de colaboraciones
+            $userId = $user->getId();
+            $url = $this->urlGenerator->generate('app_user_perfil', ['id' => $userId]);
+             $request->getSession()->getFlashBag()->add('aviso', 'Tienes ' . $colaboracionesDespuésDeConexion . ' novedades que debes revisar desde tu última conexión. Puedes verlas desde <a href='.$url.'>tu perfil</a> en Mis Colaboraciones');
+        }  
+        $ya= new \DateTime() ;
+        $user->setUltimaConexion($ya);
+        $this->entityManager->flush();
         // For example : return new RedirectResponse($this->urlGenerator->generate('some_route'));
         // throw new \Exception('TODO: provide a valid redirect inside '.__FILE__);
         return new RedirectResponse($this->urlGenerator->generate('app_inicio'));

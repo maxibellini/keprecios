@@ -5,28 +5,108 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Comercio;
+use App\Entity\Oferta;
 use App\Service\ApiMLService;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface; 
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class AppController extends AbstractController
 {
     /**
      * @Route("/", name="app_inicio")
      */
-    public function homepage()
+    public function homepage(SessionInterface $session)
     {
     	$em = $this->getDoctrine()->getManager();
+
+        $ofertas = $em->getRepository(Oferta::class)->findAll();
+        $fechaHoy = new \DateTime();
+        foreach ($ofertas as $oferta) {
+            
+            if ($oferta->getFechaVto() == null) {
+                $fechaCarga = $oferta->getFechaCarga();
+                $fechaVto = clone $fechaCarga;
+                $fechaVto->modify('+14 days');
+                $oferta->setFechaVto($fechaVto);
+            }
+            if ($oferta->getFechaUpdate() != null) {
+                $fechaUpdate = $oferta->getFechaUpdate();
+                $fechaVto = clone $fechaUpdate;
+                $fechaVto->modify('+14 days');
+                $oferta->setFechaVto($fechaVto);
+            }
+            if ($oferta->getFechaVto() <= $fechaHoy) {
+                $oferta->setEstado(0);
+                //aca tratar premios/penalización si corresponde, si terminó en confianza se premia, sino si terminó en desconfianza se penaliza, hay que crearle confianza a la oferta si no la tenía
+                $confianza= $oferta->getConfianza();
+                $userOferta = $oferta->getUser();
+                if ($confianza != null) {
+                    $nombreConfianza = $confianza->getNombre();
+                    if ($nombreConfianza == 'desconfianza') {
+                        //tratar penalización
+                        $usuOColab= $userOferta->getPuntosColab();
+                        $usuORep=  $userOferta->getPuntosRep(); 
+                        if ($usuOColab == null){ $usuOColab= 0; }
+                        if ($usuORep == null){ $usuORep= 0; }
+                        $userOferta->setPuntosColab($usuOColab-2); 
+                        $userOferta->setPuntosRep($usuORep-2); 
+                        //----------agregar colaboración mala --------
+                        $colab = new Colaboracion();
+                        $colab->setPuntaje(-2); // Establece el puntaje deseado
+                        $colab->setTipo('mala');
+                        $colab->setFecha(new \DateTime());
+                        $colab->setDescripcion('-2 puntos por oferta finalizada en desconfianza'); 
+                        $colab->setTipoVoto(0); 
+                        $em->persist($colab);
+                        $userOferta->addColaboracion($colab); 
+                        $em->persist($userOferta);
+                        $em->persist($oferta);
+                        
+                    } elseif ($nombreConfianza == 'confiable') {
+                        //tratar premio
+                        $usuOColab= $userOferta->getPuntosColab();
+                        $usuORep=  $userOferta->getPuntosRep(); 
+                        if ($usuOColab == null){ $usuOColab= 0; }
+                        if ($usuORep == null){ $usuORep= 0; }
+                        $userOferta->setPuntosColab($usuOColab+2); 
+                        $userOferta->setPuntosRep($usuORep+2); 
+                        //----------agregar colaboración mala --------
+                        $colab = new Colaboracion();
+                        $colab->setPuntaje(+2); // Establece el puntaje deseado
+                        $colab->setTipo('premio');
+                        $colab->setFecha(new \DateTime());
+                        $colab->setDescripcion('+2 puntos por oferta finalizada en confiable'); 
+                        $colab->setTipoVoto(0); 
+                        $em->persist($colab);
+                        $userOferta->addColaboracion($colab); 
+                        $em->persist($userOferta);
+                        $em->persist($oferta);
+                        
+                    }
+                }
+
+            }
+            $em->persist($oferta);
+        }
+
+        $em->flush();
+
         $comercios = $em->getRepository("App:Comercio")->findBy(array('estadoComercio'=> 'ACTIVO'));
         $ofertas = $em->getRepository("App:Oferta")->findBy(array('estado'=> 1));
         $ofertas = $em->getRepository("App:Oferta")
              ->createQueryBuilder('o')
              ->innerJoin('o.comercio', 'c')
+             ->andWhere("o.estado = 1")
              ->andWhere("c.estadoComercio like :estado")
+             ->setParameter('estado','ACTIVO')
+             ->innerJoin('o.producto', 'p')
+             ->andWhere("p.estadoProducto = 1")
              ->setParameter('estado','ACTIVO')
              ->orderBy('o.fechaCarga', 'DESC')
              ->getQuery()
              ->getResult();
+
         return $this->render('app/homepage.html.twig', [
             'controller_name' => 'Inicio KePrecios',
             'comercios' => $comercios,
@@ -70,6 +150,8 @@ class AppController extends AbstractController
         $ofertas = $em->getRepository("App:Oferta")->createQueryBuilder('o')
           ->innerJoin('o.comercio', 'c')
           ->innerJoin('o.producto', 'p')
+          ->andWhere("p.estadoProducto = 1")
+          ->andWhere("o.estado = 1")
           ->andWhere("c.estadoComercio like :estado")
           ->setParameter('estado','ACTIVO')
           ->andWhere("p.categoriaProducto like :texto or p.descripcionProducto like :texto or p.marcaProducto like :texto")

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OfertaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -77,6 +79,32 @@ class Oferta
 
     private $em;
     private $ofertas;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Colaboracion::class, mappedBy="oferta",cascade={"persist"})
+     */
+    private $colaboracions;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $fechaVto;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Confianza::class, inversedBy="oferta")
+     */
+    private $confianza;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $esTop;
+
+    public function __construct()
+    {
+        $this->colaboracions = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -291,4 +319,71 @@ class Oferta
     {
         return $this->monto.' - '.$this->descripcionOferta;
     }
+
+    /**
+     * @return Collection<int, Colaboracion>
+     */
+    public function getColaboracions(): Collection
+    {
+        return $this->colaboracions;
+    }
+
+    public function addColaboracion(Colaboracion $colaboracion): self
+    {
+        if (!$this->colaboracions->contains($colaboracion)) {
+            $this->colaboracions[] = $colaboracion;
+            $colaboracion->setOferta($this);
+        }
+
+        return $this;
+    }
+
+    public function removeColaboracion(Colaboracion $colaboracion): self
+    {
+        if ($this->colaboracions->removeElement($colaboracion)) {
+            // set the owning side to null (unless already changed)
+            if ($colaboracion->getOferta() === $this) {
+                $colaboracion->setOferta(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getFechaVto(): ?\DateTimeInterface
+    {
+        return $this->fechaVto;
+    }
+
+    public function setFechaVto(?\DateTimeInterface $fechaVto): self
+    {
+        $this->fechaVto = $fechaVto;
+
+        return $this;
+    }
+
+    public function getConfianza(): ?Confianza
+    {
+        return $this->confianza;
+    }
+
+    public function setConfianza(?Confianza $confianza): self
+    {
+        $this->confianza = $confianza;
+
+        return $this;
+    }
+
+    public function getEsTop(): ?bool
+    {
+        return $this->esTop;
+    }
+
+    public function setEsTop(?bool $esTop): self
+    {
+        $this->esTop = $esTop;
+
+        return $this;
+    }
+
 }

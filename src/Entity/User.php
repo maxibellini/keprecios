@@ -161,6 +161,26 @@ class User implements UserInterface , \Serializable
      */
     private $listaCompras;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $puntosColab;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $cantFaltas;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $puntosRep;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Colaboracion::class, mappedBy="user")
+     */
+    private $colaboracions;
+
 
     public function __construct()
     {
@@ -168,6 +188,7 @@ class User implements UserInterface , \Serializable
         $this->comercio = new ArrayCollection();
         $this->ofertas = new ArrayCollection();
         $this->listaCompras = new ArrayCollection();
+        $this->colaboracions = new ArrayCollection();
     }
 
 
@@ -689,6 +710,72 @@ class User implements UserInterface , \Serializable
             // set the owning side to null (unless already changed)
             if ($listaCompra->getUser() === $this) {
                 $listaCompra->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPuntosColab(): ?int
+    {
+        return $this->puntosColab;
+    }
+
+    public function setPuntosColab(?int $puntosColab): self
+    {
+        $this->puntosColab = $puntosColab;
+
+        return $this;
+    }
+
+    public function getCantFaltas(): ?int
+    {
+        return $this->cantFaltas;
+    }
+
+    public function setCantFaltas(?int $cantFaltas): self
+    {
+        $this->cantFaltas = $cantFaltas;
+
+        return $this;
+    }
+
+    public function getPuntosRep(): ?int
+    {
+        return $this->puntosRep;
+    }
+
+    public function setPuntosRep(?int $puntosRep): self
+    {
+        $this->puntosRep = $puntosRep;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Colaboracion>
+     */
+    public function getColaboracions(): Collection
+    {
+        return $this->colaboracions;
+    }
+
+    public function addColaboracion(Colaboracion $colaboracion): self
+    {
+        if (!$this->colaboracions->contains($colaboracion)) {
+            $this->colaboracions[] = $colaboracion;
+            $colaboracion->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeColaboracion(Colaboracion $colaboracion): self
+    {
+        if ($this->colaboracions->removeElement($colaboracion)) {
+            // set the owning side to null (unless already changed)
+            if ($colaboracion->getUser() === $this) {
+                $colaboracion->setUser(null);
             }
         }
 

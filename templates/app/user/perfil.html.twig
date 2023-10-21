@@ -16,12 +16,16 @@
 <div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
 
 <div class="e">
-{% for message in app.flashes('exito') %}
-      <div class="alert alert-success">
-         {{message}}     
-      </div>    
+{% for flash_message in app.session.flashbag.get('exito') %}
+    <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+        {{ flash_message }}
+    </div>
 {% endfor %}
-
+{% for flash_message in app.session.flashbag.get('fracaso') %}
+    <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        {{ flash_message }}
+    </div>
+{% endfor %}
 </div>
 <a href="javascript:history.back()" style="float: right"> Volver Atrás</a>
       <br>
@@ -34,7 +38,7 @@
           <h4 class="display-5 card-header">Perfil de {{user.name}}</h4>  
           <br>
           <div class="row">
-            <div class="col-4">
+            <div class="col-sm-4">
                 {% if user.image != null %}
                   {% set foto = 'uploads/images/usuarios/'~ user.image %}
                   {% set foto2 = absolute_url(asset(foto)) %}
@@ -43,19 +47,138 @@
                   <img src="assets/images/user-empty.png" alt="" style=" border-radius: 200px 200px 200px 200px; -moz-border-radius: 200px 200px 200px 200px; -webkit-border-radius: 200px 200px 200px 200px; border: 0px solid #000000;" >
                 {% endif %}
             </div>
-            <div class="col-8">
+            <div class="col-sm-8">
                 <div class=" ">Nombre: <span style="color:grey">{{user.nombrePersona}}</span> </div>
                 <div class=" ">Apellido: <span style="color:grey">{{user.apellidoPersona}}</span> </div>
                 <div class=" ">Sexo: <span style="color:grey">{{user.sexo}}</span> </div>
                 <div class=" ">Fecha de ingreso: <span style="color:grey">{% if user.fechaRegistro != null %}{{user.fechaRegistro | date("d-m-Y") }}{% endif %}</span> </div>
-                <div class=" ">Última conexión: <span style="color:grey">{% if user.ultimaConexion != null %}{{user.ultimaConexion | date("d-m-Y h:i") }}hs{% endif %}</span> </div>
+                <div class=" ">Última conexión: <span style="color:grey">{% if user.ultimaConexion != null %}{{user.ultimaConexion | date("d-m-Y h:i") }}hs{%else%}-{% endif %}</span> </div>
                 <div class=" ">Estado: <span style="color:grey">{{user.estado}}</span> </div>
+                <div class=" ">Puntos disponibles para canje: <span style="color:grey">{% if user.puntosColab == null %}0{%else%}{{user.puntosColab}}{%endif%}</span> </div>
+                <div class=" ">Puntos de reputación: <span style="color:grey">{% if user.puntosRep == null %}0{%else%}{{user.puntosRep}}{%endif%}</span></div>
+                <div class=" " style=" ">Nivel actual: </div>
+                {% if user.puntosRep < 0  %}
+                  <div class="row">
+                    <div class="col-4">
+                      <div style="position: relative; text-align: center;">
+                          <img src="/assets/images/colaboracion/medalla_madera.png" alt="imagen nivel" class="image-with-hover-effect" style="width: 100%;">
+                          <div style="font-size:120%;position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;-webkit-text-stroke: 0.5px black;">
+                              <b>Madera</b>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-8 d-flex align-items-center" style="color:grey; margin-left:-15px;">Te faltan {{0-user.puntosRep}} puntos para subir a nivel Bronce</div>
+                  </div>
+                {% elseif user.puntosRep >=0 and user.puntosRep <= 5 %}
+                  <div class="row">
+                    <div class="col-4">
+                      <div style="position: relative; text-align: center;">
+                          <img src="/assets/images/colaboracion/medalla_bronce.png" alt="imagen nivel" class="image-with-hover-effect" style="width: 100%;">
+                          <div style="font-size:120%;position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;-webkit-text-stroke: 0.5px black;">
+                              <b>Bronce</b>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-8 d-flex align-items-center" style="color:grey; margin-left:-15px;">Te faltan {{6-user.puntosRep}} puntos para subir a nivel Plata</div>
+                  </div>
+                {% elseif user.puntosRep >= 6 and user.puntosRep <=9 %}
+                  <div class="row">
+                    <div class="col-4">
+                      <div style="position: relative; text-align: center;">
+                          <img src="/assets/images/colaboracion/medalla_plata.png" alt="imagen nivel" class="image-with-hover-effect" style="width: 100%;">
+                          <div style="font-size:120%;position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;-webkit-text-stroke: 0.5px black;">
+                              <b>Plata</b>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-8 d-flex align-items-center" style="color:grey; margin-left:-15px;">Te faltan {{10-user.puntosRep}} puntos para subir a nivel Oro</div>
+                  </div>
+                {% elseif user.puntosRep >= 10 %}
+                  <div class="row">
+                    <div class="col-4">
+                      <div style="position: relative; text-align: center;">
+                          <img src="/assets/images/colaboracion/medalla_oro.png" alt="imagen nivel" class="image-with-hover-effect" style="width: 100%;">
+                          <div style="font-size:120%;position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;-webkit-text-stroke: 0.5px black;">
+                              <b>Oro</b>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-8 d-flex align-items-center" style="color:grey; margin-left:-15px;">Nivel máximo alcanzado</div>
+                  </div>
+                {% elseif user.puntosRep == null %}
+                  <div class="row">
+                    <div class="col-4">
+                      <div style="position: relative; text-align: center;">
+                          <img src="/assets/images/colaboracion/medalla_bronce.png" alt="imagen nivel" class="image-with-hover-effect" style="width: 100%;">
+                          <div style="font-size:120%;position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white;-webkit-text-stroke: 0.5px black;">
+                              <b>Bronce</b>
+                          </div>
+                      </div>
+                    </div>
+                    <div class="col-8 d-flex align-items-center" style="color:grey; margin-left:-15px;">Te faltan 6 puntos para subir de nivel (plata)</div>
+                  </div>
+                {% endif %}
+
             </div>
           </div>
     <br>
 <br>   {% if app.user != null %}
           {% if app.user.name == user.name %}
            <div class="col-sm-12 mbr-fonts-style">
+           {% set colaboraciones = user.colaboracions %}
+           {% if colaboraciones != '' %}
+                <div class="accordion" id="accordionExample4">
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-5" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo4" aria-expanded="false" aria-controls="collapseTwo" style="border: 1px solid #E85395; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                       Mis Colaboraciones
+                      </button>
+                    </h2>
+                    <div id="collapseTwo4" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample4">
+                      <div class="row accordion-body">
+                         <table class="table">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Puntaje</th>
+                                <th scope="col">Sujeto</th>
+                                <th scope="col">Descripción</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                             {% for colaboracion in colaboraciones %}
+                              <tr>
+                                <th style="width:15%" scope="row">{% if colaboracion.fecha != null %}{{colaboracion.fecha|date('Y-m-d')}}{% endif %}</th>
+                                <td style="width:10%">{{colaboracion.tipo}}</td>
+                                <td style="width:10%">{% if colaboracion.puntaje < 0 %}<span style="color: #CF2A26">{%else%}<span style="color: #2D7733">{%endif%}{{colaboracion.puntaje}}</span></td>
+                                <td style="width:20%">
+                                  <div style="">
+                                  {% if colaboracion.oferta != null %}<a href="{{path('app_oferta_perfil',{ 'id': colaboracion.oferta.id })}}">{{colaboracion.oferta}}</a>{%endif%}
+                                  {% if colaboracion.comercio != null %}<a href="{{path('app_comercio_perfil',{ 'id': colaboracion.comercio.id })}}">{{colaboracion.comercio}}</a>{%endif%}
+                                  {% if colaboracion.producto != null %}<a href="{{path('app_producto_perfil',{ 'id': colaboracion.producto.id })}}">{{colaboracion.producto}}</a>{%endif%}
+                                  {% if colaboracion.sujeto != null %}{{colaboracion.sujeto}}{%endif%}
+                                  </div>
+                                </td>
+                                <td style="width:20%">{{colaboracion.descripcion}} {% if colaboracion.tipo == "voto" %}(voto {% if colaboracion.tipoVoto == 0%}positivo{%else%}negativo{%endif%}){%endif%}
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                      <br>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            
+          
+ 
+          {% endif %}
+        {% endif %}
            {% set listas = user.listaCompras %}
            {% if listas != '' %}
                 <div class="accordion" id="accordionExample0">
@@ -256,11 +379,8 @@
                   </div>
                 </div>
                 {% endif %}
-            </div>
-          
-    <br> 
-          {% endif %}
-        {% endif %}
+                <br>
+                </div>
 </div> 
 </div> 
 </div>

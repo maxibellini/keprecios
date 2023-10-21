@@ -1,0 +1,56 @@
+.bordebl {
+    margin-top:20px;
+    height:auto;
+    width:100%;
+    border:2px solid black;
+    border-radius: 5px;
+}
+.titbordebl{
+    font-size:18px;
+    margin-top:-12px;
+    margin-left:7px;
+    background:white;
+}
+.number {
+    background-image: url('/assets/images/colaboracion/hexagon.png'); /* Ruta de tu imagen de fondo */
+    background-size: cover; /* Ajusta el tamaño de la imagen para cubrir el contenedor */
+    background-position: center center; /* Centra la imagen */
+    position:relative;
+    width: 3rem;
+    height: 3rem;
+    vertical-align: middle;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    display: flex; /* Usar display flex */
+    align-items: center; /* Centrar verticalmente */
+    justify-content: center; /* Centrar horizontalmente */
+}
+.orange-button {
+    background-color: red; 
+    color: white; /* Color del texto */
+    padding: 10px 20px; /* Espaciado interno para el botón */
+    border: none; /* Sin borde */
+    cursor: pointer; /* Cambiar el cursor al pasar el mouse */
+}
+.manito {
+    transition: transform 0.4s ease; /* Agrega una transición suave en la propiedad "transform" */
+}
+.manito:hover{
+    transform: scale(1.2);
+}
+
+.image-with-hover-effect {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-radius: 200px 200px 200px 200px;
+    -moz-border-radius: 200px 200px 200px 200px;
+    -webkit-border-radius: 200px 200px 200px 200px;
+}
+
+.image-with-hover-effect:hover {
+    transform: scale(1.21); /* Agranda la imagen al 110% del tamaño original */
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3); /* Agrega una sombra */
+    border-radius: 200px 200px 200px 200px;
+    -moz-border-radius: 200px 200px 200px 200px;
+    -webkit-border-radius: 200px 200px 200px 200px;
+}

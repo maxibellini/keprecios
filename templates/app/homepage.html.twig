@@ -8,19 +8,28 @@
 <style>
     .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
     .example-wrapper code {  padding: 2px 6px; }
+
 </style>
 
 <div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
 {% for flash_message in app.session.flashbag.get('exito') %}
     <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
-        {{ flash_message }}
+        {{ flash_message|raw }}
     </div>
 {% endfor %}
 {% for flash_message in app.session.flashbag.get('fracaso') %}
     <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
-        {{ flash_message }}
+        {{ flash_message|raw }}
     </div>
 {% endfor %}
+{% set flashMessages = app.flashes('aviso') %}
+{% if flashMessages is not empty %}
+        {% for message in flashMessages %}
+         <div class="alert alert-warning" style="background-color: rgba(255, 144, 113 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+            {{ message|raw }}
+         </div>
+        {% endfor %}
+{% endif %}
 
     <section id="" class="" style=" background: url('assets/images/istockphoto-1257207144-2048x2048s-1-2000x1778.jpg');" >
       <div class="container" data-aos="fade-up" >
@@ -127,7 +136,7 @@
         </div>
   
             <a class="btn btn-warning btn-sm" href="{{path('app_comercio_registro')}}"></i>¡Solicitá tu comercio ahora!</i></a>
-     
+            <a class="btn btn-danger btn-sm" href="{{path('app_comercios_potenciales')}}"></i>🛒Comercios potenciales </i></a>
         <div class="row">
             <div class="col-sm-7">
                 

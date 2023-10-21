@@ -51,6 +51,7 @@ class UserController extends AbstractController
             $this->addFlash('fracaso','Error, no se encontró el usuario solicitado');
             return $this->redirectToRoute('app_inicio');    
         }
+        
         return $this->render('app/user/perfil.html.twig', [
             'controller_name' => 'Perfil de Usuario',
             'user' => $user,

@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Comercio;
+use App\Entity\Colaboracion;
+use App\Entity\Confianza;
 use App\Form\ComercioType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,9 +40,47 @@ class ComercioController extends AbstractController
                 $this->addFlash('fracaso','Error no tiene la sesión iniciada.');
                 return $this->redirectToRoute('app_inicio');
             }
-    		$em->persist($comercio);
-    		$em->flush();
+            //COLABORACIÓN
+            $colaboracion = new Colaboracion();
+            $colaboracion->setPuntaje(1);
+            $colaboracion->setFecha(new \DateTime());
+            $colaboracion->setTipo('alta'); 
+            $colaboracion->setDescripcion('+1 por solicitud de comercio'); 
+            $colaboracion->setTipoVoto(0); 
+            $comercio->addColaboracion($colaboracion);
+            $usuario = $comercio->getUser();
+            $usuColab= $usuario->getPuntosColab();
+            $usuRep=  $usuario->getPuntosRep(); 
+            if ($usuColab == null){ $usuColab= 0; }
+            if ($usuRep == null){ $usuRep= 0; }
+            $usuario->setPuntosColab($usuColab+1); 
+            $usuario->setPuntosRep($usuRep+1); 
+            $usuario->addColaboracion($colaboracion); 
+            $em->persist($usuario);
+            $comercio->setUser($usuario);
+            $colaboracion->setUser($usuario);
+            $confianzaRepository = $em->getRepository(Confianza::class);
+            $confianza = $confianzaRepository->findOneBy([
+                'tipo' => 'comercio',
+                'nombre' => 'intermedio'
+            ]);
+            if (!$confianza) {
+                // Si no existe, crea una nueva Confianza
+                $confianza = new Confianza();
+                $confianza->setTipo('comercio');
+                $confianza->setNombre('intermedio');
+                $confianza->setLimiteInferior(0);
+                $confianza->setLimiteSuperior(0);
+            }
+            $em->persist($comercio);
+            $confianza->addComercio($comercio);
+            $comercio->setConfianza($confianza);
+            $em->persist($colaboracion);
+            $em->persist($confianza);
+            
+            $em->flush();
     		$this->addFlash('exito','¡La solicitud de comercio fue registrada de manera exitosa!'.PHP_EOL.'Cuando se apruebe ya podrán cargar ofertas en él');
+            $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!');
     		return $this->redirectToRoute('app_inicio');
     	}
         return $this->render('app/comercio/new.html.twig', [
@@ -49,7 +89,17 @@ class ComercioController extends AbstractController
             'comercio' => $comercio
         ]);
     }
-
+    /**
+     * @Route("/comercios-potenciales", name="app_comercios_potenciales")
+     */
+    public function comerciosPotenciales()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $comercios = $em->getRepository("App:Comercio")->findBy(array('estadoComercio'=> 'PENDIENTE'));
+        return $this->render('app/comercio/comercios_potenciales.html.twig', [
+            'comercios' => $comercios,
+        ]);
+    }
     /**
      * @Route("/perfilcomercio-{id}", name="app_comercio_perfil")
      */
@@ -62,9 +112,30 @@ class ComercioController extends AbstractController
             $this->addFlash('fracaso','Error, no se encontró el comercio solicitado');
             return $this->redirectToRoute('app_inicio');    
         }
+        $colaboraciones = $comercio->getColaboracions();
+        $votosTipo0 = 0;
+        $votosTipo1 = 0;
+        $votosFin = 0;
+        foreach ($colaboraciones as $colaboracion) {
+            if ($colaboracion->getTipo() == 'voto') {
+                if ($colaboracion->getTipoVoto() == 0) {
+                    $votosTipo0++;
+                } elseif ($colaboracion->getTipoVoto() == 1) {
+                    $votosTipo1++;
+                }
+            }
+        }
+        foreach ($colaboraciones as $colaboracion) {
+            if ($colaboracion->getTipo() == 'baja') {
+                $votosFin++;
+            }
+        }
         return $this->render('app/comercio/perfil.html.twig', [
             'controller_name' => 'Perfil de Comercio',
             'comercio' => $comercio,
+            'votosp' => $votosTipo0,
+            'votosn' => $votosTipo1,
+            'votosfin' => $votosFin,
         ]);
     }
 
@@ -82,6 +153,11 @@ class ComercioController extends AbstractController
         if (!$comercio){
             $this->addFlash('fracaso','Error, no se encontró el comercio solicitado');
             return $this->redirectToRoute('app_inicio');    
+        }
+        $colaboracionesAsociadas = $comercio->getColaboracions();
+        foreach ($colaboracionesAsociadas as $colaboracion) {
+            $colaboracion->setSujeto((string)$comercio);
+            $colaboracion->setComercio(null);
         }
         $em->remove($comercio); 
         //$comercio->setEstadoComercio('BAJA');
@@ -161,5 +237,232 @@ class ComercioController extends AbstractController
         $resx= json_encode($res,true);
         return new Response($resx);
     }
+    /**
+     * @Route("/voto-c-{idcomercio}-{idusuario}-{tipo}", name="app_voto_comercio")
+     */
+    public function votoComercio($idcomercio,$idusuario,$tipo)
+    {
+      
+        $em = $this->getDoctrine()->getManager();
+        $usuario = $em->getRepository("App:User")->findOneBy(array('id'=>$idusuario));
+        $comercio = $em->getRepository("App:Comercio")->findOneBy(array('id'=>$idcomercio));
+        if (!$usuario){
+            $url = $this->generateUrl('app_login_user');
+            $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder votar.');
+            return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+        }
+        $comercio = $em->getRepository("App:Comercio")->findOneBy(array('id'=>$idcomercio));
+        if (!$comercio){
+            $this->addFlash('fracaso','Error, no se encontró el comercio solicitado');
+            return $this->redirectToRoute('app_inicio');    
+        }
+        if($comercio->getEstadoComercio() != 'PENDIENTE'){
+            $this->addFlash('fracaso','Error, el comercio que quieres votar no esta disponible para votar.');
+            return $this->redirectToRoute('app_inicio');     
+        }   
+        //creo confianzas si no existen
+        $confianzasRepository = $em->getRepository(Confianza::class);
+        $tiposYnombres = [
+            ['tipo' => 'comercio', 'nombre' => 'desconfianza', 'limiteSuperior'=>'-4', 'limiteInferior'=>'-9999'],
+            ['tipo' => 'comercio', 'nombre' => 'bajo','limiteSuperior'=>'-3', 'limiteInferior'=>'-1'],
+            ['tipo' => 'comercio', 'nombre' => 'intermedio', 'limiteSuperior'=>'0', 'limiteInferior'=>'0'],
+            ['tipo' => 'comercio', 'nombre' => 'medio', 'limiteSuperior'=>'1', 'limiteInferior'=>'4'],
+            ['tipo' => 'comercio', 'nombre' => 'confiable', 'limiteSuperior'=>'5', 'limiteInferior'=>'9999'],
+        ];
+        foreach ($tiposYnombres as $tipoYnombre) {
+            $confianza = $confianzasRepository->findOneBy($tipoYnombre);
+            if ($confianza === null) {
+                $confianza = new Confianza();
+                $confianza->setTipo($tipoYnombre['tipo']);
+                $confianza->setNombre($tipoYnombre['nombre']);
+                $confianza->setLimiteInferior($tipoYnombre['limiteInferior']); 
+                $confianza->setLimiteSuperior($tipoYnombre['limiteSuperior']); 
+                $em->persist($confianza);
+            }
+        }
+        $em->flush();
 
+        if($comercio->getUser() == $usuario){
+             $this->addFlash('fracaso','Error, no puedes votar tu propia solicitud de comercio');
+                return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+        }
+        foreach ($comercio->getColaboracions() as $colaboracion) {
+            if ($colaboracion->getUser() === $usuario && $colaboracion->getTipo() === 'voto') {
+                $this->addFlash('fracaso','Error, usted ya ha votado en esta comercio');
+                return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+            }
+        }
+        $userComercio = $comercio->getUser();
+
+        //trato Colaboraciones
+        $colaboraciones = $comercio->getColaboracions()->filter(function ($colaboracion) {
+            return $colaboracion->getTipo() === 'voto';
+        });
+        $sumatoriaPuntajes = 0;
+        foreach ($colaboraciones as $colaboracion) {
+            if($colaboracion->getTipo() == 1){
+               $sumatoriaPuntajes = $sumatoriaPuntajes - 1;
+            }else{
+                $sumatoriaPuntajes = $sumatoriaPuntajes + 1; 
+            }
+        }
+        if($tipo == 'p'){
+            $tipoVoto = 0;$sumatoriaPuntajes = $sumatoriaPuntajes + 1;
+        }else{
+           $tipoVoto = 1;$sumatoriaPuntajes = $sumatoriaPuntajes -1;
+        }
+        $colaboracion = new Colaboracion();
+        $colaboracion->setPuntaje(1); // Establece el puntaje deseado
+        $colaboracion->setTipo('voto');
+        $colaboracion->setFecha(new \DateTime());
+        $colaboracion->setDescripcion('+1 por voto de alta de comercio'); 
+        $colaboracion->setTipoVoto($tipoVoto); 
+        $comercio->addColaboracion($colaboracion);
+        //puntuo al usuario
+            $usuario = $em->getRepository(User::class)->find($idusuario);
+            $usuColab= $usuario->getPuntosColab();
+            $usuRep=  $usuario->getPuntosRep(); 
+            if ($usuColab == null){ $usuColab= 0; }
+            if ($usuRep == null){ $usuRep= 0; }
+            $usuario->setPuntosColab($usuColab+1); 
+            $usuario->setPuntosRep($usuRep+1); 
+            $usuario->addColaboracion($colaboracion); 
+            $em->persist($usuario);
+        $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!');    
+        //trato la confianza
+        $confianzaEncajada = $confianzasRepository->createQueryBuilder('c')
+            ->where('c.tipo = :tipo AND c.limiteSuperior <= :sumatoriaPuntajes AND c.limiteInferior >= :sumatoriaPuntajes')
+            ->setParameter('tipo', 'comercio')
+            ->setParameter('sumatoriaPuntajes', $sumatoriaPuntajes)
+            ->getQuery()
+            ->getOneOrNullResult();
+        $comercio->setConfianza($confianzaEncajada);
+        //si entra en desconfianza
+        if($sumatoriaPuntajes < -4){
+            $comercio->setEstadoComercio('BAJA');
+            //penalizar al usuario que subió
+            $usuOColab= $userComercio->getPuntosColab();
+            $usuORep=  $userComercio->getPuntosRep(); 
+            if ($usuOColab == null){ $usuOColab= 0; }
+            if ($usuORep == null){ $usuORep= 0; }
+            $userComercio->setPuntosColab($usuOColab-10); 
+            $userComercio->setPuntosRep($usuORep-10); 
+            //----------agregar colaboración mala --------
+            $colab = new Colaboracion();
+            $colab->setPuntaje(-10); // Establece el puntaje deseado
+            $colab->setTipo('mala');
+            $colab->setFecha(new \DateTime());
+            $colab->setDescripcion('-10 por solicitud de comercio en desconfianza'); 
+            $colab->setTipoVoto(0); 
+            $em->persist($colab);
+            $userComercio->addColaboracion($colab); 
+            $em->persist($userComercio);
+            $em->persist($usuario);
+            $em->persist($comercio);
+            $em->flush(); 
+            $this->addFlash('fracaso','El comercio que votaste ha entrado en desconfianza y se ha dado de baja, por lo que ya no estará disponible.'); 
+            return $this->redirectToRoute('app_inicio');
+
+        }
+        //si llega a "Muy alta" se da de alta el comercio
+        if($sumatoriaPuntajes > 4){
+            $comercio->setEstadoComercio('ACTIVO');
+
+            //premiar?
+            $usuOColab= $userComercio->getPuntosColab();
+            $usuORep=  $userComercio->getPuntosRep(); 
+            if ($usuOColab == null){ $usuOColab= 0; }
+            if ($usuORep == null){ $usuORep= 0; }
+            $userComercio->setPuntosColab($usuOColab+15); 
+            $userComercio->setPuntosRep($usuORep+15); 
+            $colabok = new Colaboracion();
+            $colabok->setPuntaje(+15); // Establece el puntaje deseado
+            $colabok->setTipo('premio');
+            $colabok->setFecha(new \DateTime());
+            $colabok->setDescripcion('+15 por lograr alta de comercio'); 
+            $colabok->setTipoVoto(0); 
+            $em->persist($colabok);
+            $userComercio->addColaboracion($colabok); 
+            $em->persist($userComercio);
+            $em->persist($usuario);
+            $em->flush();
+            $this->addFlash('exito','¡El comercio que votaste ha alcanzado la confianza necesaria y se ha dado de alta de manera exitosa!'); 
+        }
+        $em->persist($comercio);
+        $em->flush();
+        return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+    }
+    /**
+     * @Route("/baja-c-{idcomercio}-{idusuario}", name="app_fin_comercio")
+     */
+    public function finComercio($idcomercio,$idusuario)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $usuario = $em->getRepository("App:User")->findOneBy(array('id'=>$idusuario));
+        $comercio = $em->getRepository("App:Comercio")->findOneBy(array('id'=>$idcomercio));
+        if (!$usuario){
+            $url = $this->generateUrl('app_login_user');
+            $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder informar la baja del comercio.');
+            return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+        }
+        $comercio = $em->getRepository("App:Comercio")->findOneBy(array('id'=>$idcomercio));
+        if (!$comercio){
+            $this->addFlash('fracaso','Error, no se encontró el comercio solicitado');
+            return $this->redirectToRoute('app_inicio');    
+        }
+        if($comercio->getEstadoComercio() != 'ACTIVO'){
+            $this->addFlash('fracaso','Error, el comercio no esta activo');
+            return $this->redirectToRoute('app_inicio');     
+        }   
+
+        foreach ($comercio->getColaboracions() as $colaboracion) {
+            if ($colaboracion->getUser() === $usuario && $colaboracion->getTipo() === 'baja') {
+                $this->addFlash('fracaso','Error, usted ya ha informado la baja del comercio');
+                return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+            }
+        }
+        $userComercio = $comercio->getUser();
+        //trato Colaboraciones
+        $colaboraciones = $comercio->getColaboracions()->filter(function ($colaboracion) {
+            return $colaboracion->getTipo() === 'baja';
+        });
+        $sumatoriaPuntajes = 0;
+        foreach ($colaboraciones as $colaboracion) {
+            $sumatoriaPuntajes += $colaboracion->getPuntaje();
+        }
+        $colaboracion = new Colaboracion();
+        $colaboracion->setPuntaje(1); // Establece el puntaje deseado
+        $colaboracion->setTipo('baja');
+        $colaboracion->setFecha(new \DateTime());
+        $colaboracion->setDescripcion('+1 por informar la baja de un comercio'); 
+        $colaboracion->setTipoVoto(0); 
+        $comercio->addColaboracion($colaboracion);           
+        //puntuo al usuario
+            $usuario = $em->getRepository(User::class)->find($idusuario);
+            $usuColab= $usuario->getPuntosColab();
+            $usuRep=  $usuario->getPuntosRep(); 
+            if ($usuColab == null){ $usuColab= 0; }
+            if ($usuRep == null){ $usuRep= 0; }
+            $usuario->setPuntosColab($usuColab+1); 
+            $usuario->setPuntosRep($usuRep+1); 
+            $usuario->addColaboracion($colaboracion); 
+            $em->persist($usuario);
+        $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!'); 
+        //si alcanzó la cantidad de votos se da de baja
+        if($sumatoriaPuntajes < -4){
+            $hoy= new \DateTime();
+            $comercio->setEstado('BAJA');
+            //informar baja de comercio
+            $em->persist($comercio);
+            $em->flush(); 
+            $this->addFlash('fracaso','El comercio que informaste se ha dado de baja, ya no estará disponible.'); 
+            return $this->redirectToRoute('app_inicio');
+           ;
+        }
+        $em->persist($comercio);
+        $em->flush();
+        return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+
+    }
+ 
 }

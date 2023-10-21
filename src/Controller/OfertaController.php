@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Oferta;
+use App\Entity\Colaboracion;
+use App\Entity\Confianza;
 use App\Entity\Producto;
 use App\Form\OfertaType;
 use App\Form\ProductoType;
@@ -29,7 +31,6 @@ class OfertaController extends AbstractController
         $oferta->setEm($em);
     	$form = $this->createForm(OfertaType::class , $oferta);
         $form-> handleRequest($request);
-        //dd($formp);
     	if($form->isSubmitted() && $form->isValid() ){
     		$em = $this->getDoctrine()->getManager();
 
@@ -47,9 +48,53 @@ class OfertaController extends AbstractController
             }
             $hoy= new \DateTime();
             $oferta->setFechaCarga($hoy);
-    		$em->persist($oferta);
+            $fechaVto = clone $hoy;
+            $fechaVto->modify('+14 days');
+            $oferta->setFechaVto($fechaVto);
+            //COLABORACIÓN
+            $colaboracion = new Colaboracion();
+            $colaboracion->setPuntaje(1);
+            $colaboracion->setFecha(new \DateTime());
+            $colaboracion->setTipo('alta'); 
+            $colaboracion->setDescripcion('+1 por alta de oferta'); 
+            $colaboracion->setTipoVoto(0); 
+            $oferta->addColaboracion($colaboracion);
+            $usuario = $oferta->getUser();
+            $usuColab= $usuario->getPuntosColab();
+            $usuRep=  $usuario->getPuntosRep(); 
+            if ($usuColab == null){ $usuColab= 0; }
+            if ($usuRep == null){ $usuRep= 0; }
+            $usuario->setPuntosColab($usuColab+1); 
+            $usuario->setPuntosRep($usuRep+1); 
+            $usuario->addColaboracion($colaboracion); 
+            $em->persist($usuario);
+            $oferta->setUser($usuario);
+            $colaboracion->setUser($usuario);
+            $confianzaRepository = $em->getRepository(Confianza::class);
+            $confianza = $confianzaRepository->findOneBy([
+                'tipo' => 'oferta',
+                'nombre' => 'intermedio'
+            ]);
+            if (!$confianza) {
+                // Si no existe, crea una nueva Confianza
+                $confianza = new Confianza();
+                $confianza->setTipo('oferta');
+                $confianza->setNombre('intermedio');
+                $confianza->setLimiteInferior(0);
+                $confianza->setLimiteSuperior(0);
+        
+            }
+
+            $oferta->setConfianza($confianza);
+            $em->persist($oferta);
+            $confianza->addOfertum($oferta);
+    		$em->persist($colaboracion);
+            
+            $em->persist($confianza);
+            
     		$em->flush();
     		$this->addFlash('exito','¡Tu oferta fue publicada exitosamente!');
+            $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!');
     		return $this->redirectToRoute('app_inicio');
     	}
         return $this->render('app/oferta/new.html.twig', [
@@ -72,9 +117,31 @@ class OfertaController extends AbstractController
             $this->addFlash('fracaso','Error, no se encontró el oferta solicitada');
             return $this->redirectToRoute('app_inicio');    
         }
+        $colaboraciones = $oferta->getColaboracions();
+        $votosTipo0 = 0;
+        $votosTipo1 = 0;
+        $votosFin = 0;
+        foreach ($colaboraciones as $colaboracion) {
+            if ($colaboracion->getTipo() == 'voto') {
+                if ($colaboracion->getTipoVoto() == 0) {
+                    $votosTipo0++;
+                } elseif ($colaboracion->getTipoVoto() == 1) {
+                    $votosTipo1++;
+                }
+            }
+        }
+        foreach ($colaboraciones as $colaboracion) {
+            if ($colaboracion->getTipo() == 'baja') {
+                $votosFin++;
+            }
+        }
+        
         return $this->render('app/oferta/perfil.html.twig', [
             'controller_name' => 'Perfil de Oferta',
             'oferta' => $oferta,
+            'votosp' => $votosTipo0,
+            'votosn' => $votosTipo1,
+            'votosfin' => $votosFin,
         ]);
     }
 
@@ -131,10 +198,12 @@ class OfertaController extends AbstractController
 
         $form = $this->createForm(OfertaType::class, $oferta);
         $form->handleRequest($request);       
-      // dd($form);
         if ($form->isSubmitted() && $form->isValid()) {
             $hoy= new \DateTime();
             $oferta->setFechaUpdate($hoy);
+            $fechaVto = clone $hoy;
+            $fechaVto->modify('+14 days');
+            $oferta->setFechaVto($fechaVto);
             $this->getDoctrine()->getManager()->flush();
             $this->addFlash('exito','¡Los cambios se han guardado correctamente!');
             return $this->redirectToRoute('app_inicio');
@@ -212,6 +281,301 @@ class OfertaController extends AbstractController
         return $this->render('app/oferta/producto/succeful.html.twig', [
             'producto' => $producto
         ]);
+    }
+    /**
+     * @Route("/voto-o-{idoferta}-{idusuario}-{tipo}", name="app_voto_oferta")
+     */
+    public function votoOferta($idoferta,$idusuario,$tipo)
+    {
+      
+        $em = $this->getDoctrine()->getManager();
+        $usuario = $em->getRepository("App:User")->findOneBy(array('id'=>$idusuario));
+        $oferta = $em->getRepository("App:Oferta")->findOneBy(array('id'=>$idoferta));
+        if (!$usuario){
+            $url = $this->generateUrl('app_login_user');
+            $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder votar.');
+            return $this->redirectToRoute('app_oferta_perfil', ['id' => $idoferta]);
+        }
+        $oferta = $em->getRepository("App:Oferta")->findOneBy(array('id'=>$idoferta));
+        if (!$oferta){
+            $this->addFlash('fracaso','Error, no se encontró la oferta solicitada');
+            return $this->redirectToRoute('app_inicio');    
+        }
+        if($ofert->getEstado() == 0){
+            $this->addFlash('fracaso','Error, la oferta que quieres votar no esta activa');
+            return $this->redirectToRoute('app_inicio');     
+        }   
+        //creo confianzas si no existen
+        $confianzasRepository = $em->getRepository(Confianza::class);
+        $tiposYnombres = [
+            ['tipo' => 'oferta', 'nombre' => 'desconfianza', 'limiteSuperior'=>'-4', 'limiteInferior'=>'-9999'],
+            ['tipo' => 'oferta', 'nombre' => 'bajo','limiteSuperior'=>'-3', 'limiteInferior'=>'-1'],
+            ['tipo' => 'oferta', 'nombre' => 'intermedio', 'limiteSuperior'=>'0', 'limiteInferior'=>'0'],
+            ['tipo' => 'oferta', 'nombre' => 'medio', 'limiteSuperior'=>'1', 'limiteInferior'=>'4'],
+            ['tipo' => 'oferta', 'nombre' => 'confiable', 'limiteSuperior'=>'5', 'limiteInferior'=>'9999'],
+        ];
+        foreach ($tiposYnombres as $tipoYnombre) {
+            $confianza = $confianzasRepository->findOneBy($tipoYnombre);
+            if ($confianza === null) {
+                $confianza = new Confianza();
+                $confianza->setTipo($tipoYnombre['tipo']);
+                $confianza->setNombre($tipoYnombre['nombre']);
+                $confianza->setLimiteInferior($tipoYnombre['limiteInferior']); 
+                $confianza->setLimiteSuperior($tipoYnombre['limiteSuperior']); 
+                $em->persist($confianza);
+            }
+        }
+        $em->flush();
+
+        if($oferta->getUser() == $usuario){
+             $this->addFlash('fracaso','Error, no puedes votar la oferta que has registrado');
+                return $this->redirectToRoute('app_oferta_perfil', ['id' => $idoferta]);
+        }
+        foreach ($oferta->getColaboracions() as $colaboracion) {
+            if ($colaboracion->getUser() === $usuario && $colaboracion->getTipo() === 'voto') {
+                $this->addFlash('fracaso','Error, usted ya ha votado en esta oferta');
+                return $this->redirectToRoute('app_oferta_perfil', ['id' => $idoferta]);
+            }
+        }
+        $userOferta = $oferta->getUser();
+
+        //trato Colaboraciones
+        $colaboraciones = $oferta->getColaboracions()->filter(function ($colaboracion) {
+            return $colaboracion->getTipo() === 'voto';
+        });
+        $sumatoriaPuntajes = 0;
+        foreach ($colaboraciones as $colaboracion) {
+            if($colaboracion->getTipo() == 1){
+               $sumatoriaPuntajes = $sumatoriaPuntajes - 1;
+            }else{
+                $sumatoriaPuntajes = $sumatoriaPuntajes + 1; 
+            }
+        }
+        if($tipo == 'p'){
+            $tipoVoto = 0;$sumatoriaPuntajes = $sumatoriaPuntajes + 1;
+        }else{
+           $tipoVoto = 1;$sumatoriaPuntajes = $sumatoriaPuntajes -1;
+        }
+        $colaboracion = new Colaboracion();
+        $colaboracion->setPuntaje(1); // Establece el puntaje deseado
+        $colaboracion->setTipo('voto');
+        $colaboracion->setFecha(new \DateTime());
+        $colaboracion->setDescripcion('+1 por voto de oferta'); 
+        $colaboracion->setTipoVoto($tipoVoto); 
+        $oferta->addColaboracion($colaboracion);
+        //puntuo al usuario
+            $usuario = $em->getRepository(User::class)->find($idusuario);
+            $usuColab= $usuario->getPuntosColab();
+            $usuRep=  $usuario->getPuntosRep(); 
+            if ($usuColab == null){ $usuColab= 0; }
+            if ($usuRep == null){ $usuRep= 0; }
+            $usuario->setPuntosColab($usuColab+1); 
+            $usuario->setPuntosRep($usuRep+1); 
+            $usuario->addColaboracion($colaboracion); 
+            $em->persist($usuario);
+        $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!');    
+        //trato la confianza
+        $confianzaEncajada = $confianzasRepository->createQueryBuilder('c')
+            ->where('c.tipo = :tipo AND c.limiteSuperior <= :sumatoriaPuntajes AND c.limiteInferior >= :sumatoriaPuntajes')
+            ->setParameter('tipo', 'oferta')
+            ->setParameter('sumatoriaPuntajes', $sumatoriaPuntajes)
+            ->getQuery()
+            ->getOneOrNullResult();
+        $oferta->setConfianza($confianzaEncajada);
+        //si entra en desconfianza
+        if($sumatoriaPuntajes < -4){
+            $hoy= new \DateTime();
+            $oferta->setFechaVto($hoy);
+            $oferta->setEstado(0);
+            //penalizar al usuario que subió, hay que felicitar al votante
+            
+            $usuOColab= $userOferta->getPuntosColab();
+            $usuORep=  $userOferta->getPuntosRep(); 
+            if ($usuOColab == null){ $usuOColab= 0; }
+            if ($usuORep == null){ $usuORep= 0; }
+            $userOferta->setPuntosColab($usuOColab-3); 
+            $userOferta->setPuntosRep($usuORep-3); 
+            //----------agregar colaboración mala --------
+            $colab = new Colaboracion();
+            $colab->setPuntaje(-3); // Establece el puntaje deseado
+            $colab->setTipo('mala');
+            $colab->setFecha(new \DateTime());
+            $colab->setDescripcion('-3 por oferta en desconfianza'); 
+            $colab->setTipoVoto(0); 
+            $em->persist($colab);
+            $userOferta->addColaboracion($colab); 
+            $em->persist($userOferta);
+            $em->persist($usuario);
+            $em->persist($oferta);
+            $em->flush(); 
+            $this->addFlash('fracaso','La oferta que votaste ha entrado en desconfianza, por lo que ya no estará disponible para su búsqueda'); 
+            return $this->redirectToRoute('app_inicio');
+
+        }
+        //si llega a oferta top
+        if($sumatoriaPuntajes > 9){
+            $oferta->setEsTop(1);
+            //premiar?
+            $usuOColab= $userOferta->getPuntosColab();
+            $usuORep=  $userOferta->getPuntosRep(); 
+            if ($usuOColab == null){ $usuOColab= 0; }
+            if ($usuORep == null){ $usuORep= 0; }
+            $userOferta->setPuntosColab($usuOColab+3); 
+            $userOferta->setPuntosRep($usuORep+3); 
+            $colabok = new Colaboracion();
+            $colabok->setPuntaje(+3); // Establece el puntaje deseado
+            $colabok->setTipo('premio');
+            $colabok->setFecha(new \DateTime());
+            $colabok->setDescripcion('+3 por alcanzar oferta hot'); 
+            $colabok->setTipoVoto(0); 
+            $em->persist($colabok);
+            $userOferta->addColaboracion($colabok); 
+            $em->persist($userOferta);
+            $em->persist($usuario);
+            $em->flush();
+        }
+        $em->persist($oferta);
+        $em->flush();
+        return $this->redirectToRoute('app_oferta_perfil', ['id' => $idoferta]);
+    }
+    /**
+     * @Route("/baja-o-{idoferta}-{idusuario}", name="app_fin_oferta")
+     */
+    public function finOferta($idoferta,$idusuario)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $usuario = $em->getRepository("App:User")->findOneBy(array('id'=>$idusuario));
+        $oferta = $em->getRepository("App:Oferta")->findOneBy(array('id'=>$idoferta));
+        if (!$usuario){
+            $url = $this->generateUrl('app_login_user');
+            $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder informar el fin de la oferta.');
+            return $this->redirectToRoute('app_oferta_perfil', ['id' => $idoferta]);
+        }
+        $oferta = $em->getRepository("App:Oferta")->findOneBy(array('id'=>$idoferta));
+        if (!$oferta){
+            $this->addFlash('fracaso','Error, no se encontró la oferta solicitada');
+            return $this->redirectToRoute('app_inicio');    
+        }
+        if($oferta->getEstado() == 0){
+            $this->addFlash('fracaso','Error, la oferta que quieres votar no esta activa');
+            return $this->redirectToRoute('app_inicio');     
+        }   
+        //creo confianzas si no existen
+        $confianzasRepository = $em->getRepository(Confianza::class);
+        $tiposYnombres = [
+            ['tipo' => 'oferta', 'nombre' => 'desconfianza', 'limiteSuperior'=>'-4', 'limiteInferior'=>'-9999'],
+            ['tipo' => 'oferta', 'nombre' => 'bajo','limiteSuperior'=>'-3', 'limiteInferior'=>'-1'],
+            ['tipo' => 'oferta', 'nombre' => 'intermedio', 'limiteSuperior'=>'0', 'limiteInferior'=>'0'],
+            ['tipo' => 'oferta', 'nombre' => 'medio', 'limiteSuperior'=>'1', 'limiteInferior'=>'4'],
+            ['tipo' => 'oferta', 'nombre' => 'confiable', 'limiteSuperior'=>'5', 'limiteInferior'=>'9999'],
+        ];
+        foreach ($tiposYnombres as $tipoYnombre) {
+            $confianza = $confianzasRepository->findOneBy($tipoYnombre);
+            if ($confianza === null) {
+                $confianza = new Confianza();
+                $confianza->setTipo($tipoYnombre['tipo']);
+                $confianza->setNombre($tipoYnombre['nombre']);
+                $confianza->setLimiteInferior($tipoYnombre['limiteInferior']); 
+                $confianza->setLimiteSuperior($tipoYnombre['limiteSuperior']); 
+                $em->persist($confianza);
+            }
+        }
+        $em->flush(); 
+        foreach ($oferta->getColaboracions() as $colaboracion) {
+            if ($colaboracion->getUser() === $usuario && $colaboracion->getTipo() === 'baja') {
+                $this->addFlash('fracaso','Error, usted ya ha informado el fin de esta oferta');
+                return $this->redirectToRoute('app_oferta_perfil', ['id' => $idoferta]);
+            }
+        }
+        $userOferta = $oferta->getUser();
+        //trato Colaboraciones
+        $colaboraciones = $oferta->getColaboracions()->filter(function ($colaboracion) {
+            return $colaboracion->getTipo() === 'baja';
+        });
+        $sumatoriaPuntajes = 0;
+        foreach ($colaboraciones as $colaboracion) {
+            $sumatoriaPuntajes += $colaboracion->getPuntaje();
+        }
+        $colaboracion = new Colaboracion();
+        $colaboracion->setPuntaje(1); // Establece el puntaje deseado
+        $colaboracion->setTipo('baja');
+        $colaboracion->setFecha(new \DateTime());
+        $colaboracion->setDescripcion('+1 por informar el fin de una oferta'); 
+        $colaboracion->setTipoVoto(0); 
+        $oferta->addColaboracion($colaboracion);           
+        //puntuo al usuario
+            $usuario = $em->getRepository(User::class)->find($idusuario);
+            $usuColab= $usuario->getPuntosColab();
+            $usuRep=  $usuario->getPuntosRep(); 
+            if ($usuColab == null){ $usuColab= 0; }
+            if ($usuRep == null){ $usuRep= 0; }
+            $usuario->setPuntosColab($usuColab+1); 
+            $usuario->setPuntosRep($usuRep+1); 
+            $usuario->addColaboracion($colaboracion); 
+            $em->persist($usuario);
+        $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!'); 
+        //si alcanzó la cantidad de votos se da de baja
+        if($sumatoriaPuntajes < -3){
+            $hoy= new \DateTime();
+            $oferta->setFechaVto($hoy);
+            $oferta->setEstado(0);
+            //si finalizó en desconfianza
+            if( $oferta->getConfianza() != null){
+                $nombreConfianza = $oferta->getConfianza()->getNombre();
+                    if ($nombreConfianza == 'desconfianza') {
+                        //tratar penalización
+                        $usuOColab= $userOferta->getPuntosColab();
+                        $usuORep=  $userOferta->getPuntosRep(); 
+                        if ($usuOColab == null){ $usuOColab= 0; }
+                        if ($usuORep == null){ $usuORep= 0; }
+                        $userOferta->setPuntosColab($usuOColab-2); 
+                        $userOferta->setPuntosRep($usuORep-2); 
+                        //----------agregar colaboración mala --------
+                        $colab = new Colaboracion();
+                        $colab->setPuntaje(-2); // Establece el puntaje deseado
+                        $colab->setTipo('mala');
+                        $colab->setFecha(new \DateTime());
+                        $colab->setDescripcion('-2 puntos por oferta finalizada en desconfianza'); 
+                        $colab->setTipoVoto(0); 
+                        $em->persist($colab);
+                        $userOferta->addColaboracion($colab); 
+                        $em->persist($userOferta);
+                        $em->persist($oferta);
+                        $em->flush();
+                        
+                    } elseif ($nombreConfianza == 'confiable') {
+                        //tratar premio
+                        $usuOColab= $userOferta->getPuntosColab();
+                        $usuORep=  $userOferta->getPuntosRep(); 
+                        if ($usuOColab == null){ $usuOColab= 0; }
+                        if ($usuORep == null){ $usuORep= 0; }
+                        $userOferta->setPuntosColab($usuOColab+2); 
+                        $userOferta->setPuntosRep($usuORep+2); 
+                        //----------agregar colaboración mala --------
+                        $colab = new Colaboracion();
+                        $colab->setPuntaje(+2); // Establece el puntaje deseado
+                        $colab->setTipo('premio');
+                        $colab->setFecha(new \DateTime());
+                        $colab->setDescripcion('+2 puntos por oferta finalizada en confiable'); 
+                        $colab->setTipoVoto(0); 
+                        $em->persist($colab);
+                        $userOferta->addColaboracion($colab); 
+                        $em->persist($userOferta);
+                        $em->persist($oferta);  
+                        $em->flush();     
+                    }
+            }
+            //informar baja de oferta
+            $em->persist($oferta);
+            $em->flush(); 
+            $this->addFlash('fracaso','La oferta que has informado se ha dado de baja, ya no estará disponible para su búsqueda'); 
+            return $this->redirectToRoute('app_inicio');
+           ;
+        }
+        $em->persist($oferta);
+        $em->flush();
+        return $this->redirectToRoute('app_oferta_perfil', ['id' => $idoferta]);
+
     }
 
 }

@@ -16,10 +16,15 @@
 <div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
 
 <div class="e">
-{% for message in app.flashes('exito') %}
-      <div class="alert alert-success">
-         {{message}}     
-      </div>    
+{% for flash_message in app.session.flashbag.get('exito') %}
+    <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+        {{ flash_message|raw }}
+    </div>
+{% endfor %}
+{% for flash_message in app.session.flashbag.get('fracaso') %}
+    <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        {{ flash_message|raw }}
+    </div>
 {% endfor %}
 
 </div>
@@ -63,7 +68,7 @@
 
             </div>
             <div class="col-4">
-                <div class=" ">Producto: <span style="color:grey">{{oferta.producto.descripcionProducto}}</span> </div>
+                <div class=" ">Producto: <span style="color:grey"><a href="{{path('app_producto_perfil',{ 'id': oferta.producto.id })}}">{{oferta.producto.descripcionProducto}}</a></span> </div>
                 <div class=" ">Código: <span style="color:grey">{{oferta.producto.gtin}}</span> </div>
                 <div class=" ">Contenido neto: <span style="color:grey">{{oferta.producto.netContent}}</span> </div>
                 <div class=" ">Marca: <span style="color:grey">{{oferta.producto.marcaProducto}}</span> </div>
@@ -75,12 +80,252 @@
                 <div class=" ">Estado: <span style="color:grey">{% if oferta.producto.estadoProducto == 1 %}ACTIVO{%else%}BAJA{% endif %}</span> </div>
 
             </div>
+            {% set confianza = oferta.confianza %}
+            {% if oferta.confianza != null %}
+                {% set conf= oferta.confianza.nombre %}
+                {%else%}
+                   {% set conf= 'intermedio' %}
+            {%endif%}
+
+            <div class="row">
+                <div class="col-sm-4"></div>
+                <div class="col-sm-8">
+                    <div class="bordebl">
+                        <div class="titbordebl" style="width: 185px;">Confianza de esta oferta</div>
+                        <div class="row">
+                            <div class="col-7 ">
+                                
+                                <table style="margin-top: -10px; margin-bottom: 10px; margin-left: 10px;">
+                                    <tbody>
+                                        <tr>
+                                            <table style="margin: 0 auto; margin-bottom: 10px;">
+                                                <tbody>
+                                                    <tr>
+                                                      {% if conf == "desconfianza" %}
+                                                          <td id="celda-conf-1s" style="width: 4rem; overflow-y: visible; text-align: center; color: black">Muy baja</td>
+                                                        {%else%}
+                                                          <td id="celda-conf-1s" style="width: 4rem; overflow-y: visible; text-align: center; color: #828387">Muy baja</td>
+                                                      {%endif%} 
+                                                      {% if conf == "bajo" %}
+                                                          <td id="celda-conf-2s" style="width: 4rem; overflow-y: visible; text-align: center; color: black">Baja</td>
+                                                        {%else%}
+                                                          <td id="celda-conf-2s" style="width: 4rem; overflow-y: visible; text-align: center; color: #828387">Baja</td>
+                                                      {%endif%}
+                                                          <td id="celda-conf-3s" style="width: 5px ;"></td>
+                                                      {% if conf == "medio" %}
+                                                          <td id="celda-conf-3s" style="width: 4rem; overflow-y: visible; text-align: center; color: black">Media</td>
+                                                         {%else%}
+                                                          <td id="celda-conf-3s" style="width: 4rem; overflow-y: visible; text-align: center; color: #828387">Media</td>
+                                                      {%endif%}
+                                                      {% if conf == "confiable" %}
+                                                          <td id="celda-conf-4s" style="width: 4rem; overflow-y: visible; text-align: center; color: black">Alta</td>
+                                                         {%else%}
+                                                          <td id="celda-conf-4s" style="width: 4rem; overflow-y: visible; text-align: center; color: #828387">Alta</td>
+                                                      {%endif%}
+                                                    </tr>
+                                                    <tr>
+                                                        {% if conf == "desconfianza" %}
+                                                           <td id="celda-conf-1" style="width: 4rem ;background-color: #EE1A29; border: 3px black solid;opacity:1;">  </td>
+                                                          {%else%}
+                                                           <td id="celda-conf-1" style="width: 4rem ;background-color: #EE1A29; border: 2px #828387 solid;opacity:0.25;">  </td>
+                                                        {%endif%}
+                                                        {% if conf == "bajo" %}      
+                                                           <td id="celda-conf-2" style="width: 4rem ;background-color: #FF7F00; border: 3px black solid;opacity:1;">&nbsp;</td>
+                                                          {%else%}
+                                                           <td id="celda-conf-2" style="width: 4rem ;background-color: #FF7F00; border: 2px #828387 solid;opacity:0.25;">&nbsp;</td>
+                                                        {%endif%}
+                                                        {% if conf is not null and conf != "intermedio" %}
+                                                           <td id="celda-conf-3" style="width: 0.5rem ;background-color: #FF7F00; border: 2px #828387 solid;opacity:0.25;"></td>
+                                                          {%else%}
+                                                           <td id="celda-conf-3" style="width: 0.5rem ;background-color: #FF7F00; border: 3px black solid;opacity:1;"></td>
+                                                        {%endif%}
+                                                        {% if conf == "medio" %}
+                                                           <td id="celda-conf-4" style="width: 4rem ;background-color: #FF7F00; border: 3px black solid;opacity:1;">&nbsp;</td>
+                                                          {%else%}
+                                                           <td id="celda-conf-4" style="width: 4rem ;background-color: #FF7F00; border: 2px #828387 solid;opacity:0.25;">&nbsp;</td>
+                                                        {%endif%}
+                                                        {% if conf == "confiable" %}
+                                                           <td id="celda-conf-5" style="width: 4rem ;background-color: #23B14D; border: 3px black solid;opacity:1;">&nbsp;</td>
+                                                          {%else%}
+                                                           <td id="celda-conf-5" style="width: 4rem ;background-color: #23B14D; border: 2px #828387 solid;opacity:0.25;">&nbsp;</td>
+                                                        {%endif%}
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <table style="margin-top: -12px;">
+                                                  <tbody>
+                                                    <tr>
+                                                        <td style="width: 3rem; text-align: center;">&nbsp;</td>
+                                                        <td style="width: 3rem; text-align: center; color: #828387">-3</td>
+                                                        <td style="width: 2rem; text-align: center;">&nbsp;</td>
+                                                        <td style="width: 2rem; text-align: center; color: #828387">0</td>
+                                                        <td style="width: 2rem; text-align: center;">&nbsp;</td>
+                                                        <td style="width: 2rem; text-align: center; color: #828387">5</td>
+                                                        <td style="width: 4rem; text-align: center;">&nbsp;</td>
+                                                    </tr>
+                                                  </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>    
+                            </div>
+                            <div class="col-5">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="color: #2D76EA">{{votosp}}</td>
+                                            <td>
+                                                {% if app.user %}
+                                                    <a id="modal-vp"  data-toggle="modal" data-target="#myModalVp" style=""><img class="manito" src="/assets/images/colaboracion/voto-positivo.png" style="width: 3rem"></a>
+                                                {% else %}
+                                                    <a id="modal-vp"  data-toggle="modal" data-target="#myModalLog" style=""><img class="manito" src="/assets/images/colaboracion/voto-positivo.png" style="width: 3rem"></a>
+                                                {% endif %}
+                                               
+                                            </td>
+                                            <td style="color: #2D76EA">Estoy de acuerdo con esta oferta</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="color: #CF2A26">{{votosn}}</td>
+                                            <td>
+                                                {% if app.user %}
+                                                    <a id="modal-vn" data-toggle="modal" data-target="#myModalVn" style=""><img class="manito" src="/assets/images/colaboracion/voto-negativo.png" style="width: 3rem"></a>
+                                                {% else %}
+                                                    <a id="modal-vn" data-toggle="modal" data-target="#myModalLog" style=""><img class="manito" src="/assets/images/colaboracion/voto-negativo.png" style="width: 3rem"></a>
+                                                {% endif %}
+                                            </td>
+                                            <td style="color: #CF2A26">No estoy de acuerdo con esta oferta</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>    
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4"></div>
+                <div class="col-sm-8">
+                    <br>
+                    <div class="bordebl" >
+                        <div class="titbordebl" style="width: 250px;" >¿Esta oferta ya no esta disponible? </div>
+                        <div class="row">
+                            <div class="col-7 ">
+                                <table style="margin-top: 5px; margin-bottom: 10px; margin-left: 10px;">
+                                    <tbody>
+                                        <tr>
+                                            <td><div class="number" align="right">{{votosfin}}</div></td>
+                                            <td>Votos registrados para informar el fin de la oferta <span style="color: gray">({{4-votosfin}} restantes)</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>    
+                            </div>
+                            <div class="col-5">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td style="color: #EE1B24">¿Informar fin de oferta?</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <center >
+                                                {% if app.user %}
+                                                    <div id="modal-fn" class="btn btn-secondary" style="background-image: url('/assets/images/colaboracion/yes.png'); margin-top: -1px; width: 75px; height: 1.4rem; " data-toggle="modal" data-target="#myModalFn" style="display:block;"></div>
+                                                {% else %}
+                                                    <div id="modal-fn" class="btn btn-secondary" style="background-image: url('/assets/images/colaboracion/yes.png'); margin-top: -1px; width: 75px; height: 1.4rem; " data-toggle="modal" data-target="#myModalLog" style="display:block;"></div>
+                                                {% endif %}
+                                                </center>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>    
+                        </div>
+                    </div>
+                </div>
+            </div>
           </div>
     <br>
 <br>
+{%  if app.user != null %}
+  {% set idUsu = app.user.id%}
+{%else%}
+  {% set idUsu = 'null'%}
+{%endif%}
+<!-- Modales para colaboración-->
+<div class="modal fade" id="myModalVp">
+  <div class="modal-dialog">
+    <div class="modal-content">    
+      <div class="modal-header">
+        <button type="button" class="ml-auto" data-dismiss="modal" style="color: white; background-color: #EE1B24; border-radius: 255px; text-align:right" >&nbsp;X&nbsp;</button>
+      </div>
+      <div class="modal-body" style="vertical-align: middle; font-size: 150%;">
+        <p>¿Esta seguro de que esta de acuerdo con esta oferta?<br>
+        <img class="manito" src="/assets/images/colaboracion/voto-positivo.png" style="width: 3rem"></p>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal" style="font-size: 130%;">Cancelar</button>
+
+        <a href="{{ path('app_voto_oferta', {'idoferta': oferta.id, 'idusuario': idUsu, 'tipo': 'p'}) }}" class="btn btn-secondary btn-sm" style="font-size: 130%;">Confirmar voto</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="myModalVn">
+  <div class="modal-dialog">
+    <div class="modal-content">    
+      <div class="modal-header">
+        <button type="button" class="ml-auto" data-dismiss="modal" style="color: white; background-color: #EE1B24; border-radius: 255px; text-align:right" >&nbsp;X&nbsp;</button>
+      </div>
+      <div class="modal-body" style="vertical-align: middle; font-size: 150%;">
+        <p>¿Esta seguro de que NO esta de acuerdo con esta oferta?<br>
+            <img class="manito" src="/assets/images/colaboracion/voto-negativo.png" style="width: 3rem"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal" style="font-size: 130%;">Cancelar</button>
+        <a href="{{ path('app_voto_oferta', {'idoferta': oferta.id, 'idusuario': idUsu, 'tipo': 'n'}) }}" class="btn btn-secondary btn-sm" style="font-size: 130%;">Confirmar voto</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="myModalFn">
+  <div class="modal-dialog">
+    <div class="modal-content">    
+      <div class="modal-header">
+        <button type="button" class="ml-auto" data-dismiss="modal" style="color: white; background-color: #EE1B24; border-radius: 255px; text-align:right" >&nbsp;X&nbsp;</button>
+      </div>
+      <div class="modal-body" style="vertical-align: middle; font-size: 150%;">
+        <p>¿Esta seguro de que desea informar el fin de la oferta?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal" style="font-size: 130%;">Cancelar</button>
+        <a href="{{ path('app_fin_oferta', {'idoferta': oferta.id, 'idusuario': idUsu}) }}" class="btn btn-secondary btn-sm" style="font-size: 130%;">Confirmar</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="myModalLog">
+  <div class="modal-dialog">
+    <div class="modal-content">    
+      <div class="modal-header">
+        <button type="button" class="ml-auto" data-dismiss="modal" style="color: white; background-color: #EE1B24; border-radius: 255px; text-align:right" >&nbsp;X&nbsp;</button>
+      </div>
+      <div class="modal-body" style="vertical-align: middle; font-size: 150%;">
+        <p>Debes iniciar sesión para poder votar.<br>
+        ¡Ingresá ahora y ganá puntos por colaborar con KePrecios!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal" style="font-size: 130%;">Cancelar</button>
+       <a href="{{path('app_login_user')}}" class="btn btn-secondary btn-sm" style="font-size: 130%;">Ingresar</a>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 </div>
 </div>
         <br>
-        
+
 {% endblock %}

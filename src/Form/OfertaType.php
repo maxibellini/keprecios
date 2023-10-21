@@ -55,6 +55,11 @@ class OfertaType extends AbstractType
             ->add('producto', EntityType::class, [
                 'class' => Producto::class,
                 'required' => false,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('p')
+                        ->where('p.estadoProducto = 1')
+                     ;
+                },
             ])
             /*
             ->add('productonuevo', ProductoType::class, [

@@ -101,9 +101,21 @@ class Producto
      */
     private $imgUrl;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Colaboracion::class, mappedBy="producto",cascade={"persist"})
+     */
+    private $colaboracions;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Confianza::class, inversedBy="producto")
+     */
+    private $confianza;
+
+
     public function __construct()
     {
         $this->ofertas = new ArrayCollection();
+        $this->colaboracions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -366,4 +378,47 @@ class Producto
     {
         return $this->gtin.' - '.$this->descripcionProducto.' - '.$this->marcaProducto.' - '.$this->netContent;
     }
+
+    /**
+     * @return Collection<int, Colaboracion>
+     */
+    public function getColaboracions(): Collection
+    {
+        return $this->colaboracions;
+    }
+
+    public function addColaboracion(Colaboracion $colaboracion): self
+    {
+        if (!$this->colaboracions->contains($colaboracion)) {
+            $this->colaboracions[] = $colaboracion;
+            $colaboracion->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeColaboracion(Colaboracion $colaboracion): self
+    {
+        if ($this->colaboracions->removeElement($colaboracion)) {
+            // set the owning side to null (unless already changed)
+            if ($colaboracion->getProducto() === $this) {
+                $colaboracion->setProducto(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getConfianza(): ?Confianza
+    {
+        return $this->confianza;
+    }
+
+    public function setConfianza(?Confianza $confianza): self
+    {
+        $this->confianza = $confianza;
+
+        return $this;
+    }
+
 }
