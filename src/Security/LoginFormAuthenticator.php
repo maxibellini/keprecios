@@ -94,26 +94,29 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
             return new RedirectResponse($targetPath);
         }
         $user = $token->getUser();
+        if ($user->getUltimaConexion() != null){
+            $ultimaConexion = $user->getUltimaConexion(); 
+            //$ultimaConexion->modify('+1 hour');
+            $colaboraciones = $user->getColaboracions();
 
-        $ultimaConexion = $user->getUltimaConexion(); 
-        $ultimaConexion->modify('+1 hour');
-        $colaboraciones = $user->getColaboracions();
+            $colaboracionesDespuésDeConexion = 0;
+            foreach ($colaboraciones as $colaboracion) {
+                $fechaColaboracion = $colaboracion->getFecha();
 
-        $colaboracionesDespuésDeConexion = 0;
-        foreach ($colaboraciones as $colaboracion) {
-            $fechaColaboracion = $colaboracion->getFecha();
-
-            if ($fechaColaboracion > $ultimaConexion) {
-                $colaboracionesDespuésDeConexion++;
+                if ($fechaColaboracion > $ultimaConexion) {
+                   if($colaboracion->getTipo() == 'premio' or $colaboracion->getTipo() == 'mala' ){
+                     $colaboracionesDespuésDeConexion++;
+                    } 
+                }
             }
+            // Verifica si hay colaboraciones después de la última conexión
+            if ($colaboracionesDespuésDeConexion > 0) {
+                // Agrega un mensaje flash informando la cantidad de colaboraciones
+                $userId = $user->getId();
+                $url = $this->urlGenerator->generate('app_user_perfil', ['id' => $userId]);
+                 $request->getSession()->getFlashBag()->add('aviso', 'Tienes ' . $colaboracionesDespuésDeConexion . ' novedades que debes revisar desde tu última conexión. Puedes verlas desde <a href='.$url.'>tu perfil</a> en Mis Colaboraciones');
+            }  
         }
-        // Verifica si hay colaboraciones después de la última conexión
-        if ($colaboracionesDespuésDeConexion > 0) {
-            // Agrega un mensaje flash informando la cantidad de colaboraciones
-            $userId = $user->getId();
-            $url = $this->urlGenerator->generate('app_user_perfil', ['id' => $userId]);
-             $request->getSession()->getFlashBag()->add('aviso', 'Tienes ' . $colaboracionesDespuésDeConexion . ' novedades que debes revisar desde tu última conexión. Puedes verlas desde <a href='.$url.'>tu perfil</a> en Mis Colaboraciones');
-        }  
         $ya= new \DateTime() ;
         $user->setUltimaConexion($ya);
         $this->entityManager->flush();

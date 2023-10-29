@@ -301,7 +301,7 @@ class OfertaController extends AbstractController
             $this->addFlash('fracaso','Error, no se encontró la oferta solicitada');
             return $this->redirectToRoute('app_inicio');    
         }
-        if($ofert->getEstado() == 0){
+        if($oferta->getEstado() == 0){
             $this->addFlash('fracaso','Error, la oferta que quieres votar no esta activa');
             return $this->redirectToRoute('app_inicio');     
         }   
@@ -413,7 +413,7 @@ class OfertaController extends AbstractController
 
         }
         //si llega a oferta top
-        if($sumatoriaPuntajes > 9){
+        if($sumatoriaPuntajes > 5){
             $oferta->setEsTop(1);
             //premiar?
             $usuOColab= $userOferta->getPuntosColab();
@@ -514,8 +514,9 @@ class OfertaController extends AbstractController
             $usuario->addColaboracion($colaboracion); 
             $em->persist($usuario);
         $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!'); 
+        $sumatoriaPuntajes=$sumatoriaPuntajes + 1;
         //si alcanzó la cantidad de votos se da de baja
-        if($sumatoriaPuntajes < -3){
+        if($sumatoriaPuntajes > 3){
             $hoy= new \DateTime();
             $oferta->setFechaVto($hoy);
             $oferta->setEstado(0);

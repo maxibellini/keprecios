@@ -288,7 +288,7 @@ class ComercioController extends AbstractController
         }
         foreach ($comercio->getColaboracions() as $colaboracion) {
             if ($colaboracion->getUser() === $usuario && $colaboracion->getTipo() === 'voto') {
-                $this->addFlash('fracaso','Error, usted ya ha votado en esta comercio');
+                $this->addFlash('fracaso','Error, usted ya ha votado en esta solicitud de comercio');
                 return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
             }
         }
@@ -338,7 +338,7 @@ class ComercioController extends AbstractController
             ->getOneOrNullResult();
         $comercio->setConfianza($confianzaEncajada);
         //si entra en desconfianza
-        if($sumatoriaPuntajes < -4){
+        if($sumatoriaPuntajes < 2){
             $comercio->setEstadoComercio('BAJA');
             //penalizar al usuario que subió
             $usuOColab= $userComercio->getPuntosColab();
@@ -353,9 +353,10 @@ class ComercioController extends AbstractController
             $colab->setTipo('mala');
             $colab->setFecha(new \DateTime());
             $colab->setDescripcion('-10 por solicitud de comercio en desconfianza'); 
-            $colab->setTipoVoto(0); 
+            $colab->setTipoVoto(0);
+            $colab->setComercio($comercio);
             $em->persist($colab);
-            $userComercio->addColaboracion($colab); 
+            $userComercio->addColaboracion($colab);
             $em->persist($userComercio);
             $em->persist($usuario);
             $em->persist($comercio);
@@ -381,6 +382,7 @@ class ComercioController extends AbstractController
             $colabok->setFecha(new \DateTime());
             $colabok->setDescripcion('+15 por lograr alta de comercio'); 
             $colabok->setTipoVoto(0); 
+            $colabok->setComercio($comercio);
             $em->persist($colabok);
             $userComercio->addColaboracion($colabok); 
             $em->persist($userComercio);
@@ -449,7 +451,7 @@ class ComercioController extends AbstractController
             $em->persist($usuario);
         $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!'); 
         //si alcanzó la cantidad de votos se da de baja
-        if($sumatoriaPuntajes < -4){
+        if($sumatoriaPuntajes > 4){
             $hoy= new \DateTime();
             $comercio->setEstado('BAJA');
             //informar baja de comercio

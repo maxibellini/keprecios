@@ -35,6 +35,11 @@ class LineaProductoType extends AbstractType
             ->add('producto' , EntityType::class, [
                 // looks for choices from this entity
                 'class' => Producto::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('p')
+                        ->where('p.estadoProducto = 1')
+                     ;
+                },
                 'attr' => [
                     'class' => 'select2'
                 ]

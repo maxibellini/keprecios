@@ -239,9 +239,10 @@ class ProductoController extends AbstractController
             $usuario->setPuntosRep($usuRep+1); 
             $usuario->addColaboracion($colaboracion); 
             $em->persist($usuario);
-        $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!'); 
+        $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!');
+        $sumatoriaPuntajes = $sumatoriaPuntajes + 1; 
         //si alcanzó la cantidad de votos se da de baja
-        if($sumatoriaPuntajes < -4){
+        if($sumatoriaPuntajes > 4){
             $producto->setEstadoProducto(0);
             //informar baja del producto
             $em->persist($producto);

@@ -62,6 +62,7 @@ class AppController extends AbstractController
                         $userOferta->addColaboracion($colab); 
                         $em->persist($userOferta);
                         $em->persist($oferta);
+                        $em->flush(); 
                         
                     } elseif ($nombreConfianza == 'confiable') {
                         //tratar premio

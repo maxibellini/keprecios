@@ -37,7 +37,7 @@
           <h4 class="display-5 card-header" align="center">{{oferta.producto.descripcionProducto}}</h4>  
           <br>
           <div class="row">
-            <div class="col-4">
+            <div class="col-sm-4">
                 {% if oferta.producto.image != null %}
                   {% set foto = 'uploads/images/productos/'~ oferta.producto.image %}
                   {% set foto2 = absolute_url(asset(foto)) %}
@@ -50,7 +50,7 @@
                     {% endif %}
                 {% endif %}
             </div>
-            <div class="col-4">
+            <div class="col-sm-4">
                 <div class=" ">Monto: <span style="color:grey;">${{oferta.monto}}</span> </div>
                 <div class=" ">Descripción: <span style="color:grey">{{oferta.descripcionOferta}}</span> </div>
                 <div class=" ">Tipo de descuento: <span style="color:grey">{{oferta.tipoDescuento}}</span> </div>
@@ -58,7 +58,39 @@
                 <div class=" ">Fecha creación: <span style="color:grey">{% if oferta.fechaCarga != null %}{{oferta.fechaCarga|date('Y-m-d')}}{% endif %} </span> </div>
                 <div class=" ">Fecha actualización: <span style="color:grey">{% if oferta.fechaUpdate != null %}{{oferta.fechaUpdate|date('Y-m-d')}}{% endif %} </span> </div>
                 <div class=" ">Comercio: <span style="color:grey"><a href="{{path('app_comercio_perfil',{ 'id': oferta.comercio.id })}}">{% if oferta.comercio != null %}{{oferta.comercio.nombreComercio}}{% endif %}</a></span> </div>
-                <div class=" ">Usuario: <span style="color:grey"><a href="{{path('app_user_perfil',{ 'id': oferta.user.id })}}">{% if oferta.user != null %}{{oferta.user.name}}{% endif %}</a></span> </div>
+                <div class=" ">
+                <table style="width: auto;">
+                    <tbody>
+                    <tr>
+                        <td style="max-width: 120px;">
+                            Usuario:
+                        </td>
+ 
+                        <td style="max-width: 25px;">                
+                            {% if oferta.user.puntosRep != null %} 
+                            <span>  
+                                {% if oferta.user.puntosRep < 0  %}
+                                  <img src="/assets/images/colaboracion/medalla_madera.png" alt="imagen nivel" class="" style="width: 85%;">
+                                {% elseif oferta.user.puntosRep >=0 and oferta.user.puntosRep <= 5 %}
+                                  <img src="/assets/images/colaboracion/medalla_bronce.png" alt="imagen nivel" class="" style="width: 85%;">
+                                {% elseif oferta.user.puntosRep >= 6 and oferta.user.puntosRep <=9 %}
+                                  <img src="/assets/images/colaboracion/medalla_plata.png" alt="imagen nivel" class="" style="width: 85%;">
+                                {% elseif oferta.user.puntosRep >= 10 %}
+                                  <img src="/assets/images/colaboracion/medalla_oro.png" alt="imagen nivel" class="" style="width: 85%;">
+                                {% elseif oferta.user.puntosRep == null %}
+                                  <img src="/assets/images/colaboracion/medalla_bronce.png" alt="imagen nivel" class="" style="width: 85%;">
+                                {% endif %}
+                            </span>
+                        </td>
+                       <td style="">
+                            <span style="color:grey"><a href="{{path('app_user_perfil',{ 'id': oferta.user.id })}}">{% if oferta.user != null %}{{oferta.user.name}}{% endif %}</a></span> 
+                        </td>
+                    </tr>
+                    </tbody>
+                </table> 
+
+                {%endif%}
+                </div>
                <div class=" ">Estado: {% if oferta.estado == '1' %}
                       <span style="color: green">ACTIVA</span>
                            {% else %}
@@ -67,7 +99,7 @@
                 </div>
 
             </div>
-            <div class="col-4">
+            <div class="col-sm-4">
                 <div class=" ">Producto: <span style="color:grey"><a href="{{path('app_producto_perfil',{ 'id': oferta.producto.id })}}">{{oferta.producto.descripcionProducto}}</a></span> </div>
                 <div class=" ">Código: <span style="color:grey">{{oferta.producto.gtin}}</span> </div>
                 <div class=" ">Contenido neto: <span style="color:grey">{{oferta.producto.netContent}}</span> </div>
@@ -88,7 +120,36 @@
             {%endif%}
 
             <div class="row">
-                <div class="col-sm-4"></div>
+                <div class="col-sm-4" style="padding-left: 30px;">
+                <div style="color: grey">¡Compartí esta oferta en tus redes!</div>
+                 {% set currentUrl = app.request.schemeAndHttpHost ~ path('app_oferta_perfil', { 'id': oferta.id }) %}
+                    <table style="width: 60%;">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <a class="ampliar2" href="https://www.facebook.com/sharer/sharer.php?u={{ currentUrl }}" target="_blank">
+                                        <img src="assets/images/colaboracion/social-fb.png" style="width: 100%; padding-right: 3px;" alt="Compartir en Facebook">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="ampliar2" href="https://twitter.com/intent/tweet?url={{ currentUrl }}" target="_blank">
+                                        <img src="assets/images/colaboracion/social-twb.png" style="width: 100%; padding-right: 3px;" alt="Compartir en Twitter">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="ampliar2" href="https://api.whatsapp.com//send?text={{ currentUrl }}" target="_blank">
+                                        <img src="assets/images/colaboracion/social-wp.png" style="width: 100%; padding-right: 3px;" alt="Compartir en WhatsApp">
+                                    </a>
+                                </td>
+                                <td>
+                                    <a class="ampliar2" href="https://t.me/share/url?url={{ currentUrl }}&text=¡Mira esta oferta increíble!" target="_blank">
+                                        <img src="assets/images/colaboracion/social-tl.png" style="width: 100%; padding-right: 3px;" alt="Compartir en Facebook">
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="col-sm-8">
                     <div class="bordebl">
                         <div class="titbordebl" style="width: 185px;">Confianza de esta oferta</div>
