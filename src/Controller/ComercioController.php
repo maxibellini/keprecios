@@ -453,7 +453,7 @@ class ComercioController extends AbstractController
         //si alcanzó la cantidad de votos se da de baja
         if($sumatoriaPuntajes > 4){
             $hoy= new \DateTime();
-            $comercio->setEstado('BAJA');
+            $comercio->setEstadoComercio('BAJA');
             //informar baja de comercio
             $em->persist($comercio);
             $em->flush(); 
