@@ -475,10 +475,10 @@ class Comercio
             $cuitcomercio= $this->getCuitComercio();
             $latcomercio= $this->getLatitudComercio();
             $longcomercio= $this->getLongitudComercio();
-            $comercion= $this->em->getRepository("App:Comercio")->findOneBy(array('nombreComercio'=>$namecomercio));
-            $comercioe= $this->em->getRepository("App:Comercio")->findOneBy(array('emailComercio'=>$emailcomercio));
-            $comercioc= $this->em->getRepository("App:Comercio")->findOneBy(array('cuitComercio'=>$cuitcomercio));
-            $comercioltln= $this->em->getRepository("App:Comercio")->findOneBy(array('latitudComercio'=>$latcomercio, 'longitudComercio'=>$longcomercio));
+            $comercion= $this->em->getRepository("App:Comercio")->findOneBy(array('nombreComercio'=>$namecomercio, 'estadoComercio' => 'ACTIVO'));
+            $comercioe= $this->em->getRepository("App:Comercio")->findOneBy(array('emailComercio'=>$emailcomercio, 'estadoComercio' => 'ACTIVO'));
+            $comercioc= $this->em->getRepository("App:Comercio")->findOneBy(array('cuitComercio'=>$cuitcomercio, 'estadoComercio' => 'ACTIVO'));
+            $comercioltln= $this->em->getRepository("App:Comercio")->findOneBy(array('latitudComercio'=>$latcomercio, 'longitudComercio'=>$longcomercio, 'estadoComercio' => 'ACTIVO'));
     
             if($comercion){
               if($comercion->getId() != $this->getId()) {
@@ -519,13 +519,19 @@ class Comercio
                   }
                }
                if($comercio->getEmailComercio() == $this->getEmailComercio() ){
-                  $contEmails++;
+                  if($comercio->getEstadoComercio() == "ACTIVO"){ 
+                    $contEmails++;
+                  }
                }
                if($comercio->getCuitComercio() == $this->getCuitComercio() and $this->getSucursal() == 0 ){
-                  $contCuits++;
+                  if($comercio->getEstadoComercio() == "ACTIVO"){
+                    $contCuits++;
+                  }
                }
                if($comercio->getLatitudComercio() == $this->getLatitudComercio() and $comercio->getLongitudComercio() == $this->getLongitudComercio()  ){
-                  $contLtLn++;
+                  if($comercio->getEstadoComercio() == "ACTIVO"){
+                    $contLtLn++;
+                  }
                }
             }
         }
