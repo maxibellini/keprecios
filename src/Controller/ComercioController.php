@@ -300,7 +300,7 @@ class ComercioController extends AbstractController
         });
         $sumatoriaPuntajes = 0;
         foreach ($colaboraciones as $colaboracion) {
-            if($colaboracion->getTipo() == 1){
+            if($colaboracion->getTipoVoto() == 1){
                $sumatoriaPuntajes = $sumatoriaPuntajes - 1;
             }else{
                 $sumatoriaPuntajes = $sumatoriaPuntajes + 1; 
