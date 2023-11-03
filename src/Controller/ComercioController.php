@@ -428,7 +428,7 @@ class ComercioController extends AbstractController
         $colaboraciones = $comercio->getColaboracions()->filter(function ($colaboracion) {
             return $colaboracion->getTipo() === 'baja';
         });
-        $sumatoriaPuntajes = 0;
+        $sumatoriaPuntajes = 1;
         foreach ($colaboraciones as $colaboracion) {
             $sumatoriaPuntajes += $colaboracion->getPuntaje();
         }
