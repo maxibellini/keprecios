@@ -338,7 +338,7 @@ class ComercioController extends AbstractController
             ->getOneOrNullResult();
         $comercio->setConfianza($confianzaEncajada);
         //si entra en desconfianza
-        if($sumatoriaPuntajes < 2){
+        if($sumatoriaPuntajes < -4){
             $comercio->setEstadoComercio('BAJA');
             //penalizar al usuario que subió
             $usuOColab= $userComercio->getPuntosColab();

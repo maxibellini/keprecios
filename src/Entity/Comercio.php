@@ -514,7 +514,9 @@ class Comercio
         if (is_array($comercios)){
             foreach ($comercios as $comercio) {
                if($comercio->getNombreComercio() == $this->getNombreComercio() ){
-                  $contNames++;
+                  if($comercio->getEstadoComercio() == "ACTIVO"){
+                    $contNames++;
+                  }
                }
                if($comercio->getEmailComercio() == $this->getEmailComercio() ){
                   $contEmails++;
