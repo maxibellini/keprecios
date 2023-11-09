@@ -375,10 +375,29 @@ class OfertaController extends AbstractController
             $em->persist($usuario);
         $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!');    
         //trato la confianza
+        switch (true) {
+            case ($sumatoriaPuntajes >= -9999 && $sumatoriaPuntajes <= -4):
+                $nombre = 'desconfianza';
+                break;
+            case ($sumatoriaPuntajes >= -3 && $sumatoriaPuntajes <= -1):
+                $nombre = 'bajo';
+                break;
+            case ($sumatoriaPuntajes >= 0 && $sumatoriaPuntajes <= 0):
+                $nombre = 'intermedio';
+                break;
+            case ($sumatoriaPuntajes >= 1 && $sumatoriaPuntajes <= 4):
+                $nombre = 'medio';
+                break;
+            case ($sumatoriaPuntajes >= 5 && $sumatoriaPuntajes <= 9999):
+                $nombre = 'confiable';
+                break;
+            default:
+                $nombre = '';
+        }
         $confianzaEncajada = $confianzasRepository->createQueryBuilder('c')
-            ->where('c.tipo = :tipo AND c.limiteSuperior <= :sumatoriaPuntajes AND c.limiteInferior >= :sumatoriaPuntajes')
+            ->where('c.tipo = :tipo AND c.nombre = :nombre')
             ->setParameter('tipo', 'oferta')
-            ->setParameter('sumatoriaPuntajes', $sumatoriaPuntajes)
+            ->setParameter('nombre', $nombre)
             ->getQuery()
             ->getOneOrNullResult();
         $oferta->setConfianza($confianzaEncajada);

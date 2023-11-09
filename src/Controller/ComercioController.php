@@ -331,9 +331,9 @@ class ComercioController extends AbstractController
         $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!');    
         //trato la confianza
         $confianzaEncajada = $confianzasRepository->createQueryBuilder('c')
-            ->where('c.tipo = :tipo AND c.limiteSuperior <= :sumatoriaPuntajes AND c.limiteInferior >= :sumatoriaPuntajes')
+            ->where('c.tipo = :tipo AND c.nombre = :nombre')
             ->setParameter('tipo', 'comercio')
-            ->setParameter('sumatoriaPuntajes', $sumatoriaPuntajes)
+            ->setParameter('nombre', $nombre)
             ->getQuery()
             ->getOneOrNullResult();
         $comercio->setConfianza($confianzaEncajada);
