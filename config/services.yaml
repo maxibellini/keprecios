@@ -9,6 +9,7 @@ parameters:
     app.path.usuarios_images: /uploads/images/usuarios
     app.path.comercios_images: /uploads/images/comercios
     app.path.productos_images: /uploads/images/productos
+    app.path.vouchers_images: /uploads/images/vouchers
 
 services:
 
@@ -40,3 +41,9 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\QrcodeService:
+        arguments:
+            $builder: '@endroid.qrcode.builder'
+    endroid.qrcode.builder:
+            class: Endroid\QrCode\Builder\Builder
+            arguments: ['UTF-8']

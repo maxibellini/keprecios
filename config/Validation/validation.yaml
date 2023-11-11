@@ -13,5 +13,8 @@ App\Entity\Oferta:
 App\Entity\ListaCompra:
     constraints:
         - Callback: validate
+App\Entity\Voucher:
+    constraints:
+        - Callback: validate
 
 

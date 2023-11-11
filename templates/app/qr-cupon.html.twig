@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTDHTML4.0Transitional//ES">
+<HTML>
+  <HEAD>
+    <META http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8">
+    <TITLE>Cupon {{ cupon }}</TITLE>
+    <style>
+                span.lineas {
+                  position: absolute;
+                  overflow: hidden;
+                  white-space: nowrap;
+                }
+                span.lineasbl {
+                  position: absolute;
+                  right: -13%;
+                  color: white;
+                  background-color: white;
+                  z-index:0 ;
+                }
+                .marco{
+                  outline: 1px solid #B7BBB8;
+                  outline-offset: 4px;
+                }
+    </style>
+  </HEAD>
+
+  <BODY lang="es-ES" text="#000000"  >
+    <img src="{{ absolute_url(asset('assets/images/mini-logo.png')) }}" width="19%" align="left"/>
+<br>
+<br>
+<br>
+     <center>
+      <h1 align="" style="font: 140% sans-serif;"><B>Cupon {{ cupon }}</B></h1>
+     </center>    
+
+
+<center>
+                  
+        <table style="font: 100% sans-serif; line-height: 150%;margin: 0 auto;" WIDTH="80%">
+          <tbody>
+            <tr>
+                <td colspan="2">Este cupón deberá ser presentado ante una persona responsable de la entidad <b>{{cupon.voucher.entidad}}</b> para ser canjeado<br></td>
+            </tr>
+            <tr>
+
+              <td style=" " >
+                <b>Usuario:</b> {{cupon.user}} <br>
+                <b>Cupón emitido el:</b> {% if cupon.fechaCreacion != null %}{{cupon.fechaCreacion|date('Y-m-d')}}{% endif %} <br>
+                <b>Vence el:</b>{% if cupon.fechaVto != null %}{{cupon.fechaVto|date('Y-m-d')}}{% endif %} <br> 
+                <b>Datos del voucher:</b><br> {{cupon.voucher}} <br>
+                {{cupon.voucher.descripcion|raw}}            
+              </td>
+              <td style=" ">
+                <center >
+                  {% if qrCode %}
+                      <center>  <img src="{{ qrCode }}" alt="qr-code">  </center>
+                  {% endif %}
+                </center>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+
+<center/>
+
+
+</BODY>
+</HTML>

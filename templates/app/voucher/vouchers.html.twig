@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+    .colorboton {
+      background-color: white; color: #FF9071;  
+       border: 1px solid #FF9071;
+    }
+    .colorboton:hover , .colorboton:focus, .colorboton:active , coloboton.active {
+
+    background-color: #FF9071;
+        border: 1px solid #FF9071;
+     
+    color: white;
+
+    }
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+{% for flash_message in app.session.flashbag.get('exito') %}
+    <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+{% for flash_message in app.session.flashbag.get('fracaso') %}
+    <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+<a href="javascript:history.back()" style="float: right"> Volver Atrás</a>
+      <br>
+         <div class="row" >      
+          <div class="mbr-section-head mb-4">
+              <h3 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
+                  <strong>Vouchers disponibles</strong></h3>
+              <h5 class="mbr-section-subtitle mbr-fonts-style align-center mb-0 mt-2 display-5" style="color:grey">¡Canjeá ahora tus puntos! ¿Qué estas esperando?</h5>              
+          </div>
+          <div class="row" >
+             {% for voucher in vouchers %}
+              <div class="col-sm-4">
+                <div class="item-wrapper tarjeta ampliar3" style="height: 150px; ">
+                  {% if voucher.image != null %}
+                      {% set foto = 'uploads/images/vouchers/'~ voucher.image %}
+                      {% set foto2 = absolute_url(asset(foto)) %}
+                          <a href="{{path('app_voucher_perfil',{ 'id': voucher.id })}}" style="color: #E85395">
+                          <div id="foto" style="   background-image: url('{{foto2}}');background-size: 100% auto; background-position: center;height: 150px; "></div></a>
+                      {% else %}  
+                      {% set foto2 = 'assets/images/comercio-empty-v2.png' %}
+                        <a href="{{path('app_voucher_perfil',{ 'id': voucher.id })}}" style="color: #E85395;"> 
+                         <div style="background: rgb(229,162,192); background: radial-gradient(circle, rgba(229,162,192,1) 0%, rgba(232,83,149,1) 58%);height: 150px;">
+                          <div style="height: 1rem;"></div>
+                            <p class="mbr-text mbr-fonts-style mt-0 display-7">
+                               <center> 
+                                <span style="color:white; font-size: 120%;">{{voucher.entidad}}</span>
+                               </center>
+                            </p>
+                            <center class="display-7" style=" font-size: 140%; -webkit-text-stroke: 1px #824434;color: #FFCFC1 "><b>{{voucher.nombre}}</b></center>
+                          </div>
+                        </a>
+                  {% endif %}
+                </div>  
+                <div style="height: 1rem;"></div>
+              </div>  
+             {%endfor%}
+          </div>
+            
+         </div>
+            
+            
+            
+            
+            
+        </div> 
+
+
+    <br>
+
+{% endblock %}

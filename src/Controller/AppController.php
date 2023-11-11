@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Comercio;
 use App\Entity\Oferta;
 use App\Entity\Colaboracion;
+use App\Entity\Cupon;
 use App\Service\ApiMLService;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface; 
@@ -22,6 +23,7 @@ class AppController extends AbstractController
     	$em = $this->getDoctrine()->getManager();
 
         $ofertas = $em->getRepository(Oferta::class)->findAll();
+        $cupones = $em->getRepository(Cupon::class)->findBy(['estado' => 'SIN CANJEAR']);
         $fechaHoy = new \DateTime();
         foreach ($ofertas as $oferta) {
             
@@ -90,8 +92,16 @@ class AppController extends AbstractController
 
             }
             $em->persist($oferta);
-        }
 
+        }
+        foreach ($cupones as $cupon) {
+            if ($cupon->getFechaVto() != null) {
+               if( $cupon->getFechaVto() <= $fechaHoy){
+                    $cupon->setEstado('VENCIDO');
+               }
+            }
+            $em->persist($cupon);
+        }
         $em->flush();
 
         $comercios = $em->getRepository("App:Comercio")->findBy(array('estadoComercio'=> 'ACTIVO'));

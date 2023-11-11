@@ -181,6 +181,16 @@ class User implements UserInterface , \Serializable
      */
     private $colaboracions;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Voucher::class, mappedBy="Responsable",cascade={"persist"})
+     */
+    private $vouchers;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Cupon::class, mappedBy="user",cascade={"persist"})
+     */
+    private $cupones;
+
 
     public function __construct()
     {
@@ -189,6 +199,8 @@ class User implements UserInterface , \Serializable
         $this->ofertas = new ArrayCollection();
         $this->listaCompras = new ArrayCollection();
         $this->colaboracions = new ArrayCollection();
+        $this->vouchers = new ArrayCollection();
+        $this->cupones = new ArrayCollection();
     }
 
 
@@ -776,6 +788,66 @@ class User implements UserInterface , \Serializable
             // set the owning side to null (unless already changed)
             if ($colaboracion->getUser() === $this) {
                 $colaboracion->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Voucher>
+     */
+    public function getVouchers(): Collection
+    {
+        return $this->vouchers;
+    }
+
+    public function addVoucher(Voucher $voucher): self
+    {
+        if (!$this->vouchers->contains($voucher)) {
+            $this->vouchers[] = $voucher;
+            $voucher->setResponsable($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVoucher(Voucher $voucher): self
+    {
+        if ($this->vouchers->removeElement($voucher)) {
+            // set the owning side to null (unless already changed)
+            if ($voucher->getResponsable() === $this) {
+                $voucher->setResponsable(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cupon>
+     */
+    public function getCupones(): Collection
+    {
+        return $this->cupones;
+    }
+
+    public function addCupone(Cupon $cupone): self
+    {
+        if (!$this->cupones->contains($cupone)) {
+            $this->cupones[] = $cupone;
+            $cupone->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCupone(Cupon $cupone): self
+    {
+        if ($this->cupones->removeElement($cupone)) {
+            // set the owning side to null (unless already changed)
+            if ($cupone->getUser() === $this) {
+                $cupone->setUser(null);
             }
         }
 

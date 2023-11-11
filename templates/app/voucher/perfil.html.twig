@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+
+{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+</style>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+
+<div class="e">
+{% for flash_message in app.session.flashbag.get('exito') %}
+    <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+        {{ flash_message|raw }}
+    </div>
+{% endfor %}
+{% for flash_message in app.session.flashbag.get('fracaso') %}
+    <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        {{ flash_message|raw }}
+    </div>
+{% endfor %}
+
+</div>
+<a href="javascript:history.back()" style="float: right"> Volver Atrás</a>
+      <br>
+ <div class="row">
+ 
+    <div class="col-sm-12 card tarjeta-body item-content display-7" style="background-color: white; border-radius: 9px 9px 9px 9px;-moz-border-radius: 9px 9px 9px 9px; -webkit-border-radius: 9px 9px 9px 9px; border: 0px solid #000000; -webkit-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); -moz-box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41); box-shadow: 0px 0px 17px -2px rgba(0,0,0,0.41);">
+          <br>
+          <h4 class="display-5 card-header" align="center">{{voucher.entidad}} - {{voucher.nombre}}</h4>  
+          <br>
+          <div class="row">
+            <div class="col-sm-6">
+                {% if voucher.image != null %}
+                  {% set foto = 'uploads/images/vouchers/'~ voucher.image %}
+                  {% set foto2 = absolute_url(asset(foto)) %}
+                 <img src="{{foto2}}" alt="" style=" border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                 {% else %}   
+                  <img src="assets/images/voucher-empty-v2.png" alt="" style="border-radius: 7px 7px 7px 7px; -moz-border-radius: 7px 7px 7px 7px; -webkit-border-radius: 7px 7px 7px 7px; border: 0px solid #000000;" >
+                {% endif %}
+                <br>
+
+            </div>
+            <div class="col-sm-6">
+                <div class=" ">Nombre: <span style="color:grey">{{voucher.nombre}}</span> </div>
+                <div class=" ">Descripción: <span style="color:grey">{{voucher.descripcion|raw}}</span> </div>
+                <div class=" ">Cupones disponibles: <span style="color:grey">{{voucher.duracion}}</span> </div>
+                <div class=" ">Costo del cupón: <span style="color:grey">{{voucher.costo}} puntos</span> </div>
+                <div class=" ">Estado: <span style="color:grey">{{voucher.estado}}</span> </div>
+                {% if app.user %}
+                    <a id="modal-vp"  class="btn btn-secondary" data-toggle="modal" data-target="#myModalVp" style="">¡Obtené tu Cupón ahora!</a>
+                {% else %}
+                    <a id="modal-log" class="btn btn-secondary" data-toggle="modal" data-target="#myModalLog" style="">¡Obtené tu Cupón ahora!</a>
+                {% endif %}
+            </div>
+
+          </div>
+    <br>
+<br>
+{%  if app.user != null %}
+  {% set idUsu = app.user.id%}
+{%else%}
+  {% set idUsu = 'null'%}
+{%endif%}
+<!-- Modales para canjeo-->
+<div class="modal fade" id="myModalVp">
+  <div class="modal-dialog">
+    <div class="modal-content">    
+      <div class="modal-header">
+        <button type="button" class="ml-auto" data-dismiss="modal" style="color: white; background-color: #EE1B24; border-radius: 255px; text-align:right" >&nbsp;X&nbsp;</button>
+      </div>
+      <div class="modal-body" style="vertical-align: middle; font-size: 150%;">
+        <p>¿Estas seguro de que quieres canjear tus puntos por este voucher?<br>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal" style="font-size: 130%;">Cancelar</button>
+
+        <a href="{{ path('app_canjear_voucher', {'idvoucher': voucher.id, 'idusuario': idUsu}) }}" class="btn btn-secondary btn-sm" style="font-size: 130%;">Obtener Cupón</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="myModalLog">
+  <div class="modal-dialog">
+    <div class="modal-content">    
+      <div class="modal-header">
+        <button type="button" class="ml-auto" data-dismiss="modal" style="color: white; background-color: #EE1B24; border-radius: 255px; text-align:right" >&nbsp;X&nbsp;</button>
+      </div>
+      <div class="modal-body" style="vertical-align: middle; font-size: 150%;">
+        <p>Debes iniciar sesión para poder canjear.<br>
+        ¡Ingresá ahora y canjeá tus puntos por asombrosos vouchers!</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cerrarModal" align="left" class="btn btn-link btn-sm" data-dismiss="modal" style="font-size: 130%;">Cancelar</button>
+       <a href="{{path('app_login_user')}}" class="btn btn-secondary btn-sm" style="font-size: 130%;">Ingresar</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+        <br>
+<script type="text/javascript">
+ 
+
+</script>        
+{% endblock %}
