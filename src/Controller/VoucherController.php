@@ -119,7 +119,6 @@ class VoucherController extends AbstractController
             $voucher->setEstado('INACTIVO');
             $voucher->setDuracion(0);
         }
-        dd($voucher);
         $em->flush(); 
         $userId = $usuario->getId();
         $url = $this->urlGenerator->generate('app_user_perfil', ['id' => $userId]);
