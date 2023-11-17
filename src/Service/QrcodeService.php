@@ -29,7 +29,7 @@ class QrcodeService
         $pathini = dirname(__DIR__, 2).'/public/';
         $path = $urlBase.'/public/uploads/images/qr/';
 
-        $url ='http://'.$urlBase.'/validar-cupon-'.$query.'-'.$nrocupon.'-'.$semilla;
+        $url =$urlBase.'/validar-cupon-'.$query.'-'.$nrocupon.'-'.$semilla;
         // set qrcode
         $result = $this->builder
             ->data($url)
