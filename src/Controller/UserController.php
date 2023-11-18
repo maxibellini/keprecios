@@ -51,7 +51,10 @@ class UserController extends AbstractController
             $this->addFlash('fracaso','Error, no se encontró el usuario solicitado');
             return $this->redirectToRoute('app_inicio');    
         }
-        
+        if ($user->getEstado()=='SUSPENDIDO'){
+            $this->addFlash('fracaso','Error, el usuario se encuentra actualmente suspendido.');
+            return $this->redirectToRoute('app_inicio');    
+        }        
         return $this->render('app/user/perfil.html.twig', [
             'controller_name' => 'Perfil de Usuario',
             'user' => $user,
@@ -73,7 +76,51 @@ class UserController extends AbstractController
             $this->addFlash('fracaso','Error, no se encontró el usuario solicitado');
             return $this->redirectToRoute('app_inicio');    
         }
+        $usuarioDumy = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
+        if (!$usuarioDumy) {
+            // Crear un nuevo usuario con las especificaciones
+            $usuarioDumy = new User();
+            $usuarioDumy->setName('usuario_eliminado');
+            $usuarioDumy->setName('usuario_eliminado@keprecios.com');
+            $usuarioDumy->setRoles(['ROLE_USER']);
+            $usuarioDumy->setEstado('dummy');
+            $usuarioDumy->setPassword('usuario_eliminado');
+            // Guardar el nuevo usuario en la base de datos
+            $em->persist($usuarioDumy);
+            $em->flush();
+        }
 
+        //tratar asociados
+            $productos = $user->getProductos();
+            foreach ($productos as $producto) {
+                $producto->setUser($usuarioDumy);
+            }
+            $comercios = $user->getComercio();
+            foreach ($comercios as $comercio) {
+                $comercio->setUser($usuarioDumy);
+            }
+            $ofertas = $user->getOfertas();
+            foreach ($ofertas as $oferta) {
+                $oferta->setUser($usuarioDumy);
+            }
+            $colaboracions = $user->getColaboracions();
+            foreach ($colaboracions as $colaboracion) {
+                $colaboracion->setUser($usuarioDumy);
+            }
+            $vouchers = $user->getVouchers();
+            foreach ($vouchers as $voucher) {
+                $voucher->setResponsable($usuarioDumy);
+            }
+            $cupons = $user->getCupones();
+            foreach ($cupons as $cupon) {
+                $cupon->setUser($usuarioDumy);
+            }
+            $suspensions = $user->getSuspensions();
+            foreach ($suspensions as $suspension) {
+                $suspension->setUser($usuarioDumy);
+            }
+            
+            $em->flush();
         $em->remove($user);
         $flush=$em->flush();
         if ($flush == null) {

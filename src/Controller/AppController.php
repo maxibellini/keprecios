@@ -8,6 +8,8 @@ use App\Entity\Comercio;
 use App\Entity\Oferta;
 use App\Entity\Colaboracion;
 use App\Entity\Cupon;
+use App\Entity\User;
+use App\Entity\Suspension;
 use App\Service\ApiMLService;
 use Symfony\Component\HttpFoundation\Request;
 use Knp\Component\Pager\PaginatorInterface; 
@@ -21,9 +23,23 @@ class AppController extends AbstractController
     public function homepage(SessionInterface $session)
     {
     	$em = $this->getDoctrine()->getManager();
-
+        // Verificar si existe un usuario con el nombre 'usuario_eliminado'
+        $usuarioExistente = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
+        if (!$usuarioExistente) {
+            // Crear un nuevo usuario con las especificaciones
+            $nuevoUsuario = new User();
+            $nuevoUsuario->setName('usuario_eliminado');
+            $nuevoUsuario->setName('usuario_eliminado@keprecios.com');
+            $nuevoUsuario->setRoles(['ROLE_USER']);
+            $nuevoUsuario->setEstado('dummy');
+            $nuevoUsuario->setPassword('usuario_eliminado');
+            // Guardar el nuevo usuario en la base de datos
+            $em->persist($nuevoUsuario);
+            $em->flush();
+        }
         $ofertas = $em->getRepository(Oferta::class)->findAll();
         $cupones = $em->getRepository(Cupon::class)->findBy(['estado' => 'SIN CANJEAR']);
+        $suspensiones = $em->getRepository(Suspension::class)->findBy(['estado' => 'ACTIVA']);
         $fechaHoy = new \DateTime();
         foreach ($ofertas as $oferta) {
             
@@ -59,11 +75,78 @@ class AppController extends AbstractController
                         $colab->setPuntaje(-2); // Establece el puntaje deseado
                         $colab->setTipo('mala');
                         $colab->setFecha(new \DateTime());
-                        $colab->setDescripcion('-2 puntos por oferta finalizada en desconfianza'); 
+                        $colab->setDescripcion('-2 puntos por oferta finalizada en confianza Muy Baja'); 
                         $colab->setTipoVoto(0); 
                         $em->persist($colab);
-                        $userOferta->addColaboracion($colab); 
+                        $userOferta->addColaboracion($colab);
+                        if($userOferta->getPuntosRep() < -4 ){
+                            if($userOferta->getCantFaltas() == null){
+                                $userOferta->setCantFaltas(1);
+                            }
+                            $catnFaltasUser = $userOferta->getCantFaltas()+1;
+                            $userOferta->setCantFaltas($catnFaltasUser);
+                            $userOferta->setEstado('SUSPENDIDO');
+                            $suspension = new Suspension();
+                            $hoy = new \DateTime();
+                            $fechaVto = clone $hoy;
+                            $fechaVto->modify('+14 days');
+                            $suspension->setFechaCreacion($hoy);
+                            $suspension->setFechaVto($fechaVto); 
+                            $suspension->setDescripción('por colaboración mala en puntaje menor a -4 puntos');
+                            $suspension->setEstado('ACTIVA');
+                            $suspension->setUser($userOferta);
+                            $userOferta->addSuspension($suspension);
+                            $em->persist($suspension);
+
+                        } 
                         $em->persist($userOferta);
+                        if($userOferta->getCantFaltas() > 2){
+                            //eliminar usuario
+                            $usuarioDumy = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
+                            if (!$usuarioDumy) {
+                                // Crear un nuevo usuario con las especificaciones
+                                $usuarioDumy = new User();
+                                $usuarioDumy->setName('usuario_eliminado');
+                                $usuarioDumy->setName('usuario_eliminado@keprecios.com');
+                                $usuarioDumy->setRoles(['ROLE_USER']);
+                                $usuarioDumy->setEstado('dummy');
+                                $usuarioDumy->setPassword('usuario_eliminado');
+                                // Guardar el nuevo usuario en la base de datos
+                                $em->persist($usuarioDumy);
+                                $em->flush();
+                            }
+
+                            //tratar asociados
+                                $productos = $userOferta->getProductos();
+                                foreach ($productos as $producto) {
+                                    $producto->setUser($usuarioDumy);
+                                }
+                                $comercios = $userOferta->getComercio();
+                                foreach ($comercios as $comercio) {
+                                    $comercio->setUser($usuarioDumy);
+                                }
+                                $ofertas = $userOferta->getOfertas();
+                                foreach ($ofertas as $oferta) {
+                                    $oferta->setUser($usuarioDumy);
+                                }
+                                $colaboracions = $userOferta->getColaboracions();
+                                foreach ($colaboracions as $colaboracion) {
+                                    $colaboracion->setUser($usuarioDumy);
+                                }
+                                $vouchers = $userOferta->getVouchers();
+                                foreach ($vouchers as $voucher) {
+                                    $voucher->setResponsable($usuarioDumy);
+                                }
+                                $cupons = $userOferta->getCupones();
+                                foreach ($cupons as $cupon) {
+                                    $cupon->setUser($usuarioDumy);
+                                }
+                                $suspensions = $userOferta->getSuspensions();
+                                foreach ($suspensions as $suspension) {
+                                    $suspension->setUser($usuarioDumy);
+                                }
+                            $em->remove($userOferta);
+                        }
                         $em->persist($oferta);
                         $em->flush(); 
                         
@@ -80,7 +163,7 @@ class AppController extends AbstractController
                         $colab->setPuntaje(+2); // Establece el puntaje deseado
                         $colab->setTipo('premio');
                         $colab->setFecha(new \DateTime());
-                        $colab->setDescripcion('+2 puntos por oferta finalizada en confiable'); 
+                        $colab->setDescripcion('+2 puntos por oferta finalizada en confianza Muy Alta'); 
                         $colab->setTipoVoto(0); 
                         $em->persist($colab);
                         $userOferta->addColaboracion($colab); 
@@ -101,6 +184,14 @@ class AppController extends AbstractController
                }
             }
             $em->persist($cupon);
+        }
+        foreach ($suspensiones as $suspension) {
+            if ($suspension->getFechaVto() != null) {
+               if( $suspension->getFechaVto() <= $fechaHoy){
+                    $suspension->setEstado('CUMPLIDA');
+               }
+            }    
+            $em->persist($suspension);        
         }
         $em->flush();
 

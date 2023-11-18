@@ -154,16 +154,22 @@ class ComercioController extends AbstractController
             $this->addFlash('fracaso','Error, no se encontró el comercio solicitado');
             return $this->redirectToRoute('app_inicio');    
         }
-        $colaboracionesAsociadas = $comercio->getColaboracions();
-        foreach ($colaboracionesAsociadas as $colaboracion) {
-            $colaboracion->setSujeto((string)$comercio);
-            $colaboracion->setComercio(null);
-        }
-        $em->remove($comercio); 
-        //$comercio->setEstadoComercio('BAJA');
+        if($comercio->getEstadoComercio() == 'ACTIVO'){
+            $comercio->setEstadoComercio('BAJA');
+        }elseif($comercio->getEstadoComercio() == 'PENDIENTE'){
+            $colaboracionesAsociadas = $comercio->getColaboracions();
+            foreach ($colaboracionesAsociadas as $colaboracion) {
+                $colaboracion->setSujeto((string)$comercio);
+                $colaboracion->setComercio(null);
+            }
+            $em->remove($comercio); 
+        }elseif($comercio->getEstadoComercio() == 'BAJA'){  
+            $this->addFlash('fracaso','Error, el comercio ya esta dado de baja');
+             return $this->redirectToRoute('app_inicio');  
+        }     
         $flush=$em->flush();
         if ($flush == null) {
-            $this->addFlash('exito','La solicitud fue eliminada correctamente');
+            $this->addFlash('exito','La baja fue exitosa');
              return $this->redirectToRoute('app_inicio');    
         } else {
             $this->addFlash('fracaso','Error, no se pudo eliminar la solicitud');
@@ -251,6 +257,10 @@ class ComercioController extends AbstractController
             $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder votar.');
             return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
         }
+        if($usuario->getName() == 'usuario_eliminado'){
+             $this->addFlash('fracaso','Error, el id de usuario pertenece a un usuario eliminado');
+                return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+        }
         $comercio = $em->getRepository("App:Comercio")->findOneBy(array('id'=>$idcomercio));
         if (!$comercio){
             $this->addFlash('fracaso','Error, no se encontró el comercio solicitado');
@@ -330,6 +340,25 @@ class ComercioController extends AbstractController
             $em->persist($usuario);
         $this->addFlash('exito','¡Has ganado +1 punto por tu colaboración!');    
         //trato la confianza
+        switch (true) {
+            case ($sumatoriaPuntajes >= -9999 && $sumatoriaPuntajes <= -4):
+                $nombre = 'desconfianza';
+                break;
+            case ($sumatoriaPuntajes >= -3 && $sumatoriaPuntajes <= -1):
+                $nombre = 'bajo';
+                break;
+            case ($sumatoriaPuntajes >= 0 && $sumatoriaPuntajes <= 0):
+                $nombre = 'intermedio';
+                break;
+            case ($sumatoriaPuntajes >= 1 && $sumatoriaPuntajes <= 4):
+                $nombre = 'medio';
+                break;
+            case ($sumatoriaPuntajes >= 5 && $sumatoriaPuntajes <= 9999):
+                $nombre = 'confiable';
+                break;
+            default:
+                $nombre = '';
+        }
         $confianzaEncajada = $confianzasRepository->createQueryBuilder('c')
             ->where('c.tipo = :tipo AND c.nombre = :nombre')
             ->setParameter('tipo', 'comercio')
@@ -357,9 +386,77 @@ class ComercioController extends AbstractController
             $colab->setComercio($comercio);
             $em->persist($colab);
             $userComercio->addColaboracion($colab);
+                    if($userComercio->getPuntosRep() < -4 ){
+                        if($userComercio->getCantFaltas() == null){
+                            $userComercio->setCantFaltas(1);
+                        }
+                        $catnFaltasUser = $userComercio->getCantFaltas()+1;
+                        $userComercio->setCantFaltas($catnFaltasUser);
+                        $userComercio->setEstado('SUSPENDIDO');
+                        $suspension = new Suspension();
+                        $hoy = new \DateTime();
+                        $fechaVto = clone $hoy;
+                        $fechaVto->modify('+14 days');
+                        $suspension->setFechaCreacion($hoy);
+                        $suspension->setFechaVto($fechaVto); 
+                        $suspension->setDescripción('por colaboración mala en puntaje menor a -4 puntos');
+                        $suspension->setEstado('ACTIVA');
+                        $suspension->setUser($userComercio);
+                        $userComercio->addSuspension($suspension);
+                        $em->persist($suspension);
+
+                    } 
             $em->persist($userComercio);
+            if($userComercio->getCantFaltas() > 2){
+                //eliminar usuario
+                $usuarioDumy = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
+                if (!$usuarioDumy) {
+                    // Crear un nuevo usuario con las especificaciones
+                    $usuarioDumy = new User();
+                    $usuarioDumy->setName('usuario_eliminado');
+                    $usuarioDumy->setName('usuario_eliminado@keprecios.com');
+                    $usuarioDumy->setRoles(['ROLE_USER']);
+                    $usuarioDumy->setEstado('dummy');
+                    $usuarioDumy->setPassword('usuario_eliminado');
+                    // Guardar el nuevo usuario en la base de datos
+                    $em->persist($usuarioDumy);
+                    $em->flush();
+                }
+
+                //tratar asociados
+                    $productos = $userComercio->getProductos();
+                    foreach ($productos as $producto) {
+                        $producto->setUser($usuarioDumy);
+                    }
+                    $comercios = $userComercio->getComercio();
+                    foreach ($comercios as $comercio) {
+                        $comercio->setUser($usuarioDumy);
+                    }
+                    $ofertas = $userComercio->getOfertas();
+                    foreach ($ofertas as $oferta) {
+                        $oferta->setUser($usuarioDumy);
+                    }
+                    $colaboracions = $userComercio->getColaboracions();
+                    foreach ($colaboracions as $colaboracion) {
+                        $colaboracion->setUser($usuarioDumy);
+                    }
+                    $vouchers = $userComercio->getVouchers();
+                    foreach ($vouchers as $voucher) {
+                        $voucher->setResponsable($usuarioDumy);
+                    }
+                    $cupons = $userComercio->getCupones();
+                    foreach ($cupons as $cupon) {
+                        $cupon->setUser($usuarioDumy);
+                    }
+                    $suspensions = $userComercio->getSuspensions();
+                    foreach ($suspensions as $suspension) {
+                        $suspension->setUser($usuarioDumy);
+                    }
+                $em->remove($userComercio);
+            }
             $em->persist($usuario);
             $em->persist($comercio);
+
             $em->flush(); 
             $this->addFlash('fracaso','El comercio que votaste ha entrado en desconfianza y se ha dado de baja, por lo que ya no estará disponible.'); 
             return $this->redirectToRoute('app_inicio');
@@ -406,6 +503,10 @@ class ComercioController extends AbstractController
             $url = $this->generateUrl('app_login_user');
             $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder informar la baja del comercio.');
             return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
+        }
+        if($usuario->getName() == 'usuario_eliminado'){
+             $this->addFlash('fracaso','Error, el id de usuario pertenece a un usuario eliminado');
+                return $this->redirectToRoute('app_comercio_perfil', ['id' => $idcomercio]);
         }
         $comercio = $em->getRepository("App:Comercio")->findOneBy(array('id'=>$idcomercio));
         if (!$comercio){
@@ -459,7 +560,6 @@ class ComercioController extends AbstractController
             $em->flush(); 
             $this->addFlash('fracaso','El comercio que informaste se ha dado de baja, ya no estará disponible.'); 
             return $this->redirectToRoute('app_inicio');
-           ;
         }
         $em->persist($comercio);
         $em->flush();

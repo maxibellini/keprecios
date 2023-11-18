@@ -197,6 +197,10 @@ class ProductoController extends AbstractController
             $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder informar la baja del producto.');
             return $this->redirectToRoute('app_producto_perfil', ['id' => $idproducto]);
         }
+        if($usuario->getName() == 'usuario_eliminado'){
+             $this->addFlash('fracaso','Error, el id de usuario pertenece a un usuario eliminado');
+                return $this->redirectToRoute('app_producto_perfil', ['id' => $idproducto]);
+        }
         $producto = $em->getRepository("App:Producto")->findOneBy(array('id'=>$idproducto));
         if (!$producto){
             $this->addFlash('fracaso','Error, no se encontró el producto solicitado');

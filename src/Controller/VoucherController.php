@@ -66,6 +66,10 @@ class VoucherController extends AbstractController
             $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder cnajear puntos.');
             return $this->redirectToRoute('app_voucher_perfil', ['id' => $idvoucher]);
         }
+        if($usuario->getName() == 'usuario_eliminado'){
+             $this->addFlash('fracaso','Error, el id de usuario pertenece a un usuario eliminado');
+                return $this->redirectToRoute('app_voucher_perfil', ['id' => $idvoucher]);
+        }
         if (!$voucher){
             $this->addFlash('fracaso','Error, no se encontró el voucher solicitado');
             return $this->redirectToRoute('app_inicio');    
@@ -173,6 +177,10 @@ class VoucherController extends AbstractController
             $this->addFlash('fracaso','Error, debe <a href='.$url.'>iniciar sesión</a> para poder cnajear puntos.');
             return $this->redirectToRoute('app_voucher_perfil', ['id' => $idvoucher]);
         }
+        if($usuario->getName() == 'usuario_eliminado'){
+             $this->addFlash('fracaso','Error, el id de usuario pertenece a un usuario eliminado');
+                return $this->redirectToRoute('app_voucher_perfil', ['id' => $idvoucher]);
+        }
         if ($cupon->getVoucher() == null){
             $this->addFlash('fracaso','Error, el cupon no tiene voucher asociado');
             return $this->redirectToRoute('app_inicio');    
@@ -223,6 +231,10 @@ class VoucherController extends AbstractController
             $this->addFlash('fracaso','Error, el cupon no tiene usuario asociado');
             return $this->redirectToRoute('app_inicio');    
         }
+        if ($cupon->getUser()->getName() == 'usuario_eliminado'){
+            $this->addFlash('fracaso','Error, el cupon corresponde a un usuario eliminado');
+            return $this->redirectToRoute('app_inicio');    
+        }        
         $nrocupon= $cupon->getNroCupon();   
         $urlBase= $request->getScheme() . '://' . $request->getHttpHost() . $request->getBasePath();
         $qrCode = $this->qrcodeService->qrcode($idcupon,$nrocupon,$semilla,$urlBase);

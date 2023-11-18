@@ -157,7 +157,7 @@ class User implements UserInterface , \Serializable
     private $ofertas;
 
     /**
-     * @ORM\OneToMany(targetEntity=ListaCompra::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=ListaCompra::class, mappedBy="user",cascade={"remove"})
      */
     private $listaCompras;
 
@@ -182,7 +182,7 @@ class User implements UserInterface , \Serializable
     private $colaboracions;
 
     /**
-     * @ORM\OneToMany(targetEntity=Voucher::class, mappedBy="Responsable",cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=Voucher::class, mappedBy="responsable",cascade={"persist"})
      */
     private $vouchers;
 
@@ -190,6 +190,11 @@ class User implements UserInterface , \Serializable
      * @ORM\OneToMany(targetEntity=Cupon::class, mappedBy="user",cascade={"persist"})
      */
     private $cupones;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Suspension::class, mappedBy="user",cascade={"persist"})
+     */
+    private $suspensions;
 
 
     public function __construct()
@@ -201,6 +206,7 @@ class User implements UserInterface , \Serializable
         $this->colaboracions = new ArrayCollection();
         $this->vouchers = new ArrayCollection();
         $this->cupones = new ArrayCollection();
+        $this->suspensions = new ArrayCollection();
     }
 
 
@@ -558,6 +564,16 @@ class User implements UserInterface , \Serializable
     public function validate(ExecutionContextInterface $context, $payload)
     {
         $contNames=0; $contEmails=0;
+        if($this->getName() == 'usuario_eliminado'){
+            $context->buildViolation('Error: No puede elegir ese nombre de usuario.')
+                    ->atPath('')
+                    ->addViolation();
+        }
+        if($this->getEmail() == 'usuario_eliminado@keprecios.com'){
+            $context->buildViolation('Error: No puede elegir ese correo.')
+                    ->atPath('')
+                    ->addViolation();
+        }
         //setea nombres
         $this->setNombrePersona( ucwords(strtolower($this->getNombrePersona())));
         $this->setApellidoPersona( strtoupper($this->getApellidoPersona()) );
@@ -604,7 +620,12 @@ class User implements UserInterface , \Serializable
                 ->atPath('')
                 ->addViolation();
         }
-
+        if($this->getPuntosColab() == null){
+            $this->getPuntosColab(0);
+        }
+        if($this->getPuntosRep() == null){
+            $this->getPuntosRep(0);
+        }
 
     }
 
@@ -848,6 +869,36 @@ class User implements UserInterface , \Serializable
             // set the owning side to null (unless already changed)
             if ($cupone->getUser() === $this) {
                 $cupone->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Suspension>
+     */
+    public function getSuspensions(): Collection
+    {
+        return $this->suspensions;
+    }
+
+    public function addSuspension(Suspension $suspension): self
+    {
+        if (!$this->suspensions->contains($suspension)) {
+            $this->suspensions[] = $suspension;
+            $suspension->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSuspension(Suspension $suspension): self
+    {
+        if ($this->suspensions->removeElement($suspension)) {
+            // set the owning side to null (unless already changed)
+            if ($suspension->getUser() === $this) {
+                $suspension->setUser(null);
             }
         }
 

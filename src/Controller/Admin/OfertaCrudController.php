@@ -63,17 +63,17 @@ class OfertaCrudController extends AbstractCrudController
         $motivoBaja = TextField::new('motivoBaja')->setLabel('Motivo de baja');
         $estado = BooleanField::new('estado', 'Estado');      
         if (Crud::PAGE_INDEX === $pageName) {
-            return [$comercio,  $producto , $monto,  $descripcionOferta, $user ];
+            return [$comercio,  $producto , $monto,  $descripcionOferta, $user,$estado ];
         } elseif (Crud::PAGE_DETAIL === $pageName) {
-            return [ $monto,  $descripcionOferta, $tipoDescuento,  $stock,  $comercio, $producto , $user , $fechaCarga,   $fechaUpdate, $motivoBaja  ];
+            return [ $monto,  $descripcionOferta, $tipoDescuento,  $stock,  $comercio, $producto , $user , $fechaCarga,   $fechaUpdate  ];
         } elseif (Crud::PAGE_EDIT === $pageName) {
-            return [$monto,  $descripcionOferta, $tipoDescuento,  $stock,  $comercio, $producto , $user ,$motivoBaja   ];
+            return [$monto,  $descripcionOferta, $tipoDescuento,  $stock,  $comercio, $producto , $user    ,$estado];
         }
     }
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->disable(Action::NEW)->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->disable(Action::NEW, Action::DELETE)->add(Crud::PAGE_INDEX, Action::DETAIL)
         ;
     }
 

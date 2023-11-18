@@ -47,16 +47,26 @@
                   <img src="assets/images/user-empty.png" alt="" style=" border-radius: 200px 200px 200px 200px; -moz-border-radius: 200px 200px 200px 200px; -webkit-border-radius: 200px 200px 200px 200px; border: 0px solid #000000;" >
                 {% endif %}
             </div>
-            <div class="col-sm-8">
+            {% if user.name == 'usuario_eliminado' %}
+
+            <div class="col-sm-8" > <span style="color: red; font-size: 150%;">Este usuario ha sido eliminado</span><div style="visibility: hidden"> {%else%}
+            <div class="col-sm-8"> <div>{%endif%}
                 <div class=" ">Nombre: <span style="color:grey">{{user.nombrePersona}}</span> </div>
                 <div class=" ">Apellido: <span style="color:grey">{{user.apellidoPersona}}</span> </div>
                 <div class=" ">Sexo: <span style="color:grey">{{user.sexo}}</span> </div>
                 <div class=" ">Fecha de ingreso: <span style="color:grey">{% if user.fechaRegistro != null %}{{user.fechaRegistro | date("d-m-Y") }}{% endif %}</span> </div>
                 <div class=" ">Última conexión: <span style="color:grey">{% if user.ultimaConexion != null %}{{user.ultimaConexion | date("d-m-Y h:i") }}hs{%else%}-{% endif %}</span> </div>
-                <div class=" ">Estado: <span style="color:grey">{{user.estado}}</span> </div>
+                <div class=" ">Estado: 
+                  {% if user.estado == 'ACTIVO'%}<span style="color:grey">
+                  {% elseif user.estado == 'SUSPENDIDO'%}<span style="color:red">
+                  {%else%}<span>
+                  {%endif%}
+                  {{user.estado}}</span>    
+                </div>
                 <div class=" ">Puntos disponibles para canje: <span style="color:grey">{% if user.puntosColab == null %}0{%else%}{{user.puntosColab}}{%endif%}</span> </div>
                 <div class=" ">Puntos de reputación: <span style="color:grey">{% if user.puntosRep == null %}0{%else%}{{user.puntosRep}}{%endif%}</span></div>
                 <div class=" " style=" ">Nivel actual: </div>
+              {% if user.puntosRep != null  %}
                 {% if user.puntosRep < 0  %}
                   <div class="row">
                     <div class="col-4">
@@ -118,8 +128,9 @@
                     <div class="col-8 d-flex align-items-center" style="color:grey; margin-left:-15px;">Te faltan 6 puntos para subir de nivel (plata)</div>
                   </div>
                 {% endif %}
-
+              {%endif%}
             </div>
+           </div>
           </div>
     <br>
 <br>   {% if app.user != null %}
@@ -207,13 +218,21 @@
                              {% for cupon in cupones %}
                               <tr>
                                 <th style="width:15%" scope="row">{{ cupon.id }}-{{ cupon.nroCupon}}-{{cupon.semilla}}</th>
-                                <td style="width:10%">{% if cupon.fechaCreacion != null %}{{cupon.fechaCreacion|date('Y-m-d')}}{% endif %}</td>
+                                <td style="width:10%">{% if cupon.fechaVto != null %}{{cupon.fechaVto|date('Y-m-d')}}{% endif %}</td>
                                 <td style="width:20%">
                                   <div style="">
                                    {% if cupon.voucher != null %}<a href="{{path('app_voucher_perfil',{ 'id': cupon.voucher.id })}}">{{cupon.voucher}}</a>{%endif%}
                                   </div>
                                 </td>
-                                <td style="width:10%">{{cupon.estado}}
+                                <td style="width:10%">
+                                  {% if cupon.estado == 'SIN CANJEAR' %} 
+                                   <span style="color: grey">
+                                  {% elseif cupon.estado == 'CANJEADO' %}
+                                   <span style="color: green"> 
+                                  {% elseif cupon.estado == 'VENCIDO' %}
+                                   <span style="color: red"> 
+                                  {%else%}
+                                  {%endif%}{{cupon.estado}}</span>
                                 </td>
                                 <td style="width:15%">
                                   <a href="{{path('app_validar_cupon', {'idcupon': cupon.id,'nrocupon': cupon.nroCupon,'semilla': cupon.semilla})}}" style="color:grey">Ver</a><br>
@@ -231,11 +250,63 @@
                   </div>
                 </div>
               {% endif %}
-            
+           {% set vouchers = user.vouchers %}
+           {% if vouchers != '' %}
+                <div class="accordion" id="accordionExample6">
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-5" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo6" aria-expanded="false" aria-controls="collapseTwo" style="border: 1px solid #E85395; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                       Vouchers de los que soy responsable
+                      </button>
+                    </h2>
+                    <div id="collapseTwo6" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample6">
+                      <div class="row accordion-body">
+                         <table class="table">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">Nombre</th>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Costo</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col">Estado</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                             {% for voucher in vouchers %}
+                              <tr>
+                                <th style="width:25%" scope="row"><a href="{{path('app_voucher_perfil',{ 'id': voucher.id })}}">{{voucher}}</a></th>
+                                <td style="width:15%">{% if voucher.fechaCreacion != null %}{{voucher.fechaCreacion|date('Y-m-d')}}{% endif %}</td>
+                                <td style="width:10%">
+                                  {{voucher.costo}}
+                                </td>
+                                <td style="width:10%">{{voucher.duracion}}
+                                </td>
+                                <td style="width:10%">
+                                  {% if voucher.estado == 'ACTIVO' %} 
+                                   <span style="color: green">
+                                  {% elseif voucher.estado == 'INACTIVO' %}
+                                   <span style="color: red"> 
+                                  {%else%}
+                                  {%endif%}{{voucher.estado}}</span>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                      <br>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}            
           
  
           {% endif %}
         {% endif %}
+{% if app.user != null %}
+    {% if app.user.name == user.name %}
            {% set listas = user.listaCompras %}
            {% if listas != '' %}
                 <div class="accordion" id="accordionExample0">
@@ -378,7 +449,10 @@
                                 </td>
                                 <td>
                                   <a style="color: grey" href="{{path('app_oferta_perfil',{ 'id': oferta.id })}}" > Ver</a>
-                                  <a style="" href="{{path('app_oferta_editar',{ 'id': oferta.id })}}" > Editar</a>
+                                    {% if oferta.estado == '1' %}
+                                      <a style="" href="{{path('app_oferta_editar',{ 'id': oferta.id })}}" > Editar</a>
+                                           {% else %}
+                                    {% endif %}
                                 </td>
                               </tr>
                               {% endfor %}
@@ -436,6 +510,56 @@
                   </div>
                 </div>
                 {% endif %}
+        {% set suspensiones = user.suspensions %}
+           {% if suspensiones != '' %}
+                <div class="accordion" id="accordionExample7">
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-5" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo7" aria-expanded="false" aria-controls="collapseTwo" style="border: 1px solid red; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                       Suspensiones
+                      </button>
+                    </h2>
+                    <div id="collapseTwo7" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample7">
+                      <div class="row accordion-body">
+                         <table class="table">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">Fecha inicio</th>
+                                <th scope="col">Fcecha fin</th>
+                                <th scope="col">Motivo</th>
+                                <th scope="col">Estado</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                             {% for suspension in suspensiones %}
+                              <tr>
+                                <th style="width:15%" scope="row">{% if suspension.fechaVto != null %}{{suspension.fechaCreacion|date('Y-m-d')}}{% endif %}</th>
+                                <td style="width:15%">{% if suspension.fechaVto != null %}{{suspension.fechaVto|date('Y-m-d')}}{% endif %}</td>
+                                <td style="width:20%">{{suspension.descripcion}}
+                                </td>
+                                <td style="width:10%">
+                                  {% if suspension.estado == 'ACTIVA' %} 
+                                   <span style="color: grey">
+                                  {% elseif suspension.estado == 'CUMPLIDA' %}
+                                   <span style="color: green"> 
+                                  {%else%}
+                                  {%endif%}{{suspension.estado}}</span>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                          <div style="text-align: center; color: red;">Atención, a las 3 suspensiones, la cuenta se elimnará de manera automática con todos sus datos. </div>
+                      <br>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+    {%endif%}                
+{%endif%}
                 <br>
                 </div>
 </div> 

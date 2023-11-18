@@ -60,6 +60,67 @@
                     <a id="modal-log" class="btn btn-secondary" data-toggle="modal" data-target="#myModalLog" style="">¡Obtené tu Cupón ahora!</a>
                 {% endif %}
             </div>
+          {% if app.user.name == voucher.responsable %}
+           {% set cupones = voucher.cupones %}
+           {% if cupones != '' %}
+                <div class="accordion" id="accordionExample5">
+
+                  <div class="accordion-item">
+                    <h2 class="accordion-header  display-5" id="headingTwo" >
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo5" aria-expanded="false" aria-controls="collapseTwo" style="border: 1px solid #E85395; color: #E85395;border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px;">
+                       Cupones generados
+                      </button>
+                    </h2>
+                    <div id="collapseTwo5" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample5">
+                      <div class="row accordion-body">
+                         <table class="table">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">Nro</th>
+                                <th scope="col">Generado</th>
+                                <th scope="col">Vto</th>
+                                <th scope="col">Usuario</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col">Acciones</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                             {% for cupon in cupones %}
+                              <tr>
+                                <th style="width:15%" scope="row">{{ cupon.id }}-{{ cupon.nroCupon}}-{{cupon.semilla}}</th>
+                                <td style="width:10%">{% if cupon.fechaCreacion != null %}{{cupon.fechaCreacion|date('Y-m-d')}}{% endif %}</td>
+                                <td style="width:10%">{% if cupon.fechaVto != null %}{{cupon.fechaVto|date('Y-m-d')}}{% endif %}</td>
+                                <td style="width:20%">
+                                  <div style="">
+                                   {% if cupon.user != null %}<a href="{{path('app_user_perfil',{ 'id': cupon.user.id })}}">{{cupon.user}}</a>{%endif%}
+                                  </div>
+                                </td>
+                                <td style="width:10%">                                 
+                                  {% if cupon.estado == 'SIN CANJEAR' %} 
+                                   <span style="color: grey">
+                                  {% elseif cupon.estado == 'CANJEADO' %}
+                                   <span style="color: green"> 
+                                  {% elseif cupon.estado == 'VENCIDO' %}
+                                   <span style="color: red"> 
+                                  {%else%}
+                                  {%endif%}{{cupon.estado}}</span>
+                                </td>
+                                <td style="width:15%">
+                                  <a href="{{path('app_validar_cupon', {'idcupon': cupon.id,'nrocupon': cupon.nroCupon,'semilla': cupon.semilla})}}" style="color:grey">Ver</a>
+                                  
+                                </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                      <br>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+          {% endif %}
 
           </div>
     <br>

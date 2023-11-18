@@ -19,6 +19,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ArrayFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityRepository;
 use Vich\UploaderBundle\Form\Type\VichImageType;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -26,7 +28,6 @@ class UserCrudController extends AbstractCrudController
     {
         return User::class;
     }
-
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
@@ -81,7 +82,63 @@ class UserCrudController extends AbstractCrudController
     {
         return $actions
             ->disable(Action::NEW)->add(Crud::PAGE_INDEX, Action::DETAIL)
-        ;
+            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+            return $action->setLabel('Eliminar')->displayIf(static function ($entity) {
+                return 'usuario_eliminado' != $entity->getName();
+            });
+        });
+    }
+
+    public function deleteEntity(EntityManagerInterface $em, $entityInstance): void
+    {
+        
+        $usuarioDumy = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
+        if (!$usuarioDumy) {
+            // Crear un nuevo usuario con las especificaciones
+            $usuarioDumy = new User();
+            $usuarioDumy->setName('usuario_eliminado');
+            $usuarioDumy->setName('usuario_eliminado@keprecios.com');
+            $usuarioDumy->setRoles(['ROLE_USER']);
+            $usuarioDumy->setEstado('dummy');
+            $usuarioDumy->setPassword('usuario_eliminado');
+            // Guardar el nuevo usuario en la base de datos
+            $em->persist($usuarioDumy);
+            $em->flush();
+        }
+         $user=$entityInstance;
+        //tratar asociados
+            $productos = $user->getProductos();
+            foreach ($productos as $producto) {
+                $producto->setUser($usuarioDumy);
+            }
+            $comercios = $user->getComercio();
+            foreach ($comercios as $comercio) {
+                $comercio->setUser($usuarioDumy);
+            }
+            $ofertas = $user->getOfertas();
+            foreach ($ofertas as $oferta) {
+                $oferta->setUser($usuarioDumy);
+            }
+            $colaboracions = $user->getColaboracions();
+            foreach ($colaboracions as $colaboracion) {
+                $colaboracion->setUser($usuarioDumy);
+            }
+            $vouchers = $user->getVouchers();
+            foreach ($vouchers as $voucher) {
+                $voucher->setResponsable($usuarioDumy);
+            }
+            $cupons = $user->getCupones();
+            foreach ($cupons as $cupon) {
+                $cupon->setUser($usuarioDumy);
+            }
+            $suspensions = $user->getSuspensions();
+            foreach ($suspensions as $suspension) {
+                $suspension->setUser($usuarioDumy);
+            }
+            $entityInstance=$user;
+            $em->flush();
+        // Llama al método de eliminación predeterminado
+        parent::deleteEntity($em, $entityInstance);
     }
     /**
      * Class constructor.

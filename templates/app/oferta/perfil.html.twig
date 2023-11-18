@@ -66,9 +66,10 @@
                             Usuario:
                         </td>
  
-                        <td style="max-width: 25px;">                
+                        <td style="max-width: 25px;">  
+                           <span>                
                             {% if oferta.user.puntosRep != null %} 
-                            <span>  
+                           
                                 {% if oferta.user.puntosRep < 0  %}
                                   <img src="/assets/images/colaboracion/medalla_madera.png" alt="imagen nivel" class="" style="width: 85%;">
                                 {% elseif oferta.user.puntosRep >=0 and oferta.user.puntosRep <= 5 %}

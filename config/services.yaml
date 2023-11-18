@@ -47,3 +47,8 @@ services:
     endroid.qrcode.builder:
             class: Endroid\QrCode\Builder\Builder
             arguments: ['UTF-8']
+    App\EventSubscriber\LogoutListener:
+        arguments:
+            $security: '@security.helper'
+        tags:
+            - { name: 'kernel.event_subscriber' }
