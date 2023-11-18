@@ -81,7 +81,7 @@ class UserController extends AbstractController
             // Crear un nuevo usuario con las especificaciones
             $usuarioDumy = new User();
             $usuarioDumy->setName('usuario_eliminado');
-            $usuarioDumy->setName('usuario_eliminado@keprecios.com');
+            $usuarioDumy->setEmail('usuario_eliminado@keprecios.com');
             $usuarioDumy->setRoles(['ROLE_USER']);
             $usuarioDumy->setEstado('dummy');
             $usuarioDumy->setPassword('usuario_eliminado');
