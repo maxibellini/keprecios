@@ -437,7 +437,7 @@ class OfertaController extends AbstractController
                             $suspension = new Suspension();
                             $hoy = new \DateTime();
                             $fechaVto = clone $hoy;
-                            $fechaVto->modify('+14 days');
+                            $fechaVto->modify('+3 days');
                             $suspension->setFechaCreacion($hoy);
                             $suspension->setFechaVto($fechaVto); 
                             $suspension->setDescripción('por colaboración mala en puntaje menor a -4 puntos');
@@ -455,7 +455,7 @@ class OfertaController extends AbstractController
                     // Crear un nuevo usuario con las especificaciones
                     $usuarioDumy = new User();
                     $usuarioDumy->setName('usuario_eliminado');
-                    $usuarioDumy->setName('usuario_eliminado@keprecios.com');
+                    $usuarioDumy->setEmail('usuario_eliminado@keprecios.com');
                     $usuarioDumy->setRoles(['ROLE_USER']);
                     $usuarioDumy->setEstado('dummy');
                     $usuarioDumy->setPassword('usuario_eliminado');
@@ -644,7 +644,7 @@ class OfertaController extends AbstractController
                             $suspension = new Suspension();
                             $hoy = new \DateTime();
                             $fechaVto = clone $hoy;
-                            $fechaVto->modify('+14 days');
+                            $fechaVto->modify('+3 days');
                             $suspension->setFechaCreacion($hoy);
                             $suspension->setFechaVto($fechaVto); 
                             $suspension->setDescripción('por colaboración mala en puntaje menor a -4 puntos');
@@ -662,7 +662,7 @@ class OfertaController extends AbstractController
                                 // Crear un nuevo usuario con las especificaciones
                                 $usuarioDumy = new User();
                                 $usuarioDumy->setName('usuario_eliminado');
-                                $usuarioDumy->setName('usuario_eliminado@keprecios.com');
+                                $usuarioDumy->setEmail('usuario_eliminado@keprecios.com');
                                 $usuarioDumy->setRoles(['ROLE_USER']);
                                 $usuarioDumy->setEstado('dummy');
                                 $usuarioDumy->setPassword('usuario_eliminado');

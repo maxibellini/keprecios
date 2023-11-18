@@ -29,7 +29,7 @@ class AppController extends AbstractController
             // Crear un nuevo usuario con las especificaciones
             $nuevoUsuario = new User();
             $nuevoUsuario->setName('usuario_eliminado');
-            $nuevoUsuario->setName('usuario_eliminado@keprecios.com');
+            $nuevoUsuario->setEmail('usuario_eliminado@keprecios.com');
             $nuevoUsuario->setRoles(['ROLE_USER']);
             $nuevoUsuario->setEstado('dummy');
             $nuevoUsuario->setPassword('usuario_eliminado');
@@ -89,7 +89,7 @@ class AppController extends AbstractController
                             $suspension = new Suspension();
                             $hoy = new \DateTime();
                             $fechaVto = clone $hoy;
-                            $fechaVto->modify('+14 days');
+                            $fechaVto->modify('+3 days');
                             $suspension->setFechaCreacion($hoy);
                             $suspension->setFechaVto($fechaVto); 
                             $suspension->setDescripción('por colaboración mala en puntaje menor a -4 puntos');
