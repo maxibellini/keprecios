@@ -92,7 +92,7 @@ class AppController extends AbstractController
                             $fechaVto->modify('+3 days');
                             $suspension->setFechaCreacion($hoy);
                             $suspension->setFechaVto($fechaVto); 
-                            $suspension->setDescripción('por colaboración mala en puntaje menor a -4 puntos');
+                            $suspension->setDescripcion('por colaboración mala en puntaje menor a -4 puntos');
                             $suspension->setEstado('ACTIVA');
                             $suspension->setUser($userOferta);
                             $userOferta->addSuspension($suspension);
