@@ -189,6 +189,12 @@ class AppController extends AbstractController
             if ($suspension->getFechaVto() != null) {
                if( $suspension->getFechaVto() <= $fechaHoy){
                     $suspension->setEstado('CUMPLIDA');
+                    if($suspension->getUser() != null){
+                        $user=$suspension->getUser();
+                        $user->setEstado('ACTIVO');
+                        $em->persist($user);  
+                        $suspension->setUser($user);
+                    }
                }
             }    
             $em->persist($suspension);        
