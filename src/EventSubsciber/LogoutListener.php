@@ -26,7 +26,7 @@ class LogoutListener implements EventSubscriberInterface
                     // Verificar si la suspensión está activa
                     if ($suspension->getEstado() === 'ACTIVA') {
                         // Obtener la fecha de creación
-                        $fechaCreacion = $suspension->getFechaCreacion();
+                        $fechaCreacion = $suspension->getFechaVto();
 
                         // Formatear la fecha (si es necesario)
                         if ($fechaCreacion instanceof \DateTimeInterface) {
