@@ -7,6 +7,7 @@ use App\Entity\Oferta;
 use App\Entity\Colaboracion;
 use App\Entity\Confianza;
 use App\Entity\Producto;
+use App\Entity\Suspension;
 use App\Form\OfertaType;
 use App\Form\ProductoType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

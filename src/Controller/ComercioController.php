@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Entity\Comercio;
 use App\Entity\Colaboracion;
 use App\Entity\Confianza;
+use App\Entity\Suspension;
 use App\Form\ComercioType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
