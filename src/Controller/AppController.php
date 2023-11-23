@@ -365,7 +365,17 @@ class AppController extends AbstractController
             'controller_name' => 'Lector KePrecios'
         ]);
     }
-
+    /**
+     * @Route("/contacto", name="app_contacto")
+     */
+    public function contacto()
+    {
+      $em = $this->getDoctrine()->getManager();
+        
+        return $this->render('app/contacto.html.twig', [
+            'controller_name' => 'Contacto KePrecios'
+        ]);
+    }
     /**
      * @param int    $codigo
      * @Route("/apiml/{codigo}", name="apiml_test")

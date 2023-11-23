@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}KePrecios{% endblock %}
+
+
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code {  padding: 2px 6px; }
+    .colorboton {
+      background-color: white; color: #FF9071;  
+       border: 1px solid #FF9071;
+    }
+    .colorboton:hover , .colorboton:focus, .colorboton:active , coloboton.active {
+        background-color: #FF9071;
+        border: 1px solid #FF9071;
+        color: white;
+    }
+    .img-responsive {
+        width: 100%;
+        height: auto;
+    }
+    .card-worker {
+        margin: 10px;
+        background-color: #EBBDCD;
+        border-radius: 10px;
+        font-family: Londrina Solid;
+        color: #585C5C;
+        transition: transform 0.5s ease;
+    }
+    .card-worker:hover {
+        transform: scale(1.05);
+        box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.25);
+    }
+    .card-worker-title {
+        margin-top: 5px;
+        font-size: 120%;
+        line-height: 1.0;
+        
+    }
+    .card-worker-subtitle {
+        font-size: 70%; 
+        line-height: 1.0;
+    }
+    .link-contacto:hover{
+        text-decoration: underline;
+    }
+</style>
+
+<div class="example-wrapper" style="background-color: rgb(255, 0, 0,0.0)">
+{% for flash_message in app.session.flashbag.get('exito') %}
+    <div class="alert alert-success" style="; border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000; ">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+{% for flash_message in app.session.flashbag.get('fracaso') %}
+    <div class="alert alert-danger" style="background-color: rgba(255, 0, 0 ,0.75); border-radius: 5px 5px 5px 5px; -moz-border-radius: 5px 5px 5px 5px; -webkit-border-radius: 5px 5px 5px 5px; border: 0px solid #000000;">
+        {{ flash_message }}
+    </div>
+{% endfor %}
+<a href="javascript:history.back()" style="float: right"> Volver Atrás</a>
+      <br>
+         <div class="row" >      
+          <div class="mbr-section-head mb-4">
+              <h3 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
+                  <strong>Sobre Nosotros</strong></h3>
+              <h5 class="mbr-section-subtitle mbr-fonts-style mb-0 mt-2 display-7" style="color:grey; font-size: 100%; text-align: justify;">Ke-precios es un proyecto que nace para ayudar a combatir la actual situación económica del país. La idea principal parte de contar con una aplicación web colaborativa, de manera que los usuarios de una ciudad puedan publicar diferentes promociones/ofertas de productos; informando al resto de los usuarios de la aplicación su importe y la ubicación del comercio.
+              </h5>   
+              <h5 class="mbr-section-subtitle mbr-fonts-style mb-0 mt-2 display-5" style="color:black">Integrantes del proyecto:
+              </h5> 
+              <center>
+              
+                <div class="row mx-auto">
+                    <div class="col-sm-2 col-5 card-worker" style="">
+                        <div class="card-worker-title "><br><b>AGUILAR</b></div>                        
+                        <div class="card-worker-subtitle ">Anibal Santiago</div>
+                        <img class="img-responsive" src="assets/images/santi.png">
+                    </div>
+                    <div class="col-sm-2 col-5 card-worker" style="">
+                        <div class="card-worker-title "><br><b>BELLINI</b></div>                        
+                        <div class="card-worker-subtitle ">Maximiliano Alain</div>
+                        <img class="img-responsive" src="assets/images/maxi.png">
+                    </div>
+                    <div class="col-sm-2 col-5 card-worker" style="">
+                        <div class="card-worker-title "><b>BENITEZ PERESSI</b></div>                        
+                        <div class="card-worker-subtitle ">Gonzalo Facundo</div>
+                        <img class="img-responsive" src="assets/images/gonza.png">
+                    </div>
+                    <div class="col-sm-2 col-5 card-worker" style="">
+                        <div class="card-worker-title "><br><b>MONZÓN</b></div>                        
+                        <div class="card-worker-subtitle ">Leticia</div>
+                        <img class="img-responsive" src="assets/images/leti.png">
+                    </div>
+                    <div class="col-sm-2 col-5 card-worker" style="">
+                        <div class="card-worker-title "><b>SANCHEZ NEGRETTE</b></div>                        
+                        <div class="card-worker-subtitle ">Luis Antonio</div>
+                        <img class="img-responsive" src="assets/images/luis.png">
+                    </div>
+                </div>
+          
+              </center>
+              <br>
+              <br>
+              <br>
+              <br>
+              <h3 id="contacto-section" class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
+                  <strong>Contacto</strong></h3>
+              <h5 class="mbr-section-subtitle mbr-fonts-style mb-0 mt-2 display-7" style="color:grey; font-size: 100%; text-align: justify;">
+                Para comunicarte con keprecios podes escribir a los siguientes correos electrónicos:
+              </h5>   
+                <table style=" margin-top: 10px;">
+                    <tbody>
+                        <tr>
+                            <td><img style="width: 25px" src="assets/images/icon-email.png"></td>
+                            <td><a href="mailto:santi.aguilar.3095@gmail.com" class="link-contacto">santi.aguilar.3095@gmail.com</a></td>
+                        </tr>
+                        <tr>
+                            <td><img style="width: 25px" src="assets/images/icon-email.png"></td>
+                            <td><a href="mailto:maxi.a.bellini@gmail.com" class="link-contacto">maxi.a.bellini@gmail.com</a></td>
+                        </tr>
+                        <tr>
+                            <td><img style="width: 25px" src="assets/images/icon-email.png"></td>
+                            <td><a href="mailto:gonzaloperessi@gmail.com" class="link-contacto">gonzaloperessi@gmail.com</a></td>
+                        </tr>
+                        <tr>
+                            <td><img style="width: 25px" src="assets/images/icon-email.png"></td>
+                            <td><a href="mailto:letimonzon13@gmail.com" class="link-contacto">letimonzon13@gmail.com</a></td>
+                        </tr>
+                        <tr>
+                            <td><img style="width: 25px" src="assets/images/icon-email.png"></td>
+                            <td><a href="mailto:luis_sanches366@hotmail.com" class="link-contacto">luis_sanches366@hotmail.com</a></td>
+                        </tr>                    
+                    </tbody>
+                </table>
+                
+            
+          </div>
+          <div class="row" >
+            <br>
+            <br>
+          </div>
+            
+         </div>
+            
+            
+            
+            
+            
+        </div> 
+
+
+    <br>
+
+{% endblock %}
