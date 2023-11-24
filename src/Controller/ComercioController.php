@@ -370,90 +370,96 @@ class ComercioController extends AbstractController
         //si entra en desconfianza
         if($sumatoriaPuntajes < -4){
             $comercio->setEstadoComercio('BAJA');
-            //penalizar al usuario que subió
-            $usuOColab= $userComercio->getPuntosColab();
-            $usuORep=  $userComercio->getPuntosRep(); 
-            if ($usuOColab == null){ $usuOColab= 0; }
-            if ($usuORep == null){ $usuORep= 0; }
-            $userComercio->setPuntosColab($usuOColab-10); 
-            $userComercio->setPuntosRep($usuORep-10); 
-            //----------agregar colaboración mala --------
-            $colab = new Colaboracion();
-            $colab->setPuntaje(-10); // Establece el puntaje deseado
-            $colab->setTipo('mala');
-            $colab->setFecha(new \DateTime());
-            $colab->setDescripcion('-10 por solicitud de comercio en desconfianza'); 
-            $colab->setTipoVoto(0);
-            $colab->setComercio($comercio);
-            $em->persist($colab);
-            $userComercio->addColaboracion($colab);
-                    if($userComercio->getPuntosRep() < -4 ){
-                        if($userComercio->getCantFaltas() == null){
-                            $userComercio->setCantFaltas(1);
+            if($userComercio != null ){ 
+                if($userComercio->getName() != 'usuario_eliminado'){  
+                    //penalizar al usuario que subió
+                    $usuOColab= $userComercio->getPuntosColab();
+                    $usuORep=  $userComercio->getPuntosRep(); 
+                    if ($usuOColab == null){ $usuOColab= 0; }
+                    if ($usuORep == null){ $usuORep= 0; }
+                    $userComercio->setPuntosColab($usuOColab-10); 
+                    $userComercio->setPuntosRep($usuORep-10); 
+                    //----------agregar colaboración mala --------
+                    $colab = new Colaboracion();
+                    $colab->setPuntaje(-10); // Establece el puntaje deseado
+                    $colab->setTipo('mala');
+                    $colab->setFecha(new \DateTime());
+                    $colab->setDescripcion('-10 por solicitud de comercio en desconfianza'); 
+                    $colab->setTipoVoto(0);
+                    $colab->setComercio($comercio);
+                    $em->persist($colab);
+                    $userComercio->addColaboracion($colab); 
+                            if($userComercio->getPuntosRep() < -4 ){
+                                if($userComercio->getCantFaltas() == null){
+                                    $userComercio->setCantFaltas(0);
+                                }
+                                $catnFaltasUser = $userComercio->getCantFaltas()+1;
+                                $userComercio->setCantFaltas($catnFaltasUser);
+                                $userComercio->setEstado('SUSPENDIDO');
+                                $suspension = new Suspension();
+                                $hoy = new \DateTime();
+                                $fechaVto = clone $hoy;
+                                $fechaVto->modify('+3 days');
+                                $suspension->setFechaCreacion($hoy);
+                                $suspension->setFechaVto($fechaVto); 
+                                $suspension->setDescripcion('por colaboración mala en puntaje menor a -4 puntos');
+                                $suspension->setEstado('ACTIVA');
+                                $suspension->setUser($userComercio);
+                                $userComercio->addSuspension($suspension);
+                                $em->persist($suspension);
+
+                            } 
                         }
-                        $catnFaltasUser = $userComercio->getCantFaltas()+1;
-                        $userComercio->setCantFaltas($catnFaltasUser);
-                        $userComercio->setEstado('SUSPENDIDO');
-                        $suspension = new Suspension();
-                        $hoy = new \DateTime();
-                        $fechaVto = clone $hoy;
-                        $fechaVto->modify('+3 days');
-                        $suspension->setFechaCreacion($hoy);
-                        $suspension->setFechaVto($fechaVto); 
-                        $suspension->setDescripcion('por colaboración mala en puntaje menor a -4 puntos');
-                        $suspension->setEstado('ACTIVA');
-                        $suspension->setUser($userComercio);
-                        $userComercio->addSuspension($suspension);
-                        $em->persist($suspension);
-
-                    } 
+                    }
+               
+            
             $em->persist($userComercio);
-            if($userComercio->getCantFaltas() > 2){
-                //eliminar usuario
-                $usuarioDumy = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
-                if (!$usuarioDumy) {
-                    // Crear un nuevo usuario con las especificaciones
-                    $usuarioDumy = new User();
-                    $usuarioDumy->setName('usuario_eliminado');
-                    $usuarioDumy->setEmail('usuario_eliminado@keprecios.com');
-                    $usuarioDumy->setRoles(['ROLE_USER']);
-                    $usuarioDumy->setEstado('dummy');
-                    $usuarioDumy->setPassword('usuario_eliminado');
-                    // Guardar el nuevo usuario en la base de datos
-                    $em->persist($usuarioDumy);
-                    $em->flush();
-                }
+            if($userComercio != null ){ 
+                if($userComercio->getName() != 'usuario_eliminado'){  
+                    if($userComercio->getCantFaltas() > 2){
+                        //eliminar usuario
+                        $usuarioDumy = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
+                        if (!$usuarioDumy) {
+                            // Crear un nuevo usuario con las especificaciones
+                            $usuarioDumy = new User();
+                            $usuarioDumy->setName('usuario_eliminado');
+                            $usuarioDumy->setEmail('usuario_eliminado@keprecios.com');
+                            $usuarioDumy->setRoles(['ROLE_USER']);
+                            $usuarioDumy->setEstado('dummy');
+                            $usuarioDumy->setPassword('usuario_eliminado');
+                            // Guardar el nuevo usuario en la base de datos
+                            $em->persist($usuarioDumy);
+                            $em->flush();
+                        }
 
-                //tratar asociados
-                    $productos = $userComercio->getProductos();
-                    foreach ($productos as $producto) {
-                        $producto->setUser($usuarioDumy);
+                        //tratar asociados
+                            $productos = $userComercio->getProductos();
+                            foreach ($productos as $producto) {
+                                $producto->setUser($usuarioDumy);
+                            }
+                            $comercios = $userComercio->getComercio();
+                            foreach ($comercios as $comercio) {
+                                $comercio->setUser($usuarioDumy);
+                            }
+                            $ofertas = $userComercio->getOfertas();
+                            foreach ($ofertas as $oferta) {
+                                $oferta->setUser($usuarioDumy);
+                            }
+                            $colaboracions = $userComercio->getColaboracions();
+                            foreach ($colaboracions as $colaboracion) {
+                                $colaboracion->setUser($usuarioDumy);
+                            }
+                            $vouchers = $userComercio->getVouchers();
+                            foreach ($vouchers as $voucher) {
+                                $voucher->setResponsable($usuarioDumy);
+                            }
+                            $cupons = $userComercio->getCupones();
+                            foreach ($cupons as $cupon) {
+                                $cupon->setUser($usuarioDumy);
+                            }
+                        $em->remove($userComercio);
                     }
-                    $comercios = $userComercio->getComercio();
-                    foreach ($comercios as $comercio) {
-                        $comercio->setUser($usuarioDumy);
-                    }
-                    $ofertas = $userComercio->getOfertas();
-                    foreach ($ofertas as $oferta) {
-                        $oferta->setUser($usuarioDumy);
-                    }
-                    $colaboracions = $userComercio->getColaboracions();
-                    foreach ($colaboracions as $colaboracion) {
-                        $colaboracion->setUser($usuarioDumy);
-                    }
-                    $vouchers = $userComercio->getVouchers();
-                    foreach ($vouchers as $voucher) {
-                        $voucher->setResponsable($usuarioDumy);
-                    }
-                    $cupons = $userComercio->getCupones();
-                    foreach ($cupons as $cupon) {
-                        $cupon->setUser($usuarioDumy);
-                    }
-                    $suspensions = $userComercio->getSuspensions();
-                    foreach ($suspensions as $suspension) {
-                        $suspension->setUser($usuarioDumy);
-                    }
-                $em->remove($userComercio);
+                }
             }
             $em->persist($usuario);
             $em->persist($comercio);
@@ -466,26 +472,30 @@ class ComercioController extends AbstractController
         //si llega a "Muy alta" se da de alta el comercio
         if($sumatoriaPuntajes > 4){
             $comercio->setEstadoComercio('ACTIVO');
+            if($userComercio != null ){ 
+                if($userComercio->getName() != 'usuario_eliminado'){  
+                    //premiar?
+                    $usuOColab= $userComercio->getPuntosColab();
+                    $usuORep=  $userComercio->getPuntosRep(); 
+                    if ($usuOColab == null){ $usuOColab= 0; }
+                    if ($usuORep == null){ $usuORep= 0; }
+                    $userComercio->setPuntosColab($usuOColab+15); 
+                    $userComercio->setPuntosRep($usuORep+15); 
+                    $colabok = new Colaboracion();
+                    $colabok->setPuntaje(+15); // Establece el puntaje deseado
+                    $colabok->setTipo('premio');
+                    $colabok->setFecha(new \DateTime());
+                    $colabok->setDescripcion('+15 por lograr alta de comercio'); 
+                    $colabok->setTipoVoto(0); 
+                    $colabok->setComercio($comercio);
+                    $em->persist($colabok);
+                    $userComercio->addColaboracion($colabok); 
+                    $em->persist($userComercio);
+                    $em->persist($usuario);
+                    $em->flush();
 
-            //premiar?
-            $usuOColab= $userComercio->getPuntosColab();
-            $usuORep=  $userComercio->getPuntosRep(); 
-            if ($usuOColab == null){ $usuOColab= 0; }
-            if ($usuORep == null){ $usuORep= 0; }
-            $userComercio->setPuntosColab($usuOColab+15); 
-            $userComercio->setPuntosRep($usuORep+15); 
-            $colabok = new Colaboracion();
-            $colabok->setPuntaje(+15); // Establece el puntaje deseado
-            $colabok->setTipo('premio');
-            $colabok->setFecha(new \DateTime());
-            $colabok->setDescripcion('+15 por lograr alta de comercio'); 
-            $colabok->setTipoVoto(0); 
-            $colabok->setComercio($comercio);
-            $em->persist($colabok);
-            $userComercio->addColaboracion($colabok); 
-            $em->persist($userComercio);
-            $em->persist($usuario);
-            $em->flush();
+                }
+            }
             $this->addFlash('exito','¡El comercio que votaste ha alcanzado la confianza necesaria y se ha dado de alta de manera exitosa!'); 
         }
         $em->persist($comercio);

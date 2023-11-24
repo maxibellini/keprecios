@@ -37,7 +37,7 @@
           <h4 class="display-5 card-header" align="center">{{oferta.producto.descripcionProducto}}</h4>  
           <br>
           <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-4">      
                 {% if oferta.producto.image != null %}
                   {% set foto = 'uploads/images/productos/'~ oferta.producto.image %}
                   {% set foto2 = absolute_url(asset(foto)) %}
@@ -67,7 +67,8 @@
                         </td>
  
                         <td style="max-width: 25px;">  
-                           <span>                
+                           <span>   
+
                             {% if oferta.user.puntosRep != null %} 
                            
                                 {% if oferta.user.puntosRep < 0  %}
@@ -81,6 +82,7 @@
                                 {% elseif oferta.user.puntosRep == null %}
                                   <img src="/assets/images/colaboracion/medalla_bronce.png" alt="imagen nivel" class="" style="width: 85%;">
                                 {% endif %}
+                            {%endif%}
                             </span>
                         </td>
                        <td style="">
@@ -90,7 +92,7 @@
                     </tbody>
                 </table> 
 
-                {%endif%}
+               
                 </div>
                <div class=" ">Estado: {% if oferta.estado == '1' %}
                       <span style="color: green">ACTIVA</span>

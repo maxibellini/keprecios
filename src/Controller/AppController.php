@@ -31,11 +31,16 @@ class AppController extends AbstractController
             $nuevoUsuario->setName('usuario_eliminado');
             $nuevoUsuario->setEmail('usuario_eliminado@keprecios.com');
             $nuevoUsuario->setRoles(['ROLE_USER']);
-            $nuevoUsuario->setEstado('dummy');
+            $nuevoUsuario->setEstado('ACTIVO');
             $nuevoUsuario->setPassword('usuario_eliminado');
             // Guardar el nuevo usuario en la base de datos
             $em->persist($nuevoUsuario);
             $em->flush();
+        }else{
+            if($usuarioExistente->getEstado()=='dummy'){
+                $usuarioExistente->setEstado('ACTIVO');
+                $em->flush();
+            }
         }
         $ofertas = $em->getRepository(Oferta::class)->findAll();
         $cupones = $em->getRepository(Cupon::class)->findBy(['estado' => 'SIN CANJEAR']);
@@ -60,116 +65,116 @@ class AppController extends AbstractController
                 //aca tratar premios/penalización si corresponde, si terminó en confianza se premia, sino si terminó en desconfianza se penaliza, hay que crearle confianza a la oferta si no la tenía
                 $confianza= $oferta->getConfianza();
                 $userOferta = $oferta->getUser();
-                if ($confianza != null) {
-                    $nombreConfianza = $confianza->getNombre();
-                    if ($nombreConfianza == 'desconfianza') {
-                        //tratar penalización
-                        $usuOColab= $userOferta->getPuntosColab();
-                        $usuORep=  $userOferta->getPuntosRep(); 
-                        if ($usuOColab == null){ $usuOColab= 0; }
-                        if ($usuORep == null){ $usuORep= 0; }
-                        $userOferta->setPuntosColab($usuOColab-2); 
-                        $userOferta->setPuntosRep($usuORep-2); 
-                        //----------agregar colaboración mala --------
-                        $colab = new Colaboracion();
-                        $colab->setPuntaje(-2); // Establece el puntaje deseado
-                        $colab->setTipo('mala');
-                        $colab->setFecha(new \DateTime());
-                        $colab->setDescripcion('-2 puntos por oferta finalizada en confianza Muy Baja'); 
-                        $colab->setTipoVoto(0); 
-                        $em->persist($colab);
-                        $userOferta->addColaboracion($colab);
-                        if($userOferta->getPuntosRep() < -4 ){
-                            if($userOferta->getCantFaltas() == null){
-                                $userOferta->setCantFaltas(1);
-                            }
-                            $catnFaltasUser = $userOferta->getCantFaltas()+1;
-                            $userOferta->setCantFaltas($catnFaltasUser);
-                            $userOferta->setEstado('SUSPENDIDO');
-                            $suspension = new Suspension();
-                            $hoy = new \DateTime();
-                            $fechaVto = clone $hoy;
-                            $fechaVto->modify('+3 days');
-                            $suspension->setFechaCreacion($hoy);
-                            $suspension->setFechaVto($fechaVto); 
-                            $suspension->setDescripcion('por colaboración mala en puntaje menor a -4 puntos');
-                            $suspension->setEstado('ACTIVA');
-                            $suspension->setUser($userOferta);
-                            $userOferta->addSuspension($suspension);
-                            $em->persist($suspension);
+                if($userOferta != null ){ 
+                    if($userOferta->getName() != 'usuario_eliminado'){   
+                        if ($confianza != null) {
+                            $nombreConfianza = $confianza->getNombre();
+                            if ($nombreConfianza == 'desconfianza') {
+                                //tratar penalización
+                                $usuOColab= $userOferta->getPuntosColab();
+                                $usuORep=  $userOferta->getPuntosRep(); 
+                                if ($usuOColab == null){ $usuOColab= 0; }
+                                if ($usuORep == null){ $usuORep= 0; }
+                                $userOferta->setPuntosColab($usuOColab-2); 
+                                $userOferta->setPuntosRep($usuORep-2); 
+                                //----------agregar colaboración mala --------
+                                $colab = new Colaboracion();
+                                $colab->setPuntaje(-2); // Establece el puntaje deseado
+                                $colab->setTipo('mala');
+                                $colab->setFecha(new \DateTime());
+                                $colab->setDescripcion('-2 puntos por oferta finalizada en confianza Muy Baja'); 
+                                $colab->setTipoVoto(0); 
+                                $em->persist($colab);
+                                $userOferta->addColaboracion($colab);
+                                if($userOferta->getPuntosRep() < -4 ){
+                                    if($userOferta->getCantFaltas() == null){
+                                        $userOferta->setCantFaltas(0);
+                                    }
+                                    $catnFaltasUser = $userOferta->getCantFaltas()+1;
+                                    $userOferta->setCantFaltas($catnFaltasUser);
+                                    $userOferta->setEstado('SUSPENDIDO');
+                                    $suspension = new Suspension();
+                                    $hoy = new \DateTime();
+                                    $fechaVto = clone $hoy;
+                                    $fechaVto->modify('+3 days');
+                                    $suspension->setFechaCreacion($hoy);
+                                    $suspension->setFechaVto($fechaVto); 
+                                    $suspension->setDescripcion('por colaboración mala en puntaje menor a -4 puntos');
+                                    $suspension->setEstado('ACTIVA');
+                                    $suspension->setUser($userOferta);
+                                    $userOferta->addSuspension($suspension);
+                                    $em->persist($suspension);
 
-                        } 
-                        $em->persist($userOferta);
-                        if($userOferta->getCantFaltas() > 2){
-                            //eliminar usuario
-                            $usuarioDumy = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
-                            if (!$usuarioDumy) {
-                                // Crear un nuevo usuario con las especificaciones
-                                $usuarioDumy = new User();
-                                $usuarioDumy->setName('usuario_eliminado');
-                                $usuarioDumy->setName('usuario_eliminado@keprecios.com');
-                                $usuarioDumy->setRoles(['ROLE_USER']);
-                                $usuarioDumy->setEstado('dummy');
-                                $usuarioDumy->setPassword('usuario_eliminado');
-                                // Guardar el nuevo usuario en la base de datos
-                                $em->persist($usuarioDumy);
-                                $em->flush();
-                            }
+                                } 
+                                $em->persist($userOferta);
+                                if($userOferta->getCantFaltas() > 2){
+                                    //eliminar usuario
+                                    $usuarioDumy = $em->getRepository(User::class)->findOneBy(['name' => 'usuario_eliminado']);
+                                    if (!$usuarioDumy) {
+                                        // Crear un nuevo usuario con las especificaciones
+                                        $usuarioDumy = new User();
+                                        $usuarioDumy->setName('usuario_eliminado');
+                                        $usuarioDumy->setName('usuario_eliminado@keprecios.com');
+                                        $usuarioDumy->setRoles(['ROLE_USER']);
+                                        $usuarioDumy->setEstado('dummy');
+                                        $usuarioDumy->setPassword('usuario_eliminado');
+                                        // Guardar el nuevo usuario en la base de datos
+                                        $em->persist($usuarioDumy);
+                                        $em->flush();
+                                    }
 
-                            //tratar asociados
-                                $productos = $userOferta->getProductos();
-                                foreach ($productos as $producto) {
-                                    $producto->setUser($usuarioDumy);
+                                    //tratar asociados
+                                        $productos = $userOferta->getProductos();
+                                        foreach ($productos as $producto) {
+                                            $producto->setUser($usuarioDumy);
+                                        }
+                                        $comercios = $userOferta->getComercio();
+                                        foreach ($comercios as $comercio) {
+                                            $comercio->setUser($usuarioDumy);
+                                        }
+                                        $ofertas = $userOferta->getOfertas();
+                                        foreach ($ofertas as $oferta) {
+                                            $oferta->setUser($usuarioDumy);
+                                        }
+                                        $colaboracions = $userOferta->getColaboracions();
+                                        foreach ($colaboracions as $colaboracion) {
+                                            $colaboracion->setUser($usuarioDumy);
+                                        }
+                                        $vouchers = $userOferta->getVouchers();
+                                        foreach ($vouchers as $voucher) {
+                                            $voucher->setResponsable($usuarioDumy);
+                                        }
+                                        $cupons = $userOferta->getCupones();
+                                        foreach ($cupons as $cupon) {
+                                            $cupon->setUser($usuarioDumy);
+                                        }
+                                    $em->remove($userOferta);
                                 }
-                                $comercios = $userOferta->getComercio();
-                                foreach ($comercios as $comercio) {
-                                    $comercio->setUser($usuarioDumy);
-                                }
-                                $ofertas = $userOferta->getOfertas();
-                                foreach ($ofertas as $oferta) {
-                                    $oferta->setUser($usuarioDumy);
-                                }
-                                $colaboracions = $userOferta->getColaboracions();
-                                foreach ($colaboracions as $colaboracion) {
-                                    $colaboracion->setUser($usuarioDumy);
-                                }
-                                $vouchers = $userOferta->getVouchers();
-                                foreach ($vouchers as $voucher) {
-                                    $voucher->setResponsable($usuarioDumy);
-                                }
-                                $cupons = $userOferta->getCupones();
-                                foreach ($cupons as $cupon) {
-                                    $cupon->setUser($usuarioDumy);
-                                }
-                                $suspensions = $userOferta->getSuspensions();
-                                foreach ($suspensions as $suspension) {
-                                    $suspension->setUser($usuarioDumy);
-                                }
-                            $em->remove($userOferta);
+                                $em->persist($oferta);
+                                $em->flush(); 
+                                
+                            } elseif ($nombreConfianza == 'confiable') {
+                                //tratar premio
+                                $usuOColab= $userOferta->getPuntosColab();
+                                $usuORep=  $userOferta->getPuntosRep(); 
+                                if ($usuOColab == null){ $usuOColab= 0; }
+                                if ($usuORep == null){ $usuORep= 0; }
+                                $userOferta->setPuntosColab($usuOColab+2); 
+                                $userOferta->setPuntosRep($usuORep+2); 
+                                //----------agregar colaboración mala --------
+                                $colab = new Colaboracion();
+                                $colab->setPuntaje(+2); // Establece el puntaje deseado
+                                $colab->setTipo('premio');
+                                $colab->setFecha(new \DateTime());
+                                $colab->setDescripcion('+2 puntos por oferta finalizada en confianza Muy Alta'); 
+                                $colab->setTipoVoto(0); 
+                                $em->persist($colab);
+                                $userOferta->addColaboracion($colab); 
+                                $em->persist($userOferta);
+                                $em->persist($oferta);
+                                
+                            }
                         }
-                        $em->persist($oferta);
-                        $em->flush(); 
-                        
-                    } elseif ($nombreConfianza == 'confiable') {
-                        //tratar premio
-                        $usuOColab= $userOferta->getPuntosColab();
-                        $usuORep=  $userOferta->getPuntosRep(); 
-                        if ($usuOColab == null){ $usuOColab= 0; }
-                        if ($usuORep == null){ $usuORep= 0; }
-                        $userOferta->setPuntosColab($usuOColab+2); 
-                        $userOferta->setPuntosRep($usuORep+2); 
-                        //----------agregar colaboración mala --------
-                        $colab = new Colaboracion();
-                        $colab->setPuntaje(+2); // Establece el puntaje deseado
-                        $colab->setTipo('premio');
-                        $colab->setFecha(new \DateTime());
-                        $colab->setDescripcion('+2 puntos por oferta finalizada en confianza Muy Alta'); 
-                        $colab->setTipoVoto(0); 
-                        $em->persist($colab);
-                        $userOferta->addColaboracion($colab); 
-                        $em->persist($userOferta);
-                        $em->persist($oferta);
-                        
                     }
                 }
 

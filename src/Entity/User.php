@@ -192,7 +192,7 @@ class User implements UserInterface , \Serializable
     private $cupones;
 
     /**
-     * @ORM\OneToMany(targetEntity=Suspension::class, mappedBy="user",cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=Suspension::class, mappedBy="user",cascade={"persist", "remove"})
      */
     private $suspensions;
 

@@ -131,10 +131,6 @@ class UserCrudController extends AbstractCrudController
             foreach ($cupons as $cupon) {
                 $cupon->setUser($usuarioDumy);
             }
-            $suspensions = $user->getSuspensions();
-            foreach ($suspensions as $suspension) {
-                $suspension->setUser($usuarioDumy);
-            }
             $entityInstance=$user;
             $em->flush();
         // Llama al método de eliminación predeterminado
