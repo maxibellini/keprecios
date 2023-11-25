@@ -189,6 +189,7 @@ class ListaCompraController extends AbstractController
           ->setParameter('lista',$lista->getId())
           ->andWhere("lc.id = :lista")
           ->andWhere("o.estado = 1")
+          ->andWhere("p.estadoProducto = 1")
           ->groupBy('c.nombreComercio')
           ->setParameter('cantp',count($lineas)-1)
           ->having('COUNT(c.nombreComercio)>:cantp')
